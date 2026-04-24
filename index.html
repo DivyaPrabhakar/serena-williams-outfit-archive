@@ -29,10 +29,16 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1.25re
 .viewer-sort-label{font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted)}
 .count-badge{font-size:0.75rem;color:var(--text-muted)}
 
-.grid{display:grid;gap:1px;padding:0 2rem 3rem;background:#1a1a1a}
-.grid.layout-grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
-.grid.layout-wide{grid-template-columns:repeat(auto-fill,minmax(340px,1fr))}
+/* YEAR ROWS */
+.year-section{margin-bottom:2.5rem;padding:0 2rem}
+.year-heading{display:flex;align-items:baseline;gap:1rem;margin-bottom:1rem;padding-bottom:0.6rem;border-bottom:1px solid #2a2a2a}
+.year-heading h2{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:900;color:var(--gold)}
+.year-heading span{font-size:0.75rem;color:var(--text-muted);letter-spacing:0.08em;text-transform:uppercase}
+.year-grid{display:grid;gap:1px;background:#1a1a1a}
+.year-grid.layout-grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+.year-grid.layout-wide{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
 
+/* Real cards */
 .card{background:var(--dark);cursor:pointer;position:relative;overflow:hidden;aspect-ratio:3/4;transition:transform 0.3s}
 .card:hover{transform:scale(0.98)}
 .card img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.4s}
@@ -42,9 +48,13 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1.25re
 .card-year{font-size:0.7rem;color:var(--gold);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:0.2rem}
 .card-label{font-family:'Playfair Display',serif;font-size:0.95rem;font-weight:700;line-height:1.2}
 .card-color-dot{position:absolute;top:0.75rem;right:0.75rem;width:10px;height:10px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.4)}
-.group-divider{grid-column:1/-1;padding:1rem 0 0.5rem;border-top:1px solid #2a2a2a}
-.group-divider h3{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--gold-light)}
-.empty-state{grid-column:1/-1;text-align:center;padding:4rem 2rem;color:var(--text-muted)}
+
+/* Empty placeholder cards */
+.card-empty{background:var(--dark);position:relative;aspect-ratio:3/4;border:1.5px dashed #2a2a2a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5rem}
+.card-empty-icon{font-size:1.2rem;color:#2e2e2e}
+.card-empty-label{font-size:0.68rem;color:#3a3a3a;letter-spacing:0.08em;text-transform:uppercase;text-align:center;padding:0 0.75rem;line-height:1.4}
+
+.empty-state{text-align:center;padding:4rem 2rem;color:var(--text-muted)}
 .empty-state h3{font-family:'Playfair Display',serif;font-size:1.5rem;margin-bottom:0.5rem;color:var(--text)}
 
 /* LIGHTBOX */
@@ -78,10 +88,17 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1.25re
 
 .field-group{margin-bottom:1rem}
 .field-group label{display:block;font-size:0.75rem;color:var(--text-muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.4rem}
-.field-group input,.field-group select,.field-group textarea{width:100%;background:var(--dark3);border:1px solid #333;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.9rem;padding:0.6rem 0.75rem;outline:none;transition:border-color 0.2s}
-.field-group input:focus,.field-group select:focus,.field-group textarea:focus{border-color:var(--gold)}
-.field-group select option{background:var(--dark3)}
+.field-group input,.field-group textarea{width:100%;background:var(--dark3);border:1px solid #333;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.9rem;padding:0.6rem 0.75rem;outline:none;transition:border-color 0.2s}
+.field-group input:focus,.field-group textarea:focus{border-color:var(--gold)}
 .field-group textarea{resize:vertical;min-height:80px}
+
+/* Tournament button picker */
+.tournament-buttons{display:flex;flex-wrap:wrap;gap:0.4rem}
+.t-btn{background:none;border:1px solid #333;color:var(--text-muted);font-family:'DM Sans',sans-serif;font-size:0.8rem;padding:0.4rem 0.85rem;cursor:pointer;transition:all 0.2s;letter-spacing:0.03em;white-space:nowrap}
+.t-btn:hover{border-color:var(--gold);color:var(--gold)}
+.t-btn.active{border-color:var(--gold);background:rgba(201,168,76,0.12);color:var(--gold)}
+.other-input{margin-top:0.6rem;display:none}
+.other-input.visible{display:block}
 
 .upload-zone{border:1.5px dashed #333;padding:2rem;text-align:center;cursor:pointer;transition:border-color 0.2s}
 .upload-zone:hover{border-color:var(--gold)}
@@ -153,7 +170,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1.25re
   .admin-grid{grid-template-columns:1fr}
   .lb-inner{grid-template-columns:1fr}
   .lb-img{max-height:50vh}
-  .grid.layout-grid,.grid.layout-wide{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
+  .year-grid.layout-grid,.year-grid.layout-wide{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
 }
 </style>
 </head>
@@ -174,10 +191,10 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1.25re
     <p>A visual archive of Serena Williams on court</p>
   </div>
   <div class="viewer-meta-bar">
-    <span class="viewer-sort-label" id="viewer-sort-label"></span>
+    <span class="viewer-sort-label">Sorted chronologically by year</span>
     <span class="count-badge" id="count-badge"></span>
   </div>
-  <div class="grid layout-grid" id="gallery-grid"></div>
+  <div id="gallery-root"></div>
 </div>
 
 <!-- ADMIN -->
@@ -203,6 +220,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1.25re
       <div>
         <div class="panel">
           <h3>Add Outfit</h3>
+
           <div class="field-group">
             <label>Image</label>
             <div class="upload-zone" onclick="document.getElementById('file-input').click()">
@@ -218,34 +236,24 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1.25re
             <img id="preview-img" class="preview-img" alt="Preview">
           </div>
 
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
-            <div class="field-group">
-              <label>Year</label>
-              <input type="number" id="f-year" placeholder="1999" min="1990" max="2030">
-            </div>
-            <div class="field-group">
-              <label>Tournament</label>
-              <select id="f-tournament">
-                <option value="">Select…</option>
-                <option>Australian Open</option>
-                <option>Roland Garros</option>
-                <option>Wimbledon</option>
-                <option>US Open</option>
-                <option>Other Tournament</option>
-                <option>Exhibition</option>
-              </select>
-            </div>
+          <div class="field-group">
+            <label>Year</label>
+            <input type="number" id="f-year" placeholder="1999" min="1990" max="2030">
           </div>
 
           <div class="field-group">
-            <label>Era / Career Phase</label>
-            <select id="f-era">
-              <option value="">Select…</option>
-              <option>Early Career (1995–2002)</option>
-              <option>Dominant Era (2003–2010)</option>
-              <option>Comeback Era (2011–2015)</option>
-              <option>GOAT Era (2016–2023)</option>
-            </select>
+            <label>Tournament</label>
+            <div class="tournament-buttons">
+              <button class="t-btn" onclick="selectTournament(this,'Australian Open')">Australian Open</button>
+              <button class="t-btn" onclick="selectTournament(this,'Roland Garros')">Roland Garros</button>
+              <button class="t-btn" onclick="selectTournament(this,'Wimbledon')">Wimbledon</button>
+              <button class="t-btn" onclick="selectTournament(this,'US Open')">US Open</button>
+              <button class="t-btn" onclick="selectTournament(this,'Olympics')">Olympics</button>
+              <button class="t-btn" onclick="selectTournament(this,'Other')">Other…</button>
+            </div>
+            <div class="other-input" id="other-tournament-wrap">
+              <input type="text" id="other-tournament" placeholder="Enter tournament name…">
+            </div>
           </div>
 
           <div class="field-group">
@@ -278,28 +286,6 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1.25re
         <div class="panel">
           <h3>Viewer Settings</h3>
 
-          <div class="settings-section-label">Sorting & Organisation</div>
-          <div class="settings-row">
-            <div><div class="settings-label">Sort Order</div><div class="settings-sub">How outfits are ordered for visitors</div></div>
-            <select id="s-sort" onchange="saveSettings()" style="width:140px;background:var(--dark3);border:1px solid #333;color:var(--text);padding:0.4rem;font-family:'DM Sans',sans-serif;font-size:0.8rem;outline:none">
-              <option value="year">Chronological</option>
-              <option value="tournament">Tournament</option>
-              <option value="color">By Color</option>
-              <option value="era">By Era</option>
-            </select>
-          </div>
-          <div class="settings-row">
-            <div><div class="settings-label">Sort Direction</div><div class="settings-sub">For chronological view</div></div>
-            <div class="seg-control">
-              <button class="seg-btn active" id="dir-asc" onclick="setSortDir('asc')">Oldest first</button>
-              <button class="seg-btn" id="dir-desc" onclick="setSortDir('desc')">Newest first</button>
-            </div>
-          </div>
-          <div class="settings-row">
-            <div><div class="settings-label">Show Group Labels</div><div class="settings-sub">Era / tournament headers in the grid</div></div>
-            <label class="toggle"><input type="checkbox" id="s-groups" checked onchange="saveSettings()"><span class="toggle-slider"></span></label>
-          </div>
-
           <div class="settings-section-label">Grid Layout</div>
           <div class="settings-row">
             <div><div class="settings-label">Grid Density</div><div class="settings-sub">Column width in the gallery</div></div>
@@ -319,10 +305,13 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1.25re
             <label class="toggle"><input type="checkbox" id="s-colordot" checked onchange="saveSettings()"><span class="toggle-slider"></span></label>
           </div>
           <div class="settings-row">
+            <div><div class="settings-label">Show Empty Slots</div><div class="settings-sub">Dotted placeholders for missing outfits</div></div>
+            <label class="toggle"><input type="checkbox" id="s-empty-slots" checked onchange="saveSettings()"><span class="toggle-slider"></span></label>
+          </div>
+          <div class="settings-row">
             <div><div class="settings-label">Card Label</div><div class="settings-sub">What appears on the card hover overlay</div></div>
             <select id="s-card-label" onchange="saveSettings()" style="width:120px;background:var(--dark3);border:1px solid #333;color:var(--text);padding:0.4rem;font-family:'DM Sans',sans-serif;font-size:0.8rem;outline:none">
               <option value="notes">Notes</option>
-              <option value="era">Era</option>
               <option value="tournament">Tournament</option>
             </select>
           </div>
@@ -388,19 +377,26 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1.25re
 <div class="toast" id="toast"></div>
 
 <script>
-// Password is injected at build time by Netlify — never hardcoded here
 const ADMIN_PASSWORD = '%%ADMIN_PASSWORD%%';
 const STORAGE_KEY = 'serena_outfits';
 const SETTINGS_KEY = 'serena_settings';
 const COLOR_MAP = {White:'#eee',Black:'#111',Red:'#c0392b',Gold:'#C9A84C',Blue:'#2980b9',Purple:'#8e44ad',Pink:'#e91e8c',Green:'#27ae60',Orange:'#e67e22',Multi:'linear-gradient(135deg,#e91e8c,#2980b9)'};
 
+// Canonical tournaments — always get a placeholder slot per year
+const GRAND_SLAMS = ['Australian Open','Roland Garros','Wimbledon','US Open','Olympics'];
+
+// Serena's full career span
+const ACTIVE_YEARS = [];
+for(let y = 1995; y <= 2022; y++) ACTIVE_YEARS.push(y);
+
 let outfits = [];
-let settings = {sort:'year',sortDir:'asc',showGroups:true,layout:'grid',lightbox:true,colorDot:true,cardLabel:'notes'};
-let sortedOutfits = [];
-let lbIndex = 0;
+let settings = {layout:'grid',lightbox:true,colorDot:true,showEmptySlots:true,cardLabel:'notes'};
+let flatSortedOutfits = [];
 let selectedColors = [];
 let urlModeActive = false;
 let selectedFile = null;
+let selectedTournament = '';
+let lbIndex = 0;
 
 function loadData(){
   try{ outfits=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]'); }catch(e){ outfits=[]; }
@@ -413,25 +409,16 @@ function loadData(){
 function saveData(){ localStorage.setItem(STORAGE_KEY,JSON.stringify(outfits)); }
 
 function saveSettings(){
-  settings.sort = document.getElementById('s-sort').value;
-  settings.showGroups = document.getElementById('s-groups').checked;
   settings.lightbox = document.getElementById('s-lightbox').checked;
   settings.colorDot = document.getElementById('s-colordot').checked;
+  settings.showEmptySlots = document.getElementById('s-empty-slots').checked;
   settings.cardLabel = document.getElementById('s-card-label').value;
   localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));
   renderGallery();
 }
 
-function setSortDir(dir){
-  settings.sortDir=dir;
-  document.getElementById('dir-asc').classList.toggle('active',dir==='asc');
-  document.getElementById('dir-desc').classList.toggle('active',dir==='desc');
-  localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));
-  renderGallery();
-}
-
 function setLayout(layout){
-  settings.layout=layout;
+  settings.layout = layout;
   document.getElementById('layout-grid').classList.toggle('active',layout==='grid');
   document.getElementById('layout-wide').classList.toggle('active',layout==='wide');
   localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));
@@ -439,23 +426,20 @@ function setLayout(layout){
 }
 
 function applySettingsToUI(){
-  document.getElementById('s-sort').value=settings.sort;
-  document.getElementById('s-groups').checked=settings.showGroups;
-  document.getElementById('s-lightbox').checked=settings.lightbox;
-  document.getElementById('s-colordot').checked=settings.colorDot;
-  document.getElementById('s-card-label').value=settings.cardLabel||'notes';
-  document.getElementById('dir-asc').classList.toggle('active',settings.sortDir!=='desc');
-  document.getElementById('dir-desc').classList.toggle('active',settings.sortDir==='desc');
-  document.getElementById('layout-grid').classList.toggle('active',settings.layout!=='wide');
-  document.getElementById('layout-wide').classList.toggle('active',settings.layout==='wide');
+  document.getElementById('s-lightbox').checked = settings.lightbox;
+  document.getElementById('s-colordot').checked = settings.colorDot;
+  document.getElementById('s-empty-slots').checked = settings.showEmptySlots !== false;
+  document.getElementById('s-card-label').value = settings.cardLabel || 'notes';
+  document.getElementById('layout-grid').classList.toggle('active', settings.layout !== 'wide');
+  document.getElementById('layout-wide').classList.toggle('active', settings.layout === 'wide');
 }
 
 function saveCloudinary(){
-  localStorage.setItem('cl_cloud',document.getElementById('s-cloud-name').value);
-  localStorage.setItem('cl_preset',document.getElementById('s-upload-preset').value);
+  localStorage.setItem('cl_cloud', document.getElementById('s-cloud-name').value);
+  localStorage.setItem('cl_preset', document.getElementById('s-upload-preset').value);
 }
 
-function showPage(page,btn){
+function showPage(page, btn){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('page-'+page).classList.add('active');
@@ -465,150 +449,294 @@ function showPage(page,btn){
 }
 
 function checkPw(){
-  if(document.getElementById('pw-input').value===ADMIN_PASSWORD){
-    document.getElementById('pw-gate').style.display='none';
-    document.getElementById('admin-panel').style.display='block';
+  if(document.getElementById('pw-input').value === ADMIN_PASSWORD){
+    document.getElementById('pw-gate').style.display = 'none';
+    document.getElementById('admin-panel').style.display = 'block';
     applySettingsToUI(); renderEntries();
   } else {
-    document.getElementById('pw-error').style.display='block';
-    document.getElementById('pw-input').value='';
+    document.getElementById('pw-error').style.display = 'block';
+    document.getElementById('pw-input').value = '';
   }
 }
 
+/* ===== GALLERY: year rows with placeholder slots ===== */
 function renderGallery(){
-  const grid=document.getElementById('gallery-grid');
-  const badge=document.getElementById('count-badge');
-  const sortLabel=document.getElementById('viewer-sort-label');
-  grid.className='grid layout-'+(settings.layout||'grid');
-  const labels={year:'Sorted chronologically',tournament:'Sorted by tournament',color:'Sorted by color',era:'Sorted by era'};
-  sortLabel.textContent=labels[settings.sort]||'';
-  if(!outfits.length){
-    grid.innerHTML='<div class="empty-state"><h3>No outfits yet</h3><p>Head to the Admin tab to start building the archive.</p></div>';
-    badge.textContent=''; return;
-  }
-  let sorted=[...outfits];
-  if(settings.sort==='year') sorted.sort((a,b)=>settings.sortDir==='desc'?(b.year||0)-(a.year||0):(a.year||0)-(b.year||0));
-  else if(settings.sort==='tournament') sorted.sort((a,b)=>(a.tournament||'').localeCompare(b.tournament||''));
-  else if(settings.sort==='color') sorted.sort((a,b)=>(a.colors?.[0]||'').localeCompare(b.colors?.[0]||''));
-  else if(settings.sort==='era') sorted.sort((a,b)=>(a.era||'').localeCompare(b.era||''));
-  sortedOutfits=sorted;
-  badge.textContent=sorted.length+' outfits';
-  let html='', lastGroup=null;
-  sorted.forEach((o,i)=>{
-    let groupKey=null;
-    if(settings.showGroups){
-      if(settings.sort==='year') groupKey=o.era;
-      else if(settings.sort==='tournament') groupKey=o.tournament;
-      else if(settings.sort==='color') groupKey=o.colors?.[0];
-      else if(settings.sort==='era') groupKey=o.era;
-    }
-    if(groupKey&&groupKey!==lastGroup){ html+=`<div class="group-divider"><h3>${groupKey}</h3></div>`; lastGroup=groupKey; }
-    const colorVal=COLOR_MAP[o.colors?.[0]]||'#888';
-    const dot=settings.colorDot&&o.colors?.[0]?`<span class="card-color-dot" style="background:${colorVal}"></span>`:'';
-    let lbl='';
-    if(settings.cardLabel==='notes') lbl=o.notes?o.notes.slice(0,45)+(o.notes.length>45?'…':''):(o.era||'');
-    else if(settings.cardLabel==='era') lbl=o.era||'';
-    else if(settings.cardLabel==='tournament') lbl=o.tournament||'';
-    html+=`<div class="card" onclick="openLightbox(${i})"><img src="${o.imageUrl}" alt="${o.tournament||''} ${o.year||''}" loading="lazy" onerror="this.src='';this.style.background='#222'">${dot}<div class="card-overlay"><div class="card-year">${o.year||''}${o.tournament?' · '+o.tournament:''}</div><div class="card-label">${lbl}</div></div></div>`;
+  const root = document.getElementById('gallery-root');
+  const badge = document.getElementById('count-badge');
+
+  // Group real outfits by year
+  const byYear = {};
+  outfits.forEach(o => {
+    const y = o.year || 'Unknown';
+    if(!byYear[y]) byYear[y] = [];
+    byYear[y].push(o);
   });
-  grid.innerHTML=html;
+
+  // Determine which years to show
+  let years;
+  if(settings.showEmptySlots){
+    const outfitYears = Object.keys(byYear).map(Number).filter(n => !isNaN(n));
+    const allYears = new Set([...ACTIVE_YEARS, ...outfitYears]);
+    years = Array.from(allYears).sort((a,b) => a - b);
+  } else {
+    const outfitYears = Object.keys(byYear).map(y => isNaN(y) ? y : Number(y));
+    years = outfitYears.sort((a,b) => a - b);
+  }
+
+  if(!years.length){
+    root.innerHTML = '<div class="empty-state"><h3>No outfits yet</h3><p>Head to the Admin tab to start building the archive.</p></div>';
+    badge.textContent = '';
+    return;
+  }
+
+  // Build flat list of real outfits in display order for lightbox
+  flatSortedOutfits = [];
+  years.forEach(y => {
+    const row = (byYear[y] || []).slice().sort((a,b) => {
+      const ai = GRAND_SLAMS.indexOf(a.tournament);
+      const bi = GRAND_SLAMS.indexOf(b.tournament);
+      return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+    });
+    flatSortedOutfits.push(...row);
+  });
+
+  badge.textContent = outfits.length + ' outfits';
+  const layoutClass = 'year-grid layout-' + (settings.layout || 'grid');
+
+  let html = '';
+
+  years.forEach(y => {
+    const realOutfits = (byYear[y] || []).slice().sort((a,b) => {
+      const ai = GRAND_SLAMS.indexOf(a.tournament);
+      const bi = GRAND_SLAMS.indexOf(b.tournament);
+      return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+    });
+
+    // Group by tournament to detect multiples
+    const byTournament = {};
+    realOutfits.forEach(o => {
+      if(!byTournament[o.tournament]) byTournament[o.tournament] = [];
+      byTournament[o.tournament].push(o);
+    });
+
+    const coveredMajors = GRAND_SLAMS.filter(s => byTournament[s]);
+    const outfitCount = realOutfits.length;
+
+    let cards = '';
+
+    // For each grand slam slot: show all real outfits, OR one placeholder
+    GRAND_SLAMS.forEach(slam => {
+      if(byTournament[slam]){
+        byTournament[slam].forEach(o => {
+          cards += buildRealCard(o);
+        });
+      } else if(settings.showEmptySlots){
+        cards += buildEmptyCard(slam, y);
+      }
+    });
+
+    // Non-grand-slam outfits (Other Tournament, Exhibition, etc.)
+    realOutfits.forEach(o => {
+      if(!GRAND_SLAMS.includes(o.tournament)){
+        cards += buildRealCard(o);
+      }
+    });
+
+    html += `
+      <div class="year-section">
+        <div class="year-heading">
+          <h2>${y}</h2>
+          <span>${outfitCount} outfit${outfitCount !== 1 ? 's' : ''} &nbsp;·&nbsp; ${coveredMajors.length} of ${GRAND_SLAMS.length} majors</span>
+        </div>
+        <div class="${layoutClass}">${cards}</div>
+      </div>`;
+  });
+
+  root.innerHTML = html;
 }
 
+function buildRealCard(o){
+  const idx = flatSortedOutfits.indexOf(o);
+  const colorVal = COLOR_MAP[o.colors?.[0]] || '#888';
+  const dot = settings.colorDot && o.colors?.[0] ? `<span class="card-color-dot" style="background:${colorVal}"></span>` : '';
+  let lbl = '';
+  if(settings.cardLabel === 'notes') lbl = o.notes ? o.notes.slice(0,45) + (o.notes.length > 45 ? '…' : '') : (o.tournament || '');
+  else if(settings.cardLabel === 'tournament') lbl = o.tournament || '';
+  return `<div class="card" onclick="openLightbox(${idx})">
+    <img src="${o.imageUrl}" alt="${o.tournament||''} ${o.year||''}" loading="lazy" onerror="this.src='';this.style.background='#222'">
+    ${dot}
+    <div class="card-overlay">
+      <div class="card-year">${o.year || ''}${o.tournament ? ' · ' + o.tournament : ''}</div>
+      <div class="card-label">${lbl}</div>
+    </div>
+  </div>`;
+}
+
+function buildEmptyCard(slam, year){
+  return `<div class="card-empty">
+    <div class="card-empty-icon">+</div>
+    <div class="card-empty-label">${slam}<br>${year}</div>
+  </div>`;
+}
+
+/* ===== LIGHTBOX ===== */
 function openLightbox(i){
   if(!settings.lightbox) return;
-  lbIndex=i; showLbEntry();
+  lbIndex = i;
+  showLbEntry();
   document.getElementById('lightbox').classList.add('open');
-  document.body.style.overflow='hidden';
+  document.body.style.overflow = 'hidden';
 }
 
 function showLbEntry(){
-  const o=sortedOutfits[lbIndex]; if(!o) return;
-  document.getElementById('lb-img').src=o.imageUrl;
-  document.getElementById('lb-year').textContent=[o.year,o.tournament].filter(Boolean).join(' · ');
-  document.getElementById('lb-title').textContent=o.era||'';
-  document.getElementById('lb-notes').textContent=o.notes||'';
-  const colors=(o.colors||[]).map(c=>`<span class="color-tag-inline" style="background:${COLOR_MAP[c]||'#888'}"></span>${c}`).join(' ');
-  document.getElementById('lb-meta').innerHTML=[
-    o.tournament?`<div class="lb-meta-row"><span>Tournament</span><span>${o.tournament}</span></div>`:'',
-    o.year?`<div class="lb-meta-row"><span>Year</span><span>${o.year}</span></div>`:'',
-    o.era?`<div class="lb-meta-row"><span>Era</span><span>${o.era}</span></div>`:'',
-    colors?`<div class="lb-meta-row"><span>Colors</span><span>${colors}</span></div>`:''
+  const o = flatSortedOutfits[lbIndex];
+  if(!o) return;
+  document.getElementById('lb-img').src = o.imageUrl;
+  document.getElementById('lb-year').textContent = [o.year, o.tournament].filter(Boolean).join(' · ');
+  document.getElementById('lb-title').textContent = o.tournament || '';
+  document.getElementById('lb-notes').textContent = o.notes || '';
+  const colors = (o.colors || []).map(c => `<span class="color-tag-inline" style="background:${COLOR_MAP[c]||'#888'}"></span>${c}`).join(' ');
+  document.getElementById('lb-meta').innerHTML = [
+    o.tournament ? `<div class="lb-meta-row"><span>Tournament</span><span>${o.tournament}</span></div>` : '',
+    o.year ? `<div class="lb-meta-row"><span>Year</span><span>${o.year}</span></div>` : '',
+    colors ? `<div class="lb-meta-row"><span>Colors</span><span>${colors}</span></div>` : ''
   ].join('');
 }
 
-function navigateLb(dir){ lbIndex=(lbIndex+dir+sortedOutfits.length)%sortedOutfits.length; showLbEntry(); }
-function closeLightbox(){ document.getElementById('lightbox').classList.remove('open'); document.body.style.overflow=''; }
-function closeLightboxBg(e){ if(e.target===document.getElementById('lightbox')) closeLightbox(); }
+function navigateLb(dir){
+  lbIndex = (lbIndex + dir + flatSortedOutfits.length) % flatSortedOutfits.length;
+  showLbEntry();
+}
 
-function toggleColor(el,color){
-  if(el.classList.contains('selected')){ el.classList.remove('selected'); selectedColors=selectedColors.filter(c=>c!==color); }
-  else { el.classList.add('selected'); selectedColors.push(color); }
+function closeLightbox(){
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function closeLightboxBg(e){
+  if(e.target === document.getElementById('lightbox')) closeLightbox();
+}
+
+/* ===== ADMIN FORM ===== */
+function selectTournament(btn, val){
+  document.querySelectorAll('.t-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedTournament = val;
+  const otherWrap = document.getElementById('other-tournament-wrap');
+  if(val === 'Other'){
+    otherWrap.classList.add('visible');
+    document.getElementById('other-tournament').focus();
+  } else {
+    otherWrap.classList.remove('visible');
+  }
+}
+
+function getTournamentValue(){
+  if(selectedTournament === 'Other') return document.getElementById('other-tournament').value.trim();
+  return selectedTournament;
+}
+
+function toggleColor(el, color){
+  if(el.classList.contains('selected')){
+    el.classList.remove('selected');
+    selectedColors = selectedColors.filter(c => c !== color);
+  } else {
+    el.classList.add('selected');
+    selectedColors.push(color);
+  }
 }
 
 function toggleUrlMode(){
-  urlModeActive=!urlModeActive;
-  document.getElementById('url-mode').classList.toggle('active',urlModeActive);
+  urlModeActive = !urlModeActive;
+  document.getElementById('url-mode').classList.toggle('active', urlModeActive);
 }
 
 function previewUrl(url){
   if(!url) return;
-  const img=document.getElementById('preview-img'); img.src=url; img.style.display='block';
+  const img = document.getElementById('preview-img');
+  img.src = url; img.style.display = 'block';
 }
 
 function handleFileSelect(e){
-  const file=e.target.files[0]; if(!file) return;
-  selectedFile=file;
-  const reader=new FileReader();
-  reader.onload=ev=>{ const img=document.getElementById('preview-img'); img.src=ev.target.result; img.style.display='block'; };
+  const file = e.target.files[0]; if(!file) return;
+  selectedFile = file;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const img = document.getElementById('preview-img');
+    img.src = ev.target.result; img.style.display = 'block';
+  };
   reader.readAsDataURL(file);
 }
 
 async function uploadToCloudinary(file){
-  const cloudName=localStorage.getItem('cl_cloud'), preset=localStorage.getItem('cl_preset');
-  if(!cloudName||!preset){ document.getElementById('cloudinary-modal').classList.add('open'); return null; }
-  const fd=new FormData(); fd.append('file',file); fd.append('upload_preset',preset);
-  const res=await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,{method:'POST',body:fd});
-  const data=await res.json();
-  return data.secure_url||null;
+  const cloudName = localStorage.getItem('cl_cloud');
+  const preset = localStorage.getItem('cl_preset');
+  if(!cloudName || !preset){
+    document.getElementById('cloudinary-modal').classList.add('open');
+    return null;
+  }
+  const fd = new FormData();
+  fd.append('file', file); fd.append('upload_preset', preset);
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {method:'POST', body:fd});
+  const data = await res.json();
+  return data.secure_url || null;
 }
 
 async function addEntry(){
-  const year=document.getElementById('f-year').value;
-  const tournament=document.getElementById('f-tournament').value;
-  const era=document.getElementById('f-era').value;
-  const notes=document.getElementById('f-notes').value;
-  let imageUrl=document.getElementById('image-url-input').value||'';
-  if(!imageUrl&&selectedFile){
-    document.getElementById('add-btn').textContent='Uploading…';
-    imageUrl=await uploadToCloudinary(selectedFile);
-    document.getElementById('add-btn').textContent='Add to Gallery';
+  const year = document.getElementById('f-year').value;
+  const tournament = getTournamentValue();
+  const notes = document.getElementById('f-notes').value;
+  let imageUrl = document.getElementById('image-url-input').value || '';
+
+  if(!year){ showToast('Please enter a year'); return; }
+  if(!tournament){ showToast('Please select a tournament'); return; }
+
+  if(!imageUrl && selectedFile){
+    document.getElementById('add-btn').textContent = 'Uploading…';
+    imageUrl = await uploadToCloudinary(selectedFile);
+    document.getElementById('add-btn').textContent = 'Add to Gallery';
     if(!imageUrl) return;
   }
   if(!imageUrl){ showToast('Please provide an image URL or upload a file'); return; }
-  outfits.push({id:Date.now().toString(),imageUrl,year:parseInt(year)||null,tournament,era,notes,colors:[...selectedColors]});
+
+  outfits.push({
+    id: Date.now().toString(),
+    imageUrl,
+    year: parseInt(year),
+    tournament,
+    notes,
+    colors: [...selectedColors]
+  });
   saveData(); resetForm(); renderEntries(); showToast('Outfit added!');
 }
 
 function resetForm(){
-  ['f-year','f-tournament','f-era','f-notes'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('image-url-input').value='';
-  document.getElementById('preview-img').style.display='none';
-  document.getElementById('file-input').value='';
-  document.querySelectorAll('.color-option.selected').forEach(el=>el.classList.remove('selected'));
-  selectedColors=[]; selectedFile=null; urlModeActive=false;
+  document.getElementById('f-year').value = '';
+  document.getElementById('f-notes').value = '';
+  document.getElementById('image-url-input').value = '';
+  document.getElementById('preview-img').style.display = 'none';
+  document.getElementById('file-input').value = '';
+  document.getElementById('other-tournament').value = '';
+  document.getElementById('other-tournament-wrap').classList.remove('visible');
+  document.querySelectorAll('.t-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.color-option.selected').forEach(el => el.classList.remove('selected'));
+  selectedColors = []; selectedFile = null; urlModeActive = false; selectedTournament = '';
   document.getElementById('url-mode').classList.remove('active');
 }
 
 function renderEntries(){
-  document.getElementById('entry-count').textContent=outfits.length;
-  const list=document.getElementById('entries-list');
-  if(!outfits.length){ list.innerHTML='<p style="font-size:0.8rem;color:var(--text-muted)">No outfits added yet.</p>'; return; }
-  list.innerHTML=[...outfits].reverse().map(o=>`
+  document.getElementById('entry-count').textContent = outfits.length;
+  const list = document.getElementById('entries-list');
+  if(!outfits.length){
+    list.innerHTML = '<p style="font-size:0.8rem;color:var(--text-muted)">No outfits added yet.</p>';
+    return;
+  }
+  list.innerHTML = [...outfits].reverse().map(o => `
     <div class="entry-row">
       <img class="entry-thumb" src="${o.imageUrl}" onerror="this.style.background='#333'" alt="">
       <div class="entry-info">
-        <div class="entry-name">${o.tournament||'Untitled'} ${o.year||''}</div>
-        <div class="entry-meta">${o.era||''}${o.colors?.length?' · '+o.colors.join(', '):''}</div>
+        <div class="entry-name">${o.tournament || 'Untitled'} ${o.year || ''}</div>
+        <div class="entry-meta">${o.colors?.length ? o.colors.join(', ') : ''}</div>
       </div>
       <button class="btn-danger" onclick="deleteEntry('${o.id}')">Delete</button>
     </div>`).join('');
@@ -616,31 +744,38 @@ function renderEntries(){
 
 function deleteEntry(id){
   if(!confirm('Delete this outfit?')) return;
-  outfits=outfits.filter(o=>o.id!==id); saveData(); renderEntries(); showToast('Deleted');
+  outfits = outfits.filter(o => o.id !== id);
+  saveData(); renderEntries(); showToast('Deleted');
 }
 
 function exportData(){
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([JSON.stringify(outfits,null,2)],{type:'application/json'}));
-  a.download='serena-outfits.json'; a.click();
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(outfits, null, 2)], {type:'application/json'}));
+  a.download = 'serena-outfits.json'; a.click();
 }
 
 function importData(e){
-  const reader=new FileReader();
-  reader.onload=ev=>{ try{ const d=JSON.parse(ev.target.result); if(Array.isArray(d)){ outfits=d; saveData(); renderEntries(); renderGallery(); showToast(d.length+' outfits imported!'); } }catch(err){ showToast('Invalid JSON'); } };
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try{
+      const d = JSON.parse(ev.target.result);
+      if(Array.isArray(d)){ outfits = d; saveData(); renderEntries(); renderGallery(); showToast(d.length + ' outfits imported!'); }
+    } catch(err){ showToast('Invalid JSON'); }
+  };
   reader.readAsText(e.target.files[0]);
 }
 
 function showToast(msg){
-  const t=document.getElementById('toast'); t.textContent=msg;
-  t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500);
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
 }
 
-document.addEventListener('keydown',e=>{
+document.addEventListener('keydown', e => {
   if(!document.getElementById('lightbox').classList.contains('open')) return;
-  if(e.key==='Escape') closeLightbox();
-  if(e.key==='ArrowRight') navigateLb(1);
-  if(e.key==='ArrowLeft') navigateLb(-1);
+  if(e.key === 'Escape') closeLightbox();
+  if(e.key === 'ArrowRight') navigateLb(1);
+  if(e.key === 'ArrowLeft') navigateLb(-1);
 });
 
 loadData();

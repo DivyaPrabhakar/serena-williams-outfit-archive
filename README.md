@@ -56,4 +56,3 @@ Your Cloudinary credentials are saved in the browser's localStorage on your devi
 3. Trigger a new deploy
 
 That's it. The password never touches your code.
-# serena-williams-outfit-archive
