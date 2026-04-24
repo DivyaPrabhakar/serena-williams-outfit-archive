@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Serena — The Looks</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--gold:#C9A84C;--gold-light:#F0D98A;--dark:#0D0D0D;--dark2:#1A1A1A;--dark3:#252525;--text:#F0EDE6;--text-muted:#8A877F;--accent:#E85C3A}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--dark);color:var(--text)}
+
+nav{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 2rem;border-bottom:1px solid #2a2a2a;position:sticky;top:0;background:rgba(13,13,13,0.95);backdrop-filter:blur(8px);z-index:100}
+.nav-logo{font-family:'Playfair Display',serif;font-size:1.1rem;letter-spacing:0.08em;color:var(--gold)}
+.nav-logo span{color:var(--text);font-weight:300}
+.nav-tabs{display:flex;gap:1.5rem}
+.tab-btn{background:none;border:none;color:var(--text-muted);font-family:'DM Sans',sans-serif;font-size:0.85rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;padding:0.4rem 0;border-bottom:2px solid transparent;transition:all 0.2s}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold)}
+
+.page{display:none;min-height:calc(100vh - 60px)}
+.page.active{display:block}
+
+/* VIEWER */
+.viewer-header{padding:3rem 2rem 2rem;text-align:center}
+.viewer-header h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3.5rem);font-weight:900;letter-spacing:-0.02em;line-height:1}
+.viewer-header h1 span{color:var(--gold)}
+.viewer-header p{color:var(--text-muted);font-size:0.9rem;margin-top:0.75rem;letter-spacing:0.05em;text-transform:uppercase}
+.viewer-meta-bar{display:flex;align-items:center;justify-content:space-between;padding:0 2rem 1.25rem}
+.viewer-sort-label{font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted)}
+.count-badge{font-size:0.75rem;color:var(--text-muted)}
+
+.grid{display:grid;gap:1px;padding:0 2rem 3rem;background:#1a1a1a}
+.grid.layout-grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+.grid.layout-wide{grid-template-columns:repeat(auto-fill,minmax(340px,1fr))}
+
+.card{background:var(--dark);cursor:pointer;position:relative;overflow:hidden;aspect-ratio:3/4;transition:transform 0.3s}
+.card:hover{transform:scale(0.98)}
+.card img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.4s}
+.card:hover img{transform:scale(1.04)}
+.card-overlay{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(0,0,0,0.9) 0%,transparent 100%);padding:1.25rem 1rem 0.85rem;transform:translateY(4px);transition:transform 0.3s}
+.card:hover .card-overlay{transform:translateY(0)}
+.card-year{font-size:0.7rem;color:var(--gold);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:0.2rem}
+.card-label{font-family:'Playfair Display',serif;font-size:0.95rem;font-weight:700;line-height:1.2}
+.card-color-dot{position:absolute;top:0.75rem;right:0.75rem;width:10px;height:10px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.4)}
+.group-divider{grid-column:1/-1;padding:1rem 0 0.5rem;border-top:1px solid #2a2a2a}
+.group-divider h3{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--gold-light)}
+.empty-state{grid-column:1/-1;text-align:center;padding:4rem 2rem;color:var(--text-muted)}
+.empty-state h3{font-family:'Playfair Display',serif;font-size:1.5rem;margin-bottom:0.5rem;color:var(--text)}
+
+/* LIGHTBOX */
+.lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:1000;align-items:center;justify-content:center;padding:2rem}
+.lightbox.open{display:flex}
+.lb-inner{display:grid;grid-template-columns:1fr 320px;max-width:900px;width:100%;max-height:90vh;background:var(--dark2);border:1px solid #2a2a2a}
+.lb-img{overflow:hidden}
+.lb-img img{width:100%;height:100%;object-fit:cover;max-height:80vh}
+.lb-info{padding:2rem;display:flex;flex-direction:column;gap:1rem;overflow-y:auto}
+.lb-year{font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold)}
+.lb-title{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:900;line-height:1.1}
+.lb-meta{display:flex;flex-direction:column;gap:0.5rem;margin-top:0.5rem}
+.lb-meta-row{display:flex;justify-content:space-between;font-size:0.8rem;border-bottom:1px solid #2a2a2a;padding-bottom:0.4rem}
+.lb-meta-row span:first-child{color:var(--text-muted)}
+.lb-notes{font-size:0.85rem;color:var(--text-muted);line-height:1.6;margin-top:auto}
+.lb-close{position:absolute;top:1.5rem;right:1.5rem;background:none;border:none;color:var(--text);font-size:1.5rem;cursor:pointer;z-index:1001;width:36px;height:36px;display:flex;align-items:center;justify-content:center}
+.lb-close:hover{color:var(--gold)}
+.lb-nav{display:flex;gap:0.5rem;margin-top:1rem}
+.lb-nav button{flex:1;background:none;border:1px solid #333;color:var(--text-muted);font-family:'DM Sans',sans-serif;font-size:0.75rem;padding:0.5rem;cursor:pointer;transition:all 0.2s;letter-spacing:0.05em}
+.lb-nav button:hover{border-color:var(--gold);color:var(--gold)}
+
+/* ADMIN */
+.admin-wrap{max-width:1100px;margin:0 auto;padding:2rem}
+.admin-header{margin-bottom:2rem}
+.admin-header h2{font-family:'Playfair Display',serif;font-size:2rem}
+.admin-header p{color:var(--text-muted);font-size:0.85rem;margin-top:0.25rem}
+.admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem}
+
+.panel{background:var(--dark2);border:1px solid #2a2a2a;padding:1.5rem}
+.panel h3{font-size:0.75rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:1.25rem}
+
+.field-group{margin-bottom:1rem}
+.field-group label{display:block;font-size:0.75rem;color:var(--text-muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.4rem}
+.field-group input,.field-group select,.field-group textarea{width:100%;background:var(--dark3);border:1px solid #333;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.9rem;padding:0.6rem 0.75rem;outline:none;transition:border-color 0.2s}
+.field-group input:focus,.field-group select:focus,.field-group textarea:focus{border-color:var(--gold)}
+.field-group select option{background:var(--dark3)}
+.field-group textarea{resize:vertical;min-height:80px}
+
+.upload-zone{border:1.5px dashed #333;padding:2rem;text-align:center;cursor:pointer;transition:border-color 0.2s}
+.upload-zone:hover{border-color:var(--gold)}
+.upload-zone p{font-size:0.8rem;color:var(--text-muted)}
+.upload-zone p strong{color:var(--text)}
+.preview-img{width:100%;max-height:200px;object-fit:cover;margin-top:1rem;display:none}
+.url-input-row{margin-top:0.75rem;font-size:0.75rem;text-align:center;color:var(--text-muted)}
+.url-input-row a{color:var(--gold);cursor:pointer;text-decoration:none}
+.url-mode{display:none}
+.url-mode.active{display:block;margin-top:0.5rem}
+
+.color-options{display:flex;flex-wrap:wrap;gap:0.5rem}
+.color-option{display:flex;align-items:center;gap:0.3rem;padding:0.3rem 0.6rem;border:1px solid #333;cursor:pointer;font-size:0.75rem;transition:all 0.2s}
+.color-option:hover,.color-option.selected{border-color:var(--gold);background:rgba(201,168,76,0.1);color:var(--gold)}
+.color-dot-sm{display:inline-block;width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+.btn-primary{background:var(--gold);color:var(--dark);border:none;padding:0.7rem 1.5rem;font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:500;cursor:pointer;letter-spacing:0.05em;width:100%;transition:opacity 0.2s}
+.btn-primary:hover{opacity:0.85}
+.btn-secondary{background:none;border:1px solid #444;color:var(--text);padding:0.6rem 1rem;font-family:'DM Sans',sans-serif;font-size:0.8rem;cursor:pointer;transition:all 0.2s;flex:1}
+.btn-secondary:hover{border-color:var(--text)}
+.btn-danger{background:none;border:1px solid #c0392b;color:#c0392b;padding:0.35rem 0.75rem;font-family:'DM Sans',sans-serif;font-size:0.75rem;cursor:pointer}
+
+.settings-section-label{font-size:0.65rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-muted);margin:1.25rem 0 0.5rem;padding-top:1rem;border-top:1px solid #222}
+.settings-section-label:first-child{margin-top:0;padding-top:0;border-top:none}
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:0.65rem 0;border-bottom:1px solid #1e1e1e}
+.settings-row:last-child{border-bottom:none}
+.settings-label{font-size:0.85rem}
+.settings-sub{font-size:0.72rem;color:var(--text-muted);margin-top:0.1rem}
+.toggle{position:relative;width:36px;height:20px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;background:#333;border-radius:20px;cursor:pointer;transition:0.2s}
+.toggle-slider:before{content:'';position:absolute;height:14px;width:14px;left:3px;bottom:3px;background:#888;border-radius:50%;transition:0.2s}
+.toggle input:checked+.toggle-slider{background:var(--gold)}
+.toggle input:checked+.toggle-slider:before{transform:translateX(16px);background:var(--dark)}
+.seg-control{display:flex;border:1px solid #333;overflow:hidden}
+.seg-btn{background:none;border:none;border-right:1px solid #333;color:var(--text-muted);font-family:'DM Sans',sans-serif;font-size:0.75rem;padding:0.4rem 0.75rem;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+.seg-btn:last-child{border-right:none}
+.seg-btn.active{background:rgba(201,168,76,0.15);color:var(--gold)}
+
+.entries-list{display:flex;flex-direction:column;gap:0.5rem;max-height:380px;overflow-y:auto;margin-top:0.5rem}
+.entry-row{display:flex;align-items:center;gap:0.75rem;padding:0.75rem;background:var(--dark3);border:1px solid #2a2a2a}
+.entry-thumb{width:44px;height:56px;object-fit:cover;flex-shrink:0;background:#1a1a1a}
+.entry-info{flex:1;min-width:0}
+.entry-name{font-size:0.85rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.entry-meta{font-size:0.75rem;color:var(--text-muted)}
+
+.pw-gate{min-height:calc(100vh - 60px);display:flex;align-items:center;justify-content:center}
+.pw-box{background:var(--dark2);border:1px solid #2a2a2a;padding:2.5rem;max-width:360px;width:100%;text-align:center}
+.pw-box h3{font-family:'Playfair Display',serif;font-size:1.5rem;margin-bottom:0.5rem}
+.pw-box p{font-size:0.8rem;color:var(--text-muted);margin-bottom:1.5rem}
+.pw-box input{width:100%;background:var(--dark3);border:1px solid #333;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.95rem;padding:0.75rem;outline:none;text-align:center;letter-spacing:0.1em;margin-bottom:1rem}
+.pw-box input:focus{border-color:var(--gold)}
+.pw-error{font-size:0.8rem;color:var(--accent);margin-top:0.5rem;display:none}
+
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:500;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal-box{background:var(--dark2);border:1px solid #2a2a2a;padding:1.5rem;max-width:420px;width:100%;margin:1rem}
+.modal-box h3{font-family:'Playfair Display',serif;font-size:1.2rem;margin-bottom:0.5rem}
+.modal-box p{font-size:0.8rem;color:var(--text-muted);line-height:1.6;margin-bottom:1rem}
+.modal-btns{display:flex;gap:0.75rem;margin-top:1rem}
+
+.import-export{display:flex;gap:0.75rem}
+.toast{position:fixed;bottom:2rem;right:2rem;background:var(--dark2);border:1px solid var(--gold);color:var(--text);padding:0.75rem 1.25rem;font-size:0.85rem;z-index:2000;transform:translateY(100px);transition:transform 0.3s;pointer-events:none}
+.toast.show{transform:translateY(0)}
+.color-tag-inline{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:3px;vertical-align:middle}
+.right-col{display:flex;flex-direction:column;gap:1.5rem}
+
+@media(max-width:700px){
+  .admin-grid{grid-template-columns:1fr}
+  .lb-inner{grid-template-columns:1fr}
+  .lb-img{max-height:50vh}
+  .grid.layout-grid,.grid.layout-wide{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">SERENA <span>/ THE LOOKS</span></div>
+  <div class="nav-tabs">
+    <button class="tab-btn active" onclick="showPage('viewer',this)">Gallery</button>
+    <button class="tab-btn" onclick="showPage('admin',this)">Admin</button>
+  </div>
+</nav>
+
+<!-- VIEWER -->
+<div id="page-viewer" class="page active">
+  <div class="viewer-header">
+    <h1>THE <span>LOOKS</span></h1>
+    <p>A visual archive of Serena Williams on court</p>
+  </div>
+  <div class="viewer-meta-bar">
+    <span class="viewer-sort-label" id="viewer-sort-label"></span>
+    <span class="count-badge" id="count-badge"></span>
+  </div>
+  <div class="grid layout-grid" id="gallery-grid"></div>
+</div>
+
+<!-- ADMIN -->
+<div id="page-admin" class="page">
+  <div class="pw-gate" id="pw-gate">
+    <div class="pw-box">
+      <h3>Admin Access</h3>
+      <p>Enter the admin password to manage the gallery</p>
+      <input type="password" id="pw-input" placeholder="••••••••" onkeydown="if(event.key==='Enter')checkPw()">
+      <button class="btn-primary" onclick="checkPw()">Enter</button>
+      <p class="pw-error" id="pw-error">Incorrect password</p>
+    </div>
+  </div>
+
+  <div class="admin-wrap" id="admin-panel" style="display:none">
+    <div class="admin-header">
+      <h2>Gallery Admin</h2>
+      <p>Upload outfits, set metadata, and control every aspect of the viewer</p>
+    </div>
+    <div class="admin-grid">
+
+      <!-- LEFT: Add outfit -->
+      <div>
+        <div class="panel">
+          <h3>Add Outfit</h3>
+          <div class="field-group">
+            <label>Image</label>
+            <div class="upload-zone" onclick="document.getElementById('file-input').click()">
+              <div style="font-size:1.4rem;margin-bottom:0.4rem;color:var(--text-muted)">⬆</div>
+              <p><strong>Click to upload</strong> or drag & drop</p>
+              <p>JPG, PNG, WEBP — 3:4 ratio recommended</p>
+              <input type="file" id="file-input" accept="image/*" onchange="handleFileSelect(event)" style="display:none">
+            </div>
+            <div class="url-input-row">or <a onclick="toggleUrlMode()">paste an image URL instead</a></div>
+            <div class="url-mode" id="url-mode">
+              <input type="url" id="image-url-input" placeholder="https://example.com/image.jpg" oninput="previewUrl(this.value)" style="width:100%;background:var(--dark3);border:1px solid #333;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.85rem;padding:0.5rem 0.75rem;outline:none">
+            </div>
+            <img id="preview-img" class="preview-img" alt="Preview">
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+            <div class="field-group">
+              <label>Year</label>
+              <input type="number" id="f-year" placeholder="1999" min="1990" max="2030">
+            </div>
+            <div class="field-group">
+              <label>Tournament</label>
+              <select id="f-tournament">
+                <option value="">Select…</option>
+                <option>Australian Open</option>
+                <option>Roland Garros</option>
+                <option>Wimbledon</option>
+                <option>US Open</option>
+                <option>Other Tournament</option>
+                <option>Exhibition</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label>Era / Career Phase</label>
+            <select id="f-era">
+              <option value="">Select…</option>
+              <option>Early Career (1995–2002)</option>
+              <option>Dominant Era (2003–2010)</option>
+              <option>Comeback Era (2011–2015)</option>
+              <option>GOAT Era (2016–2023)</option>
+            </select>
+          </div>
+
+          <div class="field-group">
+            <label>Primary Color</label>
+            <div class="color-options">
+              <div class="color-option" onclick="toggleColor(this,'White')"><span class="color-dot-sm" style="background:#eee;border:1px solid #888"></span>White</div>
+              <div class="color-option" onclick="toggleColor(this,'Black')"><span class="color-dot-sm" style="background:#111"></span>Black</div>
+              <div class="color-option" onclick="toggleColor(this,'Red')"><span class="color-dot-sm" style="background:#c0392b"></span>Red</div>
+              <div class="color-option" onclick="toggleColor(this,'Gold')"><span class="color-dot-sm" style="background:#C9A84C"></span>Gold</div>
+              <div class="color-option" onclick="toggleColor(this,'Blue')"><span class="color-dot-sm" style="background:#2980b9"></span>Blue</div>
+              <div class="color-option" onclick="toggleColor(this,'Purple')"><span class="color-dot-sm" style="background:#8e44ad"></span>Purple</div>
+              <div class="color-option" onclick="toggleColor(this,'Pink')"><span class="color-dot-sm" style="background:#e91e8c"></span>Pink</div>
+              <div class="color-option" onclick="toggleColor(this,'Green')"><span class="color-dot-sm" style="background:#27ae60"></span>Green</div>
+              <div class="color-option" onclick="toggleColor(this,'Orange')"><span class="color-dot-sm" style="background:#e67e22"></span>Orange</div>
+              <div class="color-option" onclick="toggleColor(this,'Multi')"><span class="color-dot-sm" style="background:linear-gradient(135deg,#e91e8c,#2980b9)"></span>Multi</div>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label>Notes / Description</label>
+            <textarea id="f-notes" placeholder="e.g. Nike catsuit, worn during pregnancy comeback at Roland Garros…"></textarea>
+          </div>
+
+          <button class="btn-primary" onclick="addEntry()" id="add-btn">Add to Gallery</button>
+        </div>
+      </div>
+
+      <!-- RIGHT: Settings + Entries -->
+      <div class="right-col">
+        <div class="panel">
+          <h3>Viewer Settings</h3>
+
+          <div class="settings-section-label">Sorting & Organisation</div>
+          <div class="settings-row">
+            <div><div class="settings-label">Sort Order</div><div class="settings-sub">How outfits are ordered for visitors</div></div>
+            <select id="s-sort" onchange="saveSettings()" style="width:140px;background:var(--dark3);border:1px solid #333;color:var(--text);padding:0.4rem;font-family:'DM Sans',sans-serif;font-size:0.8rem;outline:none">
+              <option value="year">Chronological</option>
+              <option value="tournament">Tournament</option>
+              <option value="color">By Color</option>
+              <option value="era">By Era</option>
+            </select>
+          </div>
+          <div class="settings-row">
+            <div><div class="settings-label">Sort Direction</div><div class="settings-sub">For chronological view</div></div>
+            <div class="seg-control">
+              <button class="seg-btn active" id="dir-asc" onclick="setSortDir('asc')">Oldest first</button>
+              <button class="seg-btn" id="dir-desc" onclick="setSortDir('desc')">Newest first</button>
+            </div>
+          </div>
+          <div class="settings-row">
+            <div><div class="settings-label">Show Group Labels</div><div class="settings-sub">Era / tournament headers in the grid</div></div>
+            <label class="toggle"><input type="checkbox" id="s-groups" checked onchange="saveSettings()"><span class="toggle-slider"></span></label>
+          </div>
+
+          <div class="settings-section-label">Grid Layout</div>
+          <div class="settings-row">
+            <div><div class="settings-label">Grid Density</div><div class="settings-sub">Column width in the gallery</div></div>
+            <div class="seg-control">
+              <button class="seg-btn active" id="layout-grid" onclick="setLayout('grid')">Standard</button>
+              <button class="seg-btn" id="layout-wide" onclick="setLayout('wide')">Large</button>
+            </div>
+          </div>
+
+          <div class="settings-section-label">Card Behaviour</div>
+          <div class="settings-row">
+            <div><div class="settings-label">Lightbox on Click</div><div class="settings-sub">Detail panel when a card is tapped</div></div>
+            <label class="toggle"><input type="checkbox" id="s-lightbox" checked onchange="saveSettings()"><span class="toggle-slider"></span></label>
+          </div>
+          <div class="settings-row">
+            <div><div class="settings-label">Show Color Dot</div><div class="settings-sub">Small color indicator on each card</div></div>
+            <label class="toggle"><input type="checkbox" id="s-colordot" checked onchange="saveSettings()"><span class="toggle-slider"></span></label>
+          </div>
+          <div class="settings-row">
+            <div><div class="settings-label">Card Label</div><div class="settings-sub">What appears on the card hover overlay</div></div>
+            <select id="s-card-label" onchange="saveSettings()" style="width:120px;background:var(--dark3);border:1px solid #333;color:var(--text);padding:0.4rem;font-family:'DM Sans',sans-serif;font-size:0.8rem;outline:none">
+              <option value="notes">Notes</option>
+              <option value="era">Era</option>
+              <option value="tournament">Tournament</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Data & Cloudinary</h3>
+          <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:1rem">Free Cloudinary account required for direct uploads. Create an unsigned upload preset at cloudinary.com.</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:1rem">
+            <input type="text" id="s-cloud-name" placeholder="Cloud name" style="background:var(--dark3);border:1px solid #333;color:var(--text);padding:0.5rem;font-family:'DM Sans',sans-serif;font-size:0.8rem;outline:none;width:100%" oninput="saveCloudinary()">
+            <input type="text" id="s-upload-preset" placeholder="Upload preset" style="background:var(--dark3);border:1px solid #333;color:var(--text);padding:0.5rem;font-family:'DM Sans',sans-serif;font-size:0.8rem;outline:none;width:100%" oninput="saveCloudinary()">
+          </div>
+          <div class="import-export">
+            <button class="btn-secondary" onclick="exportData()">Export JSON</button>
+            <button class="btn-secondary" onclick="document.getElementById('import-input').click()">Import JSON</button>
+            <input type="file" id="import-input" accept=".json" style="display:none" onchange="importData(event)">
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>All Outfits (<span id="entry-count">0</span>)</h3>
+          <div class="entries-list" id="entries-list">
+            <p style="font-size:0.8rem;color:var(--text-muted)">No outfits added yet.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightboxBg(event)">
+  <button class="lb-close" onclick="closeLightbox()">✕</button>
+  <div class="lb-inner" onclick="event.stopPropagation()">
+    <div class="lb-img"><img id="lb-img" src="" alt=""></div>
+    <div class="lb-info">
+      <div>
+        <div class="lb-year" id="lb-year"></div>
+        <div class="lb-title" id="lb-title"></div>
+      </div>
+      <div class="lb-meta" id="lb-meta"></div>
+      <p class="lb-notes" id="lb-notes"></p>
+      <div class="lb-nav">
+        <button onclick="navigateLb(-1)">← Prev</button>
+        <button onclick="navigateLb(1)">Next →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Cloudinary modal -->
+<div class="modal-overlay" id="cloudinary-modal">
+  <div class="modal-box">
+    <h3>Cloudinary not configured</h3>
+    <p>Enter your Cloud name and Upload preset in the Data & Cloudinary panel, or use "paste an image URL" to add images by URL instead.</p>
+    <div class="modal-btns">
+      <button class="btn-secondary" onclick="document.getElementById('cloudinary-modal').classList.remove('open');toggleUrlMode()">Use URL instead</button>
+      <button class="btn-primary" onclick="document.getElementById('cloudinary-modal').classList.remove('open')" style="width:auto;padding:0.6rem 1.25rem">Got it</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// Password is injected at build time by Netlify — never hardcoded here
+const ADMIN_PASSWORD = '%%ADMIN_PASSWORD%%';
+const STORAGE_KEY = 'serena_outfits';
+const SETTINGS_KEY = 'serena_settings';
+const COLOR_MAP = {White:'#eee',Black:'#111',Red:'#c0392b',Gold:'#C9A84C',Blue:'#2980b9',Purple:'#8e44ad',Pink:'#e91e8c',Green:'#27ae60',Orange:'#e67e22',Multi:'linear-gradient(135deg,#e91e8c,#2980b9)'};
+
+let outfits = [];
+let settings = {sort:'year',sortDir:'asc',showGroups:true,layout:'grid',lightbox:true,colorDot:true,cardLabel:'notes'};
+let sortedOutfits = [];
+let lbIndex = 0;
+let selectedColors = [];
+let urlModeActive = false;
+let selectedFile = null;
+
+function loadData(){
+  try{ outfits=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]'); }catch(e){ outfits=[]; }
+  try{ Object.assign(settings,JSON.parse(localStorage.getItem(SETTINGS_KEY)||'{}')); }catch(e){}
+  document.getElementById('s-cloud-name').value = localStorage.getItem('cl_cloud')||'';
+  document.getElementById('s-upload-preset').value = localStorage.getItem('cl_preset')||'';
+  applySettingsToUI();
+}
+
+function saveData(){ localStorage.setItem(STORAGE_KEY,JSON.stringify(outfits)); }
+
+function saveSettings(){
+  settings.sort = document.getElementById('s-sort').value;
+  settings.showGroups = document.getElementById('s-groups').checked;
+  settings.lightbox = document.getElementById('s-lightbox').checked;
+  settings.colorDot = document.getElementById('s-colordot').checked;
+  settings.cardLabel = document.getElementById('s-card-label').value;
+  localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));
+  renderGallery();
+}
+
+function setSortDir(dir){
+  settings.sortDir=dir;
+  document.getElementById('dir-asc').classList.toggle('active',dir==='asc');
+  document.getElementById('dir-desc').classList.toggle('active',dir==='desc');
+  localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));
+  renderGallery();
+}
+
+function setLayout(layout){
+  settings.layout=layout;
+  document.getElementById('layout-grid').classList.toggle('active',layout==='grid');
+  document.getElementById('layout-wide').classList.toggle('active',layout==='wide');
+  localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));
+  renderGallery();
+}
+
+function applySettingsToUI(){
+  document.getElementById('s-sort').value=settings.sort;
+  document.getElementById('s-groups').checked=settings.showGroups;
+  document.getElementById('s-lightbox').checked=settings.lightbox;
+  document.getElementById('s-colordot').checked=settings.colorDot;
+  document.getElementById('s-card-label').value=settings.cardLabel||'notes';
+  document.getElementById('dir-asc').classList.toggle('active',settings.sortDir!=='desc');
+  document.getElementById('dir-desc').classList.toggle('active',settings.sortDir==='desc');
+  document.getElementById('layout-grid').classList.toggle('active',settings.layout!=='wide');
+  document.getElementById('layout-wide').classList.toggle('active',settings.layout==='wide');
+}
+
+function saveCloudinary(){
+  localStorage.setItem('cl_cloud',document.getElementById('s-cloud-name').value);
+  localStorage.setItem('cl_preset',document.getElementById('s-upload-preset').value);
+}
+
+function showPage(page,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  if(btn) btn.classList.add('active');
+  if(page==='viewer') renderGallery();
+  if(page==='admin'){ applySettingsToUI(); renderEntries(); }
+}
+
+function checkPw(){
+  if(document.getElementById('pw-input').value===ADMIN_PASSWORD){
+    document.getElementById('pw-gate').style.display='none';
+    document.getElementById('admin-panel').style.display='block';
+    applySettingsToUI(); renderEntries();
+  } else {
+    document.getElementById('pw-error').style.display='block';
+    document.getElementById('pw-input').value='';
+  }
+}
+
+function renderGallery(){
+  const grid=document.getElementById('gallery-grid');
+  const badge=document.getElementById('count-badge');
+  const sortLabel=document.getElementById('viewer-sort-label');
+  grid.className='grid layout-'+(settings.layout||'grid');
+  const labels={year:'Sorted chronologically',tournament:'Sorted by tournament',color:'Sorted by color',era:'Sorted by era'};
+  sortLabel.textContent=labels[settings.sort]||'';
+  if(!outfits.length){
+    grid.innerHTML='<div class="empty-state"><h3>No outfits yet</h3><p>Head to the Admin tab to start building the archive.</p></div>';
+    badge.textContent=''; return;
+  }
+  let sorted=[...outfits];
+  if(settings.sort==='year') sorted.sort((a,b)=>settings.sortDir==='desc'?(b.year||0)-(a.year||0):(a.year||0)-(b.year||0));
+  else if(settings.sort==='tournament') sorted.sort((a,b)=>(a.tournament||'').localeCompare(b.tournament||''));
+  else if(settings.sort==='color') sorted.sort((a,b)=>(a.colors?.[0]||'').localeCompare(b.colors?.[0]||''));
+  else if(settings.sort==='era') sorted.sort((a,b)=>(a.era||'').localeCompare(b.era||''));
+  sortedOutfits=sorted;
+  badge.textContent=sorted.length+' outfits';
+  let html='', lastGroup=null;
+  sorted.forEach((o,i)=>{
+    let groupKey=null;
+    if(settings.showGroups){
+      if(settings.sort==='year') groupKey=o.era;
+      else if(settings.sort==='tournament') groupKey=o.tournament;
+      else if(settings.sort==='color') groupKey=o.colors?.[0];
+      else if(settings.sort==='era') groupKey=o.era;
+    }
+    if(groupKey&&groupKey!==lastGroup){ html+=`<div class="group-divider"><h3>${groupKey}</h3></div>`; lastGroup=groupKey; }
+    const colorVal=COLOR_MAP[o.colors?.[0]]||'#888';
+    const dot=settings.colorDot&&o.colors?.[0]?`<span class="card-color-dot" style="background:${colorVal}"></span>`:'';
+    let lbl='';
+    if(settings.cardLabel==='notes') lbl=o.notes?o.notes.slice(0,45)+(o.notes.length>45?'…':''):(o.era||'');
+    else if(settings.cardLabel==='era') lbl=o.era||'';
+    else if(settings.cardLabel==='tournament') lbl=o.tournament||'';
+    html+=`<div class="card" onclick="openLightbox(${i})"><img src="${o.imageUrl}" alt="${o.tournament||''} ${o.year||''}" loading="lazy" onerror="this.src='';this.style.background='#222'">${dot}<div class="card-overlay"><div class="card-year">${o.year||''}${o.tournament?' · '+o.tournament:''}</div><div class="card-label">${lbl}</div></div></div>`;
+  });
+  grid.innerHTML=html;
+}
+
+function openLightbox(i){
+  if(!settings.lightbox) return;
+  lbIndex=i; showLbEntry();
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function showLbEntry(){
+  const o=sortedOutfits[lbIndex]; if(!o) return;
+  document.getElementById('lb-img').src=o.imageUrl;
+  document.getElementById('lb-year').textContent=[o.year,o.tournament].filter(Boolean).join(' · ');
+  document.getElementById('lb-title').textContent=o.era||'';
+  document.getElementById('lb-notes').textContent=o.notes||'';
+  const colors=(o.colors||[]).map(c=>`<span class="color-tag-inline" style="background:${COLOR_MAP[c]||'#888'}"></span>${c}`).join(' ');
+  document.getElementById('lb-meta').innerHTML=[
+    o.tournament?`<div class="lb-meta-row"><span>Tournament</span><span>${o.tournament}</span></div>`:'',
+    o.year?`<div class="lb-meta-row"><span>Year</span><span>${o.year}</span></div>`:'',
+    o.era?`<div class="lb-meta-row"><span>Era</span><span>${o.era}</span></div>`:'',
+    colors?`<div class="lb-meta-row"><span>Colors</span><span>${colors}</span></div>`:''
+  ].join('');
+}
+
+function navigateLb(dir){ lbIndex=(lbIndex+dir+sortedOutfits.length)%sortedOutfits.length; showLbEntry(); }
+function closeLightbox(){ document.getElementById('lightbox').classList.remove('open'); document.body.style.overflow=''; }
+function closeLightboxBg(e){ if(e.target===document.getElementById('lightbox')) closeLightbox(); }
+
+function toggleColor(el,color){
+  if(el.classList.contains('selected')){ el.classList.remove('selected'); selectedColors=selectedColors.filter(c=>c!==color); }
+  else { el.classList.add('selected'); selectedColors.push(color); }
+}
+
+function toggleUrlMode(){
+  urlModeActive=!urlModeActive;
+  document.getElementById('url-mode').classList.toggle('active',urlModeActive);
+}
+
+function previewUrl(url){
+  if(!url) return;
+  const img=document.getElementById('preview-img'); img.src=url; img.style.display='block';
+}
+
+function handleFileSelect(e){
+  const file=e.target.files[0]; if(!file) return;
+  selectedFile=file;
+  const reader=new FileReader();
+  reader.onload=ev=>{ const img=document.getElementById('preview-img'); img.src=ev.target.result; img.style.display='block'; };
+  reader.readAsDataURL(file);
+}
+
+async function uploadToCloudinary(file){
+  const cloudName=localStorage.getItem('cl_cloud'), preset=localStorage.getItem('cl_preset');
+  if(!cloudName||!preset){ document.getElementById('cloudinary-modal').classList.add('open'); return null; }
+  const fd=new FormData(); fd.append('file',file); fd.append('upload_preset',preset);
+  const res=await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,{method:'POST',body:fd});
+  const data=await res.json();
+  return data.secure_url||null;
+}
+
+async function addEntry(){
+  const year=document.getElementById('f-year').value;
+  const tournament=document.getElementById('f-tournament').value;
+  const era=document.getElementById('f-era').value;
+  const notes=document.getElementById('f-notes').value;
+  let imageUrl=document.getElementById('image-url-input').value||'';
+  if(!imageUrl&&selectedFile){
+    document.getElementById('add-btn').textContent='Uploading…';
+    imageUrl=await uploadToCloudinary(selectedFile);
+    document.getElementById('add-btn').textContent='Add to Gallery';
+    if(!imageUrl) return;
+  }
+  if(!imageUrl){ showToast('Please provide an image URL or upload a file'); return; }
+  outfits.push({id:Date.now().toString(),imageUrl,year:parseInt(year)||null,tournament,era,notes,colors:[...selectedColors]});
+  saveData(); resetForm(); renderEntries(); showToast('Outfit added!');
+}
+
+function resetForm(){
+  ['f-year','f-tournament','f-era','f-notes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('image-url-input').value='';
+  document.getElementById('preview-img').style.display='none';
+  document.getElementById('file-input').value='';
+  document.querySelectorAll('.color-option.selected').forEach(el=>el.classList.remove('selected'));
+  selectedColors=[]; selectedFile=null; urlModeActive=false;
+  document.getElementById('url-mode').classList.remove('active');
+}
+
+function renderEntries(){
+  document.getElementById('entry-count').textContent=outfits.length;
+  const list=document.getElementById('entries-list');
+  if(!outfits.length){ list.innerHTML='<p style="font-size:0.8rem;color:var(--text-muted)">No outfits added yet.</p>'; return; }
+  list.innerHTML=[...outfits].reverse().map(o=>`
+    <div class="entry-row">
+      <img class="entry-thumb" src="${o.imageUrl}" onerror="this.style.background='#333'" alt="">
+      <div class="entry-info">
+        <div class="entry-name">${o.tournament||'Untitled'} ${o.year||''}</div>
+        <div class="entry-meta">${o.era||''}${o.colors?.length?' · '+o.colors.join(', '):''}</div>
+      </div>
+      <button class="btn-danger" onclick="deleteEntry('${o.id}')">Delete</button>
+    </div>`).join('');
+}
+
+function deleteEntry(id){
+  if(!confirm('Delete this outfit?')) return;
+  outfits=outfits.filter(o=>o.id!==id); saveData(); renderEntries(); showToast('Deleted');
+}
+
+function exportData(){
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(outfits,null,2)],{type:'application/json'}));
+  a.download='serena-outfits.json'; a.click();
+}
+
+function importData(e){
+  const reader=new FileReader();
+  reader.onload=ev=>{ try{ const d=JSON.parse(ev.target.result); if(Array.isArray(d)){ outfits=d; saveData(); renderEntries(); renderGallery(); showToast(d.length+' outfits imported!'); } }catch(err){ showToast('Invalid JSON'); } };
+  reader.readAsText(e.target.files[0]);
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast'); t.textContent=msg;
+  t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+document.addEventListener('keydown',e=>{
+  if(!document.getElementById('lightbox').classList.contains('open')) return;
+  if(e.key==='Escape') closeLightbox();
+  if(e.key==='ArrowRight') navigateLb(1);
+  if(e.key==='ArrowLeft') navigateLb(-1);
+});
+
+loadData();
+renderGallery();
+</script>
+</body>
+</html>
