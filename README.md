@@ -1,64 +1,68 @@
 # Serena — The Looks
 
-A gallery of Serena Williams' on-court outfits, with an admin panel for uploading and curating looks.
+A gallery of Serena Williams' on-court outfits with an admin panel for curating looks. Powered by Supabase (database) and Cloudinary (image hosting). Hosted free on Netlify.
 
 ---
 
-## Hosting (free on Netlify)
+## Architecture
 
-### 1. Push this folder to a GitHub repo
+- **Frontend**: Single `index.html` static file
+- **Database**: Supabase (Postgres) — all credentials are server-side only
+- **API**: Netlify serverless function (`netlify/functions/outfits.js`) — proxies all database calls, credentials never reach the browser
+- **Images**: Cloudinary free tier
+
+---
+
+## Deployment
+
+### 1. Push to GitHub
 
 ```bash
 git init
 git add .
 git commit -m "initial commit"
-# create a repo on github.com, then:
-git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO.git
+git remote add origin https://github.com/YOUR_USERNAME/serena-gallery.git
 git push -u origin main
 ```
 
 ### 2. Connect to Netlify
 
-1. Go to [netlify.com](https://netlify.com) and sign up (free)
-2. Click **"Add new site" → "Import an existing project"**
-3. Connect your GitHub account and select your repo
-4. Build settings will be auto-detected from `netlify.toml`
+1. Go to [netlify.com](https://netlify.com) → Add new site → Import from GitHub
+2. Select your repo
+3. Build settings are auto-detected from `netlify.toml`
 
-### 3. Set your environment variables (the important part)
+### 3. Set environment variables
 
-1. In your Netlify site dashboard, go to **Site configuration → Environment variables**
-2. Add each of these four variables:
+In Netlify: **Site configuration → Environment variables** — add all four:
 
-| Key | Value |
-|-----|-------|
-| `ADMIN_PASSWORD` | Your chosen gallery admin password |
-| `SUPABASE_URL` | Your Supabase project URL |
-| `SUPABASE_KEY` | Your Supabase anon/publishable key |
-| `SUPABASE_ADMIN_TOKEN` | Your secret write token (from the SQL setup) |
+| Key | Value | Secret? |
+|-----|-------|---------|
+| `ADMIN_PASSWORD` | Your chosen admin password | ✅ Yes |
+| `SUPABASE_URL` | Your Supabase project URL | ✅ Yes |
+| `SUPABASE_KEY` | Your Supabase anon key | ✅ Yes |
+| `SUPABASE_ADMIN_TOKEN` | Your secret write token | ✅ Yes |
 
-3. Click **Save** after adding all four.
+Mark all four as **Secret** in Netlify.
 
-### 4. Trigger a deploy
+### 4. Deploy
 
-Go to **Deploys → Trigger deploy → Deploy site**. Netlify runs `inject-password.sh`, which reads all four env vars and bakes them into the HTML at build time. None of these values ever appear in your git repo or source code.
+Go to **Deploys → Trigger deploy → Deploy site**.
+
+The build injects only `ADMIN_PASSWORD` into the HTML.
+All Supabase credentials stay server-side in the Netlify function — they never appear in any file or in the browser.
 
 ---
 
-## Image uploads (Cloudinary — free tier)
+## Changing your password or rotating credentials
+
+Update the value in Netlify → Environment variables, then trigger a new deploy.
+
+---
+
+## Image uploads (Cloudinary)
 
 1. Create a free account at [cloudinary.com](https://cloudinary.com)
-2. Go to **Settings → Upload → Upload presets → Add upload preset**
-3. Set signing mode to **Unsigned**, save it
-4. In the gallery admin panel → Data & Cloudinary: enter your **Cloud name** and **Upload preset name**
+2. Settings → Upload → Add upload preset → set to **Unsigned**
+3. In the gallery admin panel → Data & Cloudinary: enter your Cloud name and preset name
 
-Your Cloudinary credentials are saved in the browser's localStorage on your device — not in the code.
-
----
-
-## Changing your password
-
-1. Go to Netlify → Site configuration → Environment variables
-2. Update `ADMIN_PASSWORD`
-3. Trigger a new deploy
-
-That's it. The password never touches your code.
+Cloudinary credentials are saved in the browser's localStorage on your device only.

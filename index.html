@@ -493,26 +493,29 @@ const GRAND_SLAMS = ['Australian Open','Roland Garros','Wimbledon','US Open','Ol
 const ACTIVE_YEARS = [];
 for(let y = 1995; y <= 2022; y++) ACTIVE_YEARS.push(y);
 
-// Supabase REST client — credentials injected at build time by Netlify
-const SB_URL = '%%SUPABASE_URL%%';
-const SB_KEY = '%%SUPABASE_KEY%%';
-const SB_ADMIN_TOKEN = '%%SUPABASE_ADMIN_TOKEN%%';
-async function sbFetch(path, opts={}){
-  const isWrite = opts.method && opts.method !== 'GET';
-  const res = await fetch(SB_URL+'/rest/v1/'+path, {
-    ...opts,
-    headers:{
-      'apikey':SB_KEY,
-      'Authorization':'Bearer '+SB_KEY,
-      'Content-Type':'application/json',
-      'Prefer':opts.prefer||'',
-      ...(isWrite ? {'x-admin-token':SB_ADMIN_TOKEN} : {}),
-      ...(opts.headers||{})
-    }
+// All database calls go through our Netlify serverless function.
+// No Supabase credentials ever appear in this file.
+const API = '/.netlify/functions/outfits';
+
+async function apiFetch(opts={}){
+  const {method='GET', id, body, bulk=false} = opts;
+  const url = (method==='PATCH'||method==='DELETE') ? API+'?id='+encodeURIComponent(id) : API;
+  const headers = {'Content-Type':'application/json'};
+  // Admin token is sent for writes so the function can verify the caller is admin
+  // The actual Supabase admin token never leaves the server
+  if(method!=='GET') headers['x-admin-token'] = adminToken;
+  const res = await fetch(url, {
+    method,
+    headers,
+    ...(body ? {body: JSON.stringify(body)} : {})
   });
-  if(!res.ok){const t=await res.text();throw new Error('Supabase '+res.status+': '+t);}
-  const t=await res.text(); return t?JSON.parse(t):null;
+  if(!res.ok){ const t=await res.text(); throw new Error('API '+res.status+': '+t); }
+  const t = await res.text(); return t ? JSON.parse(t) : null;
 }
+
+// adminToken is set after password is verified — never stored in code
+let adminToken = '';
+
 function rowToOutfit(r){return{id:r.id,imageUrl:r.image_url,year:r.year,tournament:r.tournament,notes:r.notes,colors:r.colors||[]};}
 function outfitToRow(o){return{id:o.id,image_url:o.imageUrl,year:o.year||null,tournament:o.tournament||null,notes:o.notes||null,colors:o.colors||[]};}
 
@@ -534,33 +537,33 @@ async function loadData(){
   document.getElementById('s-upload-preset').value = localStorage.getItem('cl_preset')||'';
   applySettingsToUI();
   document.getElementById('gallery-root').innerHTML =
-    '<div class="empty-state"><h3 style="color:var(--text-muted);font-size:1rem;font-weight:400">Loading gallery\u2026</h3></div>';
+    '<div class="empty-state"><h3 style="color:var(--text-muted);font-size:1rem;font-weight:400">Loading gallery…</h3></div>';
   try{
-    await migrateFromLocalStorage();
-    const rows = await sbFetch('outfits?select=*&order=year.asc,created_at.asc');
+    const rows = await apiFetch({method:'GET'});
     outfits = (rows||[]).map(rowToOutfit);
   }catch(e){
-    console.error('Supabase load failed:',e);
-    showToast('Database unreachable \u2014 showing cached data');
-    try{outfits=JSON.parse(localStorage.getItem('serena_outfits')||'[]');}catch(e2){outfits=[];}
+    console.error('API load failed:',e);
+    showToast('Could not load gallery — please refresh');
+    outfits=[];
   }
   renderGallery();
 }
 async function migrateFromLocalStorage(){
+  // Migration runs after login so adminToken is set
   if(localStorage.getItem(MIGRATION_KEY)) return;
   let local=[];
   try{local=JSON.parse(localStorage.getItem('serena_outfits')||'[]');}catch(e){local=[];}
   if(!local.length){localStorage.setItem(MIGRATION_KEY,'1');return;}
-  showToast('Migrating '+local.length+' saved outfits to database\u2026');
+  showToast('Migrating '+local.length+' saved outfits to database…');
   try{
-    await sbFetch('outfits',{method:'POST',prefer:'resolution=ignore-duplicates',body:JSON.stringify(local.map(outfitToRow))});
+    await apiFetch({method:'POST',body:local.map(outfitToRow),bulk:true});
     localStorage.setItem(MIGRATION_KEY,'1');
-    showToast(local.length+' outfits migrated \u2713');
-  }catch(e){console.error('Migration failed:',e);showToast('Migration failed \u2014 local data is safe');}
+    showToast(local.length+' outfits migrated ✓');
+  }catch(e){console.error('Migration failed:',e);showToast('Migration failed — local data is safe');}
 }
-async function dbInsert(o){return sbFetch('outfits',{method:'POST',prefer:'return=representation',body:JSON.stringify(outfitToRow(o))});}
-async function dbUpdate(o){return sbFetch('outfits?id=eq.'+encodeURIComponent(o.id),{method:'PATCH',prefer:'return=representation',body:JSON.stringify(outfitToRow(o))});}
-async function dbDelete(id){return sbFetch('outfits?id=eq.'+encodeURIComponent(id),{method:'DELETE'});}
+async function dbInsert(o){return apiFetch({method:'POST',body:outfitToRow(o)});}
+async function dbUpdate(o){return apiFetch({method:'PATCH',id:o.id,body:outfitToRow(o)});}
+async function dbDelete(id){return apiFetch({method:'DELETE',id});}
 
 function saveCloudinary(){
   localStorage.setItem('cl_cloud', document.getElementById('s-cloud-name').value);
@@ -603,11 +606,17 @@ function showPage(page, btn){
   if(page === 'viewer') renderGallery();
   if(page === 'admin'){ applySettingsToUI(); renderEntries(); }
 }
-function checkPw(){
-  if(document.getElementById('pw-input').value === ADMIN_PASSWORD){
+async function checkPw(){
+  const entered = document.getElementById('pw-input').value;
+  if(entered === ADMIN_PASSWORD){
+    // Store token in memory only — never in localStorage or the DOM
+    adminToken = entered;
     document.getElementById('pw-gate').style.display = 'none';
     document.getElementById('admin-panel').style.display = 'block';
-    applySettingsToUI(); renderEntries();
+    applySettingsToUI();
+    // Run migration now that we have auth
+    await migrateFromLocalStorage();
+    renderEntries();
   } else {
     document.getElementById('pw-error').style.display = 'block';
     document.getElementById('pw-input').value = '';
@@ -1009,7 +1018,7 @@ async function importData(e){
       const d=JSON.parse(ev.target.result);
       if(!Array.isArray(d)){ showToast('Invalid JSON'); return; }
       showToast('Importing '+d.length+' outfits…');
-      await sbFetch('outfits',{method:'POST',prefer:'resolution=ignore-duplicates',body:JSON.stringify(d.map(outfitToRow))});
+      await apiFetch({method:'POST', body:d.map(outfitToRow), bulk:true});
       outfits=d; renderEntries(); renderGallery(); showToast(d.length+' outfits imported!');
     }catch(err){ console.error(err); showToast('Import failed'); }
   };

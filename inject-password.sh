@@ -1,8 +1,8 @@
 #!/bin/bash
 # Runs during Netlify build.
-# Reads environment variables set privately in the Netlify dashboard
-# and injects them into index.html, replacing placeholders.
-# None of these values ever appear in the git repo or source code.
+# Only ADMIN_PASSWORD is injected into the HTML.
+# All Supabase credentials stay server-side in the Netlify function
+# and are never written to any file.
 
 set -e
 
@@ -19,11 +19,6 @@ check_var SUPABASE_URL
 check_var SUPABASE_KEY
 check_var SUPABASE_ADMIN_TOKEN
 
-echo "Injecting environment variables into build..."
-
+echo "Injecting admin password into build..."
 sed -i "s|%%ADMIN_PASSWORD%%|${ADMIN_PASSWORD}|g" index.html
-sed -i "s|%%SUPABASE_URL%%|${SUPABASE_URL}|g" index.html
-sed -i "s|%%SUPABASE_KEY%%|${SUPABASE_KEY}|g" index.html
-sed -i "s|%%SUPABASE_ADMIN_TOKEN%%|${SUPABASE_ADMIN_TOKEN}|g" index.html
-
-echo "Done. All variables injected."
+echo "Done. Supabase credentials stay server-side only."
