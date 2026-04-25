@@ -24,17 +24,23 @@ git push -u origin main
 3. Connect your GitHub account and select your repo
 4. Build settings will be auto-detected from `netlify.toml`
 
-### 3. Set your admin password (the important part)
+### 3. Set your environment variables (the important part)
 
 1. In your Netlify site dashboard, go to **Site configuration → Environment variables**
-2. Click **"Add a variable"**
-3. Key: `ADMIN_PASSWORD`
-4. Value: your chosen password (e.g. `my-secret-password-123`)
-5. Click **Save**
+2. Add each of these four variables:
+
+| Key | Value |
+|-----|-------|
+| `ADMIN_PASSWORD` | Your chosen gallery admin password |
+| `SUPABASE_URL` | Your Supabase project URL |
+| `SUPABASE_KEY` | Your Supabase anon/publishable key |
+| `SUPABASE_ADMIN_TOKEN` | Your secret write token (from the SQL setup) |
+
+3. Click **Save** after adding all four.
 
 ### 4. Trigger a deploy
 
-Go to **Deploys → Trigger deploy → Deploy site**. Netlify runs `inject-password.sh`, which reads your env var and bakes it into the HTML at build time. The password never appears in your code or git history.
+Go to **Deploys → Trigger deploy → Deploy site**. Netlify runs `inject-password.sh`, which reads all four env vars and bakes them into the HTML at build time. None of these values ever appear in your git repo or source code.
 
 ---
 

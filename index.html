@@ -493,13 +493,22 @@ const GRAND_SLAMS = ['Australian Open','Roland Garros','Wimbledon','US Open','Ol
 const ACTIVE_YEARS = [];
 for(let y = 1995; y <= 2022; y++) ACTIVE_YEARS.push(y);
 
-// Supabase REST client
-const SB_URL = 'https://yoxgnjwuzbaibqbqkiml.supabase.co';
-const SB_KEY = 'sb_publishable_P9kjAUxIDBUHzn0EKgl9PA_j-ujqY8c';
+// Supabase REST client — credentials injected at build time by Netlify
+const SB_URL = '%%SUPABASE_URL%%';
+const SB_KEY = '%%SUPABASE_KEY%%';
+const SB_ADMIN_TOKEN = '%%SUPABASE_ADMIN_TOKEN%%';
 async function sbFetch(path, opts={}){
+  const isWrite = opts.method && opts.method !== 'GET';
   const res = await fetch(SB_URL+'/rest/v1/'+path, {
     ...opts,
-    headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':opts.prefer||'',...(opts.headers||{})}
+    headers:{
+      'apikey':SB_KEY,
+      'Authorization':'Bearer '+SB_KEY,
+      'Content-Type':'application/json',
+      'Prefer':opts.prefer||'',
+      ...(isWrite ? {'x-admin-token':SB_ADMIN_TOKEN} : {}),
+      ...(opts.headers||{})
+    }
   });
   if(!res.ok){const t=await res.text();throw new Error('Supabase '+res.status+': '+t);}
   const t=await res.text(); return t?JSON.parse(t):null;
