@@ -485,7 +485,7 @@ input[type=number]{-moz-appearance:textfield}
 <div class="toast" id="toast"></div>
 
 <script>
-const ADMIN_PASSWORD = '%%ADMIN_PASSWORD%%';
+// Password is verified server-side — never stored in this file
 const SETTINGS_KEY = 'serena_settings';
 const MIGRATION_KEY = 'serena_migrated_v1';
 const COLOR_MAP = {White:'#eee',Black:'#111',Red:'#c0392b',Gold:'#C9A84C',Blue:'#2980b9',Purple:'#8e44ad',Pink:'#e91e8c',Green:'#27ae60',Orange:'#e67e22',Multi:'linear-gradient(135deg,#e91e8c,#2980b9)'};
@@ -608,18 +608,34 @@ function showPage(page, btn){
 }
 async function checkPw(){
   const entered = document.getElementById('pw-input').value;
-  if(entered === ADMIN_PASSWORD){
-    // Store token in memory only — never in localStorage or the DOM
-    adminToken = entered;
-    document.getElementById('pw-gate').style.display = 'none';
-    document.getElementById('admin-panel').style.display = 'block';
-    applySettingsToUI();
-    // Run migration now that we have auth
-    await migrateFromLocalStorage();
-    renderEntries();
-  } else {
-    document.getElementById('pw-error').style.display = 'block';
-    document.getElementById('pw-input').value = '';
+  if(!entered) return;
+  const btn = document.querySelector('#pw-gate .btn-primary');
+  btn.textContent = 'Checking…';
+  try {
+    // Verify password server-side — the actual password never lives in this file
+    const res = await fetch('/.netlify/functions/outfits', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json', 'x-admin-token': entered},
+      body: JSON.stringify({_authCheck: true})
+    });
+    if(res.status === 401){
+      document.getElementById('pw-error').style.display = 'block';
+      document.getElementById('pw-input').value = '';
+    } else if(res.ok || res.status === 200){
+      // Password accepted — store in memory only for this session
+      adminToken = entered;
+      document.getElementById('pw-gate').style.display = 'none';
+      document.getElementById('admin-panel').style.display = 'block';
+      applySettingsToUI();
+      await migrateFromLocalStorage();
+      renderEntries();
+    } else {
+      showToast('Server error — try again');
+    }
+  } catch(e) {
+    showToast('Could not reach server');
+  } finally {
+    btn.textContent = 'Enter';
   }
 }
 

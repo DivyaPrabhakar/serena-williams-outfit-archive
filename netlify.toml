@@ -1,5 +1,4 @@
 [build]
-  command = "bash inject-password.sh"
   publish = "."
   functions = "netlify/functions"
 

@@ -1,16 +1,25 @@
-// Netlify serverless function — all Supabase credentials live here, server-side only.
-// The browser never sees SB_URL, SB_KEY, or SB_ADMIN_TOKEN.
-// Environment variables are set in the Netlify dashboard, never in code.
+// Netlify serverless function — ALL credentials live here, server-side only.
+// The browser sends the admin password as a header; this function verifies it.
+// Nothing sensitive ever appears in index.html.
 
 const SB_URL = process.env.SUPABASE_URL;
 const SB_KEY = process.env.SUPABASE_KEY;
 const SB_ADMIN_TOKEN = process.env.SUPABASE_ADMIN_TOKEN;
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'Content-Type, x-admin-token',
   'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, OPTIONS',
 };
+
+function unauthorized() {
+  return {
+    statusCode: 401,
+    headers: { ...CORS, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ error: 'Unauthorized' }),
+  };
+}
 
 async function sbFetch(path, opts = {}) {
   const res = await fetch(`${SB_URL}/rest/v1/${path}`, {
@@ -20,7 +29,7 @@ async function sbFetch(path, opts = {}) {
       'Authorization': `Bearer ${SB_KEY}`,
       'Content-Type': 'application/json',
       'Prefer': opts.prefer || '',
-      ...(opts.adminToken ? { 'x-admin-token': SB_ADMIN_TOKEN } : {}),
+      ...(opts.adminWrite ? { 'x-admin-token': SB_ADMIN_TOKEN } : {}),
     },
   });
   const text = await res.text();
@@ -28,62 +37,62 @@ async function sbFetch(path, opts = {}) {
 }
 
 exports.handler = async (event) => {
-  // Handle CORS preflight
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 204, headers: CORS, body: '' };
   }
 
   const method = event.httpMethod;
+  const clientToken = event.headers['x-admin-token'] || event.headers['X-Admin-Token'] || '';
 
-  // Validate admin token for all write operations
-  if (method !== 'GET') {
-    const clientToken = event.headers['x-admin-token'] || event.headers['X-Admin-Token'];
-    if (!clientToken || clientToken !== SB_ADMIN_TOKEN) {
-      return {
-        statusCode: 401,
-        headers: { ...CORS, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Unauthorized' }),
-      };
-    }
+  // All writes require the admin password as the token
+  const isWrite = method !== 'GET';
+  if (isWrite && clientToken !== ADMIN_PASSWORD) {
+    return unauthorized();
   }
 
   try {
-    let result;
     const params = event.queryStringParameters || {};
 
+    // Auth-check ping — just validate the token, return 200
+    if (method === 'POST') {
+      let body = {};
+      try { body = JSON.parse(event.body || '{}'); } catch(e) {}
+      if (body._authCheck) {
+        return { statusCode: 200, headers: { ...CORS, 'Content-Type': 'application/json' }, body: JSON.stringify({ ok: true }) };
+      }
+    }
+
+    let result;
+
     if (method === 'GET') {
-      // GET all outfits, ordered by year then created_at
       result = await sbFetch('outfits?select=*&order=year.asc,created_at.asc');
 
     } else if (method === 'POST') {
-      // POST: insert one or many outfits
       const body = JSON.parse(event.body || '[]');
       const isBulk = Array.isArray(body);
       result = await sbFetch('outfits', {
         method: 'POST',
         prefer: isBulk ? 'resolution=ignore-duplicates' : 'return=representation',
-        adminToken: true,
+        adminWrite: true,
         body: JSON.stringify(body),
       });
 
     } else if (method === 'PATCH') {
-      // PATCH: update by id — passed as query param ?id=xxx
       const id = params.id;
       if (!id) return { statusCode: 400, headers: CORS, body: JSON.stringify({ error: 'Missing id' }) };
       result = await sbFetch(`outfits?id=eq.${encodeURIComponent(id)}`, {
         method: 'PATCH',
         prefer: 'return=representation',
-        adminToken: true,
+        adminWrite: true,
         body: event.body,
       });
 
     } else if (method === 'DELETE') {
-      // DELETE: delete by id — passed as query param ?id=xxx
       const id = params.id;
       if (!id) return { statusCode: 400, headers: CORS, body: JSON.stringify({ error: 'Missing id' }) };
       result = await sbFetch(`outfits?id=eq.${encodeURIComponent(id)}`, {
         method: 'DELETE',
-        adminToken: true,
+        adminWrite: true,
       });
 
     } else {
