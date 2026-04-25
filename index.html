@@ -20,44 +20,73 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1.25re
 .page{display:none;min-height:calc(100vh - 60px)}
 .page.active{display:block}
 
-/* VIEWER */
-.viewer-header{padding:3rem 2rem 2rem;text-align:center}
+/* ===== VIEWER ===== */
+.viewer-header{padding:3rem 2rem 1.5rem;text-align:center}
 .viewer-header h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3.5rem);font-weight:900;letter-spacing:-0.02em;line-height:1}
 .viewer-header h1 span{color:var(--gold)}
 .viewer-header p{color:var(--text-muted);font-size:0.9rem;margin-top:0.75rem;letter-spacing:0.05em;text-transform:uppercase}
-.viewer-meta-bar{display:flex;align-items:center;justify-content:space-between;padding:0 2rem 1.25rem}
-.viewer-sort-label{font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted)}
+
+/* Tournament filter bar */
+.filter-bar{display:flex;align-items:center;gap:0.5rem;padding:0 2rem 1.5rem;flex-wrap:wrap;border-bottom:1px solid #1a1a1a;margin-bottom:0}
+.filter-bar-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);margin-right:0.25rem;white-space:nowrap}
+.f-btn{background:none;border:1px solid #2a2a2a;color:var(--text-muted);font-family:'DM Sans',sans-serif;font-size:0.78rem;padding:0.35rem 0.85rem;cursor:pointer;transition:all 0.2s;letter-spacing:0.03em;white-space:nowrap}
+.f-btn:hover{border-color:var(--gold);color:var(--gold)}
+.f-btn.active{border-color:var(--gold);background:rgba(201,168,76,0.12);color:var(--gold)}
+
+.viewer-meta-bar{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem 0.75rem}
+.viewer-mode-label{font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted)}
 .count-badge{font-size:0.75rem;color:var(--text-muted)}
 
-/* YEAR ROWS */
+/* ===== YEAR ROWS (default view) ===== */
 .year-section{margin-bottom:2.5rem;padding:0 2rem}
 .year-heading{display:flex;align-items:baseline;gap:1rem;margin-bottom:1rem;padding-bottom:0.6rem;border-bottom:1px solid #2a2a2a}
 .year-heading h2{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:900;color:var(--gold)}
 .year-heading span{font-size:0.75rem;color:var(--text-muted);letter-spacing:0.08em;text-transform:uppercase}
-.year-grid{display:grid;gap:1px;background:#1a1a1a}
+.year-grid{display:grid;gap:0;background:var(--dark)}
+.year-grid.layout-small{grid-template-columns:repeat(auto-fill,minmax(130px,1fr))}
 .year-grid.layout-grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
 .year-grid.layout-wide{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
 
-/* Real cards */
+/* ===== TOURNAMENT VIEW (filtered) ===== */
+.tournament-view-grid{display:grid;gap:0;padding:0 2rem 3rem;background:var(--dark)}
+.tournament-view-grid.layout-small{grid-template-columns:repeat(auto-fill,minmax(130px,1fr))}
+.tournament-view-grid.layout-grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+.tournament-view-grid.layout-wide{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+
+/* ===== CARDS ===== */
+/* Group wrapper — cards in the same tournament/year share a border */
+.card-group{display:contents} /* default: invisible wrapper */
+.card-group.multi{display:block;position:relative} /* multi-outfit group gets styling */
+/* When a group has multiple cards, wrap them in a flex row inside the grid cell span */
+.card-group-inner{display:flex;gap:1px;background:#1a1a1a}
+.card-group.multi .card-group-inner{outline:2px solid transparent;outline-offset:-1px;transition:outline-color 0.25s}
+.card-group.multi:hover .card-group-inner{outline-color:var(--gold)}
+/* Each card inside a multi-group shares hover state */
+.card-group.multi .card{flex:1;min-width:0}
+.card-group.multi:hover .card img{transform:scale(1.04)}
+.card-group.multi:hover .card-overlay{transform:translateY(0)}
+/* Multi badge */
+.multi-badge{position:absolute;top:0.6rem;left:0.6rem;background:rgba(201,168,76,0.85);color:#0d0d0d;font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:0.2rem 0.45rem;z-index:10;pointer-events:none}
+
 .card{background:var(--dark);cursor:pointer;position:relative;overflow:hidden;aspect-ratio:3/4;transition:transform 0.3s}
-.card:hover{transform:scale(0.98)}
+.card-group:not(.multi) .card:hover{transform:scale(0.98)}
 .card img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.4s}
-.card:hover img{transform:scale(1.04)}
+.card:not(.card-group .card) img:hover{transform:scale(1.04)}
 .card-overlay{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(0,0,0,0.9) 0%,transparent 100%);padding:1.25rem 1rem 0.85rem;transform:translateY(4px);transition:transform 0.3s}
-.card:hover .card-overlay{transform:translateY(0)}
-.card-year{font-size:0.7rem;color:var(--gold);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:0.2rem}
+.card:not(.card-group.multi .card):hover .card-overlay{transform:translateY(0)}
+.card-year-lbl{font-size:0.7rem;color:var(--gold);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:0.2rem}
 .card-label{font-family:'Playfair Display',serif;font-size:0.95rem;font-weight:700;line-height:1.2}
 .card-color-dot{position:absolute;top:0.75rem;right:0.75rem;width:10px;height:10px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.4)}
 
-/* Empty placeholder cards */
-.card-empty{background:var(--dark);position:relative;aspect-ratio:3/4;border:1.5px dashed #2a2a2a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5rem}
-.card-empty-icon{font-size:1.2rem;color:#2e2e2e}
-.card-empty-label{font-size:0.68rem;color:#3a3a3a;letter-spacing:0.08em;text-transform:uppercase;text-align:center;padding:0 0.75rem;line-height:1.4}
+/* Empty placeholder */
+.card-empty{background:var(--dark);position:relative;aspect-ratio:3/4;border:1.5px dashed #232323;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5rem}
+.card-empty-icon{font-size:1.2rem;color:#2a2a2a}
+.card-empty-label{font-size:0.68rem;color:#333;letter-spacing:0.08em;text-transform:uppercase;text-align:center;padding:0 0.75rem;line-height:1.4}
 
 .empty-state{text-align:center;padding:4rem 2rem;color:var(--text-muted)}
 .empty-state h3{font-family:'Playfair Display',serif;font-size:1.5rem;margin-bottom:0.5rem;color:var(--text)}
 
-/* LIGHTBOX */
+/* ===== LIGHTBOX ===== */
 .lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:1000;align-items:center;justify-content:center;padding:2rem}
 .lightbox.open{display:flex}
 .lb-inner{display:grid;grid-template-columns:1fr 320px;max-width:900px;width:100%;max-height:90vh;background:var(--dark2);border:1px solid #2a2a2a}
@@ -76,8 +105,8 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1.25re
 .lb-nav button{flex:1;background:none;border:1px solid #333;color:var(--text-muted);font-family:'DM Sans',sans-serif;font-size:0.75rem;padding:0.5rem;cursor:pointer;transition:all 0.2s;letter-spacing:0.05em}
 .lb-nav button:hover{border-color:var(--gold);color:var(--gold)}
 
-/* ADMIN */
-.admin-wrap{max-width:1100px;margin:0 auto;padding:2rem}
+/* ===== ADMIN ===== */
+.admin-wrap{max-width:1200px;margin:0 auto;padding:2rem}
 .admin-header{margin-bottom:2rem}
 .admin-header h2{font-family:'Playfair Display',serif;font-size:2rem}
 .admin-header p{color:var(--text-muted);font-size:0.85rem;margin-top:0.25rem}
@@ -91,6 +120,9 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1.25re
 .field-group input,.field-group textarea{width:100%;background:var(--dark3);border:1px solid #333;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.9rem;padding:0.6rem 0.75rem;outline:none;transition:border-color 0.2s}
 .field-group input:focus,.field-group textarea:focus{border-color:var(--gold)}
 .field-group textarea{resize:vertical;min-height:80px}
+/* Prevent scroll from changing year number input */
+input[type=number]{-moz-appearance:textfield}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 
 /* Tournament button picker */
 .tournament-buttons{display:flex;flex-wrap:wrap;gap:0.4rem}
@@ -119,7 +151,9 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1.25re
 .btn-primary:hover{opacity:0.85}
 .btn-secondary{background:none;border:1px solid #444;color:var(--text);padding:0.6rem 1rem;font-family:'DM Sans',sans-serif;font-size:0.8rem;cursor:pointer;transition:all 0.2s;flex:1}
 .btn-secondary:hover{border-color:var(--text)}
-.btn-danger{background:none;border:1px solid #c0392b;color:#c0392b;padding:0.35rem 0.75rem;font-family:'DM Sans',sans-serif;font-size:0.75rem;cursor:pointer}
+.btn-danger{background:none;border:1px solid #c0392b;color:#c0392b;padding:0.35rem 0.6rem;font-family:'DM Sans',sans-serif;font-size:0.75rem;cursor:pointer}
+.btn-edit{background:none;border:1px solid #444;color:var(--text-muted);padding:0.35rem 0.6rem;font-family:'DM Sans',sans-serif;font-size:0.75rem;cursor:pointer;transition:all 0.2s}
+.btn-edit:hover{border-color:var(--gold);color:var(--gold)}
 
 .settings-section-label{font-size:0.65rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-muted);margin:1.25rem 0 0.5rem;padding-top:1rem;border-top:1px solid #222}
 .settings-section-label:first-child{margin-top:0;padding-top:0;border-top:none}
@@ -138,12 +172,30 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1.25re
 .seg-btn:last-child{border-right:none}
 .seg-btn.active{background:rgba(201,168,76,0.15);color:var(--gold)}
 
-.entries-list{display:flex;flex-direction:column;gap:0.5rem;max-height:380px;overflow-y:auto;margin-top:0.5rem}
+/* ===== ENTRIES (search + list) ===== */
+.search-box{width:100%;background:var(--dark3);border:1px solid #333;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.85rem;padding:0.55rem 0.75rem;outline:none;margin-bottom:0.75rem;transition:border-color 0.2s}
+.search-box:focus{border-color:var(--gold)}
+.entries-list{display:flex;flex-direction:column;gap:0.5rem;max-height:420px;overflow-y:auto}
 .entry-row{display:flex;align-items:center;gap:0.75rem;padding:0.75rem;background:var(--dark3);border:1px solid #2a2a2a}
 .entry-thumb{width:44px;height:56px;object-fit:cover;flex-shrink:0;background:#1a1a1a}
 .entry-info{flex:1;min-width:0}
 .entry-name{font-size:0.85rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .entry-meta{font-size:0.75rem;color:var(--text-muted)}
+.entry-actions{display:flex;gap:0.4rem;flex-shrink:0}
+
+/* ===== EDIT MODAL ===== */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal-box{background:var(--dark2);border:1px solid #2a2a2a;padding:1.75rem;max-width:480px;width:100%;margin:1rem;max-height:90vh;overflow-y:auto}
+.modal-box h3{font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:1.25rem;color:var(--gold)}
+.modal-box p{font-size:0.8rem;color:var(--text-muted);line-height:1.6;margin-bottom:1rem}
+.modal-btns{display:flex;gap:0.75rem;margin-top:1.25rem}
+.modal-field{margin-bottom:1rem}
+.modal-field label{display:block;font-size:0.7rem;color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.35rem}
+.modal-field input,.modal-field textarea{width:100%;background:var(--dark3);border:1px solid #333;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.88rem;padding:0.55rem 0.75rem;outline:none;transition:border-color 0.2s}
+.modal-field input:focus,.modal-field textarea:focus{border-color:var(--gold)}
+.modal-field textarea{resize:vertical;min-height:70px}
+input[type=number]{-moz-appearance:textfield}
 
 .pw-gate{min-height:calc(100vh - 60px);display:flex;align-items:center;justify-content:center}
 .pw-box{background:var(--dark2);border:1px solid #2a2a2a;padding:2.5rem;max-width:360px;width:100%;text-align:center}
@@ -152,13 +204,6 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1.25re
 .pw-box input{width:100%;background:var(--dark3);border:1px solid #333;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.95rem;padding:0.75rem;outline:none;text-align:center;letter-spacing:0.1em;margin-bottom:1rem}
 .pw-box input:focus{border-color:var(--gold)}
 .pw-error{font-size:0.8rem;color:var(--accent);margin-top:0.5rem;display:none}
-
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:500;align-items:center;justify-content:center}
-.modal-overlay.open{display:flex}
-.modal-box{background:var(--dark2);border:1px solid #2a2a2a;padding:1.5rem;max-width:420px;width:100%;margin:1rem}
-.modal-box h3{font-family:'Playfair Display',serif;font-size:1.2rem;margin-bottom:0.5rem}
-.modal-box p{font-size:0.8rem;color:var(--text-muted);line-height:1.6;margin-bottom:1rem}
-.modal-btns{display:flex;gap:0.75rem;margin-top:1rem}
 
 .import-export{display:flex;gap:0.75rem}
 .toast{position:fixed;bottom:2rem;right:2rem;background:var(--dark2);border:1px solid var(--gold);color:var(--text);padding:0.75rem 1.25rem;font-size:0.85rem;z-index:2000;transform:translateY(100px);transition:transform 0.3s;pointer-events:none}
@@ -170,7 +215,8 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1.25re
   .admin-grid{grid-template-columns:1fr}
   .lb-inner{grid-template-columns:1fr}
   .lb-img{max-height:50vh}
-  .year-grid.layout-grid,.year-grid.layout-wide{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+  .year-grid.layout-small,.year-grid.layout-grid,.year-grid.layout-wide,
+  .tournament-view-grid.layout-small,.tournament-view-grid.layout-grid,.tournament-view-grid.layout-wide{grid-template-columns:repeat(auto-fill,minmax(120px,1fr))}
 }
 </style>
 </head>
@@ -184,20 +230,32 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1.25re
   </div>
 </nav>
 
-<!-- VIEWER -->
+<!-- ===== VIEWER ===== -->
 <div id="page-viewer" class="page active">
   <div class="viewer-header">
     <h1>THE <span>LOOKS</span></h1>
     <p>A visual archive of Serena Williams on court</p>
   </div>
+
+  <!-- Tournament filter bar -->
+  <div class="filter-bar">
+    <span class="filter-bar-label">Filter</span>
+    <button class="f-btn active" onclick="setFilter('all',this)">All Years</button>
+    <button class="f-btn" onclick="setFilter('Australian Open',this)">Australian Open</button>
+    <button class="f-btn" onclick="setFilter('Roland Garros',this)">Roland Garros</button>
+    <button class="f-btn" onclick="setFilter('Wimbledon',this)">Wimbledon</button>
+    <button class="f-btn" onclick="setFilter('US Open',this)">US Open</button>
+    <button class="f-btn" onclick="setFilter('Olympics',this)">Olympics</button>
+  </div>
+
   <div class="viewer-meta-bar">
-    <span class="viewer-sort-label">Sorted chronologically by year</span>
+    <span class="viewer-mode-label" id="viewer-mode-label">Sorted chronologically by year</span>
     <span class="count-badge" id="count-badge"></span>
   </div>
   <div id="gallery-root"></div>
 </div>
 
-<!-- ADMIN -->
+<!-- ===== ADMIN ===== -->
 <div id="page-admin" class="page">
   <div class="pw-gate" id="pw-gate">
     <div class="pw-box">
@@ -212,7 +270,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1.25re
   <div class="admin-wrap" id="admin-panel" style="display:none">
     <div class="admin-header">
       <h2>Gallery Admin</h2>
-      <p>Upload outfits, set metadata, and control every aspect of the viewer</p>
+      <p>Upload outfits, edit entries, and control the viewer</p>
     </div>
     <div class="admin-grid">
 
@@ -229,8 +287,8 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1.25re
               <p>JPG, PNG, WEBP — 3:4 ratio recommended</p>
               <input type="file" id="file-input" accept="image/*" onchange="handleFileSelect(event)" style="display:none">
             </div>
-            <div class="url-input-row">or <a onclick="toggleUrlMode()">paste an image URL instead</a></div>
-            <div class="url-mode" id="url-mode">
+            <div class="url-input-row" style="text-align:left;margin-top:0.75rem">
+              <label style="display:block;font-size:0.75rem;color:var(--text-muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.4rem">Or paste an image URL</label>
               <input type="url" id="image-url-input" placeholder="https://example.com/image.jpg" oninput="previewUrl(this.value)" style="width:100%;background:var(--dark3);border:1px solid #333;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.85rem;padding:0.5rem 0.75rem;outline:none">
             </div>
             <img id="preview-img" class="preview-img" alt="Preview">
@@ -238,18 +296,20 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1.25re
 
           <div class="field-group">
             <label>Year</label>
-            <input type="number" id="f-year" placeholder="1999" min="1990" max="2030">
+            <input type="number" id="f-year" placeholder="1999" min="1990" max="2030"
+              onwheel="this.blur()"
+              onkeydown="if(e.key==='ArrowUp'||e.key==='ArrowDown')e.preventDefault()">
           </div>
 
           <div class="field-group">
             <label>Tournament</label>
-            <div class="tournament-buttons">
-              <button class="t-btn" onclick="selectTournament(this,'Australian Open')">Australian Open</button>
-              <button class="t-btn" onclick="selectTournament(this,'Roland Garros')">Roland Garros</button>
-              <button class="t-btn" onclick="selectTournament(this,'Wimbledon')">Wimbledon</button>
-              <button class="t-btn" onclick="selectTournament(this,'US Open')">US Open</button>
-              <button class="t-btn" onclick="selectTournament(this,'Olympics')">Olympics</button>
-              <button class="t-btn" onclick="selectTournament(this,'Other')">Other…</button>
+            <div class="tournament-buttons" id="add-tournament-btns">
+              <button class="t-btn" onclick="selectTournament(this,'Australian Open','add')">Australian Open</button>
+              <button class="t-btn" onclick="selectTournament(this,'Roland Garros','add')">Roland Garros</button>
+              <button class="t-btn" onclick="selectTournament(this,'Wimbledon','add')">Wimbledon</button>
+              <button class="t-btn" onclick="selectTournament(this,'US Open','add')">US Open</button>
+              <button class="t-btn" onclick="selectTournament(this,'Olympics','add')">Olympics</button>
+              <button class="t-btn" onclick="selectTournament(this,'Other','add')">Other…</button>
             </div>
             <div class="other-input" id="other-tournament-wrap">
               <input type="text" id="other-tournament" placeholder="Enter tournament name…">
@@ -258,17 +318,17 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1.25re
 
           <div class="field-group">
             <label>Primary Color</label>
-            <div class="color-options">
-              <div class="color-option" onclick="toggleColor(this,'White')"><span class="color-dot-sm" style="background:#eee;border:1px solid #888"></span>White</div>
-              <div class="color-option" onclick="toggleColor(this,'Black')"><span class="color-dot-sm" style="background:#111"></span>Black</div>
-              <div class="color-option" onclick="toggleColor(this,'Red')"><span class="color-dot-sm" style="background:#c0392b"></span>Red</div>
-              <div class="color-option" onclick="toggleColor(this,'Gold')"><span class="color-dot-sm" style="background:#C9A84C"></span>Gold</div>
-              <div class="color-option" onclick="toggleColor(this,'Blue')"><span class="color-dot-sm" style="background:#2980b9"></span>Blue</div>
-              <div class="color-option" onclick="toggleColor(this,'Purple')"><span class="color-dot-sm" style="background:#8e44ad"></span>Purple</div>
-              <div class="color-option" onclick="toggleColor(this,'Pink')"><span class="color-dot-sm" style="background:#e91e8c"></span>Pink</div>
-              <div class="color-option" onclick="toggleColor(this,'Green')"><span class="color-dot-sm" style="background:#27ae60"></span>Green</div>
-              <div class="color-option" onclick="toggleColor(this,'Orange')"><span class="color-dot-sm" style="background:#e67e22"></span>Orange</div>
-              <div class="color-option" onclick="toggleColor(this,'Multi')"><span class="color-dot-sm" style="background:linear-gradient(135deg,#e91e8c,#2980b9)"></span>Multi</div>
+            <div class="color-options" id="add-color-options">
+              <div class="color-option" onclick="toggleColor(this,'White','add')"><span class="color-dot-sm" style="background:#eee;border:1px solid #888"></span>White</div>
+              <div class="color-option" onclick="toggleColor(this,'Black','add')"><span class="color-dot-sm" style="background:#111"></span>Black</div>
+              <div class="color-option" onclick="toggleColor(this,'Red','add')"><span class="color-dot-sm" style="background:#c0392b"></span>Red</div>
+              <div class="color-option" onclick="toggleColor(this,'Gold','add')"><span class="color-dot-sm" style="background:#C9A84C"></span>Gold</div>
+              <div class="color-option" onclick="toggleColor(this,'Blue','add')"><span class="color-dot-sm" style="background:#2980b9"></span>Blue</div>
+              <div class="color-option" onclick="toggleColor(this,'Purple','add')"><span class="color-dot-sm" style="background:#8e44ad"></span>Purple</div>
+              <div class="color-option" onclick="toggleColor(this,'Pink','add')"><span class="color-dot-sm" style="background:#e91e8c"></span>Pink</div>
+              <div class="color-option" onclick="toggleColor(this,'Green','add')"><span class="color-dot-sm" style="background:#27ae60"></span>Green</div>
+              <div class="color-option" onclick="toggleColor(this,'Orange','add')"><span class="color-dot-sm" style="background:#e67e22"></span>Orange</div>
+              <div class="color-option" onclick="toggleColor(this,'Multi','add')"><span class="color-dot-sm" style="background:linear-gradient(135deg,#e91e8c,#2980b9)"></span>Multi</div>
             </div>
           </div>
 
@@ -285,16 +345,15 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1.25re
       <div class="right-col">
         <div class="panel">
           <h3>Viewer Settings</h3>
-
           <div class="settings-section-label">Grid Layout</div>
           <div class="settings-row">
             <div><div class="settings-label">Grid Density</div><div class="settings-sub">Column width in the gallery</div></div>
             <div class="seg-control">
+              <button class="seg-btn" id="layout-small" onclick="setLayout('small')">Small</button>
               <button class="seg-btn active" id="layout-grid" onclick="setLayout('grid')">Standard</button>
               <button class="seg-btn" id="layout-wide" onclick="setLayout('wide')">Large</button>
             </div>
           </div>
-
           <div class="settings-section-label">Card Behaviour</div>
           <div class="settings-row">
             <div><div class="settings-label">Lightbox on Click</div><div class="settings-sub">Detail panel when a card is tapped</div></div>
@@ -309,7 +368,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1.25re
             <label class="toggle"><input type="checkbox" id="s-empty-slots" checked onchange="saveSettings()"><span class="toggle-slider"></span></label>
           </div>
           <div class="settings-row">
-            <div><div class="settings-label">Card Label</div><div class="settings-sub">What appears on the card hover overlay</div></div>
+            <div><div class="settings-label">Card Label</div><div class="settings-sub">Text shown on card hover</div></div>
             <select id="s-card-label" onchange="saveSettings()" style="width:120px;background:var(--dark3);border:1px solid #333;color:var(--text);padding:0.4rem;font-family:'DM Sans',sans-serif;font-size:0.8rem;outline:none">
               <option value="notes">Notes</option>
               <option value="tournament">Tournament</option>
@@ -331,8 +390,10 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1.25re
           </div>
         </div>
 
+        <!-- Entries with search -->
         <div class="panel">
           <h3>All Outfits (<span id="entry-count">0</span>)</h3>
+          <input type="text" class="search-box" id="entry-search" placeholder="Search by tournament, year, notes…" oninput="renderEntries()">
           <div class="entries-list" id="entries-list">
             <p style="font-size:0.8rem;color:var(--text-muted)">No outfits added yet.</p>
           </div>
@@ -342,7 +403,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1.25re
   </div>
 </div>
 
-<!-- LIGHTBOX -->
+<!-- ===== LIGHTBOX ===== -->
 <div class="lightbox" id="lightbox" onclick="closeLightboxBg(event)">
   <button class="lb-close" onclick="closeLightbox()">✕</button>
   <div class="lb-inner" onclick="event.stopPropagation()">
@@ -362,13 +423,60 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1.25re
   </div>
 </div>
 
+<!-- ===== EDIT MODAL ===== -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal-box">
+    <h3>Edit Outfit</h3>
+    <div class="modal-field">
+      <label>Year</label>
+      <input type="number" id="edit-year" placeholder="1999" min="1990" max="2030" onwheel="this.blur()">
+    </div>
+    <div class="modal-field">
+      <label>Tournament</label>
+      <div class="tournament-buttons" id="edit-tournament-btns" style="margin-bottom:0.4rem">
+        <button class="t-btn" onclick="selectTournament(this,'Australian Open','edit')">Australian Open</button>
+        <button class="t-btn" onclick="selectTournament(this,'Roland Garros','edit')">Roland Garros</button>
+        <button class="t-btn" onclick="selectTournament(this,'Wimbledon','edit')">Wimbledon</button>
+        <button class="t-btn" onclick="selectTournament(this,'US Open','edit')">US Open</button>
+        <button class="t-btn" onclick="selectTournament(this,'Olympics','edit')">Olympics</button>
+        <button class="t-btn" onclick="selectTournament(this,'Other','edit')">Other…</button>
+      </div>
+      <div class="other-input" id="edit-other-wrap">
+        <input type="text" id="edit-other-tournament" placeholder="Enter tournament name…">
+      </div>
+    </div>
+    <div class="modal-field">
+      <label>Primary Color</label>
+      <div class="color-options" id="edit-color-options">
+        <div class="color-option" onclick="toggleColor(this,'White','edit')"><span class="color-dot-sm" style="background:#eee;border:1px solid #888"></span>White</div>
+        <div class="color-option" onclick="toggleColor(this,'Black','edit')"><span class="color-dot-sm" style="background:#111"></span>Black</div>
+        <div class="color-option" onclick="toggleColor(this,'Red','edit')"><span class="color-dot-sm" style="background:#c0392b"></span>Red</div>
+        <div class="color-option" onclick="toggleColor(this,'Gold','edit')"><span class="color-dot-sm" style="background:#C9A84C"></span>Gold</div>
+        <div class="color-option" onclick="toggleColor(this,'Blue','edit')"><span class="color-dot-sm" style="background:#2980b9"></span>Blue</div>
+        <div class="color-option" onclick="toggleColor(this,'Purple','edit')"><span class="color-dot-sm" style="background:#8e44ad"></span>Purple</div>
+        <div class="color-option" onclick="toggleColor(this,'Pink','edit')"><span class="color-dot-sm" style="background:#e91e8c"></span>Pink</div>
+        <div class="color-option" onclick="toggleColor(this,'Green','edit')"><span class="color-dot-sm" style="background:#27ae60"></span>Green</div>
+        <div class="color-option" onclick="toggleColor(this,'Orange','edit')"><span class="color-dot-sm" style="background:#e67e22"></span>Orange</div>
+        <div class="color-option" onclick="toggleColor(this,'Multi','edit')"><span class="color-dot-sm" style="background:linear-gradient(135deg,#e91e8c,#2980b9)"></span>Multi</div>
+      </div>
+    </div>
+    <div class="modal-field">
+      <label>Notes</label>
+      <textarea id="edit-notes" placeholder="Description…"></textarea>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-secondary" onclick="closeEditModal()" style="flex:1">Cancel</button>
+      <button class="btn-primary" onclick="saveEdit()" style="width:auto;padding:0.65rem 1.5rem;flex:1">Save Changes</button>
+    </div>
+  </div>
+</div>
+
 <!-- Cloudinary modal -->
 <div class="modal-overlay" id="cloudinary-modal">
   <div class="modal-box">
-    <h3>Cloudinary not configured</h3>
+    <h3 style="color:var(--text);font-size:1.1rem;margin-bottom:0.5rem">Cloudinary not configured</h3>
     <p>Enter your Cloud name and Upload preset in the Data & Cloudinary panel, or use "paste an image URL" to add images by URL instead.</p>
     <div class="modal-btns">
-      <button class="btn-secondary" onclick="document.getElementById('cloudinary-modal').classList.remove('open');toggleUrlMode()">Use URL instead</button>
       <button class="btn-primary" onclick="document.getElementById('cloudinary-modal').classList.remove('open')" style="width:auto;padding:0.6rem 1.25rem">Got it</button>
     </div>
   </div>
@@ -378,76 +486,114 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1.25re
 
 <script>
 const ADMIN_PASSWORD = '%%ADMIN_PASSWORD%%';
-const STORAGE_KEY = 'serena_outfits';
 const SETTINGS_KEY = 'serena_settings';
+const MIGRATION_KEY = 'serena_migrated_v1';
 const COLOR_MAP = {White:'#eee',Black:'#111',Red:'#c0392b',Gold:'#C9A84C',Blue:'#2980b9',Purple:'#8e44ad',Pink:'#e91e8c',Green:'#27ae60',Orange:'#e67e22',Multi:'linear-gradient(135deg,#e91e8c,#2980b9)'};
-
-// Canonical tournaments — always get a placeholder slot per year
 const GRAND_SLAMS = ['Australian Open','Roland Garros','Wimbledon','US Open','Olympics'];
-
-// Serena's full career span
 const ACTIVE_YEARS = [];
 for(let y = 1995; y <= 2022; y++) ACTIVE_YEARS.push(y);
 
-let outfits = [];
-let settings = {layout:'grid',lightbox:true,colorDot:true,showEmptySlots:true,cardLabel:'notes'};
-let flatSortedOutfits = [];
-let selectedColors = [];
-let urlModeActive = false;
-let selectedFile = null;
-let selectedTournament = '';
-let lbIndex = 0;
+// Supabase REST client
+const SB_URL = 'https://yoxgnjwuzbaibqbqkiml.supabase.co';
+const SB_KEY = 'sb_publishable_P9kjAUxIDBUHzn0EKgl9PA_j-ujqY8c';
+async function sbFetch(path, opts={}){
+  const res = await fetch(SB_URL+'/rest/v1/'+path, {
+    ...opts,
+    headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':opts.prefer||'',...(opts.headers||{})}
+  });
+  if(!res.ok){const t=await res.text();throw new Error('Supabase '+res.status+': '+t);}
+  const t=await res.text(); return t?JSON.parse(t):null;
+}
+function rowToOutfit(r){return{id:r.id,imageUrl:r.image_url,year:r.year,tournament:r.tournament,notes:r.notes,colors:r.colors||[]};}
+function outfitToRow(o){return{id:o.id,image_url:o.imageUrl,year:o.year||null,tournament:o.tournament||null,notes:o.notes||null,colors:o.colors||[]};}
 
-function loadData(){
-  try{ outfits=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]'); }catch(e){ outfits=[]; }
-  try{ Object.assign(settings,JSON.parse(localStorage.getItem(SETTINGS_KEY)||'{}')); }catch(e){}
+let outfits = [];
+let settings = {layout:'grid', lightbox:true, colorDot:true, showEmptySlots:true, cardLabel:'notes'};
+let flatSortedOutfits = [];
+let lbIndex = 0;
+let activeFilter = 'all';
+
+// Add-form state
+let addColors = [], addTournament = '', addFile = null;
+// Edit-form state
+let editId = null, editColors = [], editTournament = '';
+
+/* ===== DATA ===== */
+async function loadData(){
+  try{ Object.assign(settings, JSON.parse(localStorage.getItem(SETTINGS_KEY)||'{}')); }catch(e){}
   document.getElementById('s-cloud-name').value = localStorage.getItem('cl_cloud')||'';
   document.getElementById('s-upload-preset').value = localStorage.getItem('cl_preset')||'';
   applySettingsToUI();
-}
-
-function saveData(){ localStorage.setItem(STORAGE_KEY,JSON.stringify(outfits)); }
-
-function saveSettings(){
-  settings.lightbox = document.getElementById('s-lightbox').checked;
-  settings.colorDot = document.getElementById('s-colordot').checked;
-  settings.showEmptySlots = document.getElementById('s-empty-slots').checked;
-  settings.cardLabel = document.getElementById('s-card-label').value;
-  localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));
+  document.getElementById('gallery-root').innerHTML =
+    '<div class="empty-state"><h3 style="color:var(--text-muted);font-size:1rem;font-weight:400">Loading gallery\u2026</h3></div>';
+  try{
+    await migrateFromLocalStorage();
+    const rows = await sbFetch('outfits?select=*&order=year.asc,created_at.asc');
+    outfits = (rows||[]).map(rowToOutfit);
+  }catch(e){
+    console.error('Supabase load failed:',e);
+    showToast('Database unreachable \u2014 showing cached data');
+    try{outfits=JSON.parse(localStorage.getItem('serena_outfits')||'[]');}catch(e2){outfits=[];}
+  }
   renderGallery();
 }
-
-function setLayout(layout){
-  settings.layout = layout;
-  document.getElementById('layout-grid').classList.toggle('active',layout==='grid');
-  document.getElementById('layout-wide').classList.toggle('active',layout==='wide');
-  localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));
-  renderGallery();
+async function migrateFromLocalStorage(){
+  if(localStorage.getItem(MIGRATION_KEY)) return;
+  let local=[];
+  try{local=JSON.parse(localStorage.getItem('serena_outfits')||'[]');}catch(e){local=[];}
+  if(!local.length){localStorage.setItem(MIGRATION_KEY,'1');return;}
+  showToast('Migrating '+local.length+' saved outfits to database\u2026');
+  try{
+    await sbFetch('outfits',{method:'POST',prefer:'resolution=ignore-duplicates',body:JSON.stringify(local.map(outfitToRow))});
+    localStorage.setItem(MIGRATION_KEY,'1');
+    showToast(local.length+' outfits migrated \u2713');
+  }catch(e){console.error('Migration failed:',e);showToast('Migration failed \u2014 local data is safe');}
 }
-
-function applySettingsToUI(){
-  document.getElementById('s-lightbox').checked = settings.lightbox;
-  document.getElementById('s-colordot').checked = settings.colorDot;
-  document.getElementById('s-empty-slots').checked = settings.showEmptySlots !== false;
-  document.getElementById('s-card-label').value = settings.cardLabel || 'notes';
-  document.getElementById('layout-grid').classList.toggle('active', settings.layout !== 'wide');
-  document.getElementById('layout-wide').classList.toggle('active', settings.layout === 'wide');
-}
+async function dbInsert(o){return sbFetch('outfits',{method:'POST',prefer:'return=representation',body:JSON.stringify(outfitToRow(o))});}
+async function dbUpdate(o){return sbFetch('outfits?id=eq.'+encodeURIComponent(o.id),{method:'PATCH',prefer:'return=representation',body:JSON.stringify(outfitToRow(o))});}
+async function dbDelete(id){return sbFetch('outfits?id=eq.'+encodeURIComponent(id),{method:'DELETE'});}
 
 function saveCloudinary(){
   localStorage.setItem('cl_cloud', document.getElementById('s-cloud-name').value);
   localStorage.setItem('cl_preset', document.getElementById('s-upload-preset').value);
 }
 
-function showPage(page, btn){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('page-'+page).classList.add('active');
-  if(btn) btn.classList.add('active');
-  if(page==='viewer') renderGallery();
-  if(page==='admin'){ applySettingsToUI(); renderEntries(); }
+/* ===== SETTINGS ===== */
+function saveSettings(){
+  settings.lightbox = document.getElementById('s-lightbox').checked;
+  settings.colorDot = document.getElementById('s-colordot').checked;
+  settings.showEmptySlots = document.getElementById('s-empty-slots').checked;
+  settings.cardLabel = document.getElementById('s-card-label').value;
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  renderGallery();
+}
+function setLayout(layout){
+  settings.layout = layout;
+  document.getElementById('layout-small').classList.toggle('active', layout==='small');
+  document.getElementById('layout-grid').classList.toggle('active', layout==='grid');
+  document.getElementById('layout-wide').classList.toggle('active', layout==='wide');
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  renderGallery();
+}
+function applySettingsToUI(){
+  document.getElementById('s-lightbox').checked = settings.lightbox;
+  document.getElementById('s-colordot').checked = settings.colorDot;
+  document.getElementById('s-empty-slots').checked = settings.showEmptySlots !== false;
+  document.getElementById('s-card-label').value = settings.cardLabel || 'notes';
+  document.getElementById('layout-small').classList.toggle('active', settings.layout === 'small');
+  document.getElementById('layout-grid').classList.toggle('active', settings.layout === 'grid' || !settings.layout);
+  document.getElementById('layout-wide').classList.toggle('active', settings.layout === 'wide');
 }
 
+/* ===== PAGE NAV ===== */
+function showPage(page, btn){
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  if(btn) btn.classList.add('active');
+  if(page === 'viewer') renderGallery();
+  if(page === 'admin'){ applySettingsToUI(); renderEntries(); }
+}
 function checkPw(){
   if(document.getElementById('pw-input').value === ADMIN_PASSWORD){
     document.getElementById('pw-gate').style.display = 'none';
@@ -459,12 +605,71 @@ function checkPw(){
   }
 }
 
-/* ===== GALLERY: year rows with placeholder slots ===== */
+/* ===== FILTER ===== */
+function setFilter(val, btn){
+  activeFilter = val;
+  document.querySelectorAll('.f-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderGallery();
+}
+
+/* ===== GALLERY RENDER ===== */
 function renderGallery(){
   const root = document.getElementById('gallery-root');
   const badge = document.getElementById('count-badge');
+  const modeLabel = document.getElementById('viewer-mode-label');
+  const layout = settings.layout || 'grid';
 
-  // Group real outfits by year
+  if(activeFilter !== 'all'){
+    // TOURNAMENT FILTER VIEW — one card per year (or multiple if multiple outfits)
+    modeLabel.textContent = activeFilter + ' — all years';
+    const filtered = outfits.filter(o => o.tournament === activeFilter)
+      .sort((a,b) => (a.year||0) - (b.year||0));
+
+    flatSortedOutfits = filtered;
+    badge.textContent = filtered.length + ' outfits';
+
+    if(!filtered.length && !settings.showEmptySlots){
+      root.innerHTML = '<div class="empty-state"><h3>No outfits yet for ' + activeFilter + '</h3></div>';
+      return;
+    }
+
+    // Build year list
+    const yearsWithOutfits = new Set(filtered.map(o => o.year));
+    let years = settings.showEmptySlots
+      ? ACTIVE_YEARS.filter(y => GRAND_SLAMS.includes(activeFilter) || yearsWithOutfits.has(y))
+      : [...yearsWithOutfits].sort((a,b)=>a-b);
+    if(settings.showEmptySlots && GRAND_SLAMS.includes(activeFilter)){
+      years = ACTIVE_YEARS; // show all active years with placeholders
+    }
+
+    // Group by year
+    const byYear = {};
+    filtered.forEach(o => {
+      if(!byYear[o.year]) byYear[o.year] = [];
+      byYear[o.year].push(o);
+    });
+
+    let html = `<div class="tournament-view-grid layout-${layout}">`;
+    years.forEach(y => {
+      const group = byYear[y];
+      if(group && group.length > 0){
+        group.forEach(o => {
+          const idx = flatSortedOutfits.indexOf(o);
+          html += buildRealCard(o, idx);
+        });
+      } else if(settings.showEmptySlots){
+        html += buildEmptyCard(activeFilter, y);
+      }
+    });
+    html += '</div>';
+    root.innerHTML = html;
+    return;
+  }
+
+  // ALL-YEARS VIEW — row per year, grand slam groups
+  modeLabel.textContent = 'Sorted chronologically by year';
+
   const byYear = {};
   outfits.forEach(o => {
     const y = o.year || 'Unknown';
@@ -472,104 +677,96 @@ function renderGallery(){
     byYear[y].push(o);
   });
 
-  // Determine which years to show
   let years;
   if(settings.showEmptySlots){
     const outfitYears = Object.keys(byYear).map(Number).filter(n => !isNaN(n));
-    const allYears = new Set([...ACTIVE_YEARS, ...outfitYears]);
-    years = Array.from(allYears).sort((a,b) => a - b);
+    years = Array.from(new Set([...ACTIVE_YEARS, ...outfitYears])).sort((a,b)=>a-b);
   } else {
-    const outfitYears = Object.keys(byYear).map(y => isNaN(y) ? y : Number(y));
-    years = outfitYears.sort((a,b) => a - b);
+    years = Object.keys(byYear).map(y => isNaN(y)?y:Number(y)).sort((a,b)=>a-b);
   }
 
   if(!years.length){
     root.innerHTML = '<div class="empty-state"><h3>No outfits yet</h3><p>Head to the Admin tab to start building the archive.</p></div>';
-    badge.textContent = '';
-    return;
+    badge.textContent = ''; return;
   }
 
-  // Build flat list of real outfits in display order for lightbox
+  // Build flat list for lightbox
   flatSortedOutfits = [];
   years.forEach(y => {
-    const row = (byYear[y] || []).slice().sort((a,b) => {
-      const ai = GRAND_SLAMS.indexOf(a.tournament);
-      const bi = GRAND_SLAMS.indexOf(b.tournament);
-      return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+    const row = (byYear[y]||[]).slice().sort((a,b)=>{
+      const ai = GRAND_SLAMS.indexOf(a.tournament); const bi = GRAND_SLAMS.indexOf(b.tournament);
+      return (ai===-1?99:ai)-(bi===-1?99:bi);
     });
     flatSortedOutfits.push(...row);
   });
 
   badge.textContent = outfits.length + ' outfits';
-  const layoutClass = 'year-grid layout-' + (settings.layout || 'grid');
 
   let html = '';
-
   years.forEach(y => {
-    const realOutfits = (byYear[y] || []).slice().sort((a,b) => {
-      const ai = GRAND_SLAMS.indexOf(a.tournament);
-      const bi = GRAND_SLAMS.indexOf(b.tournament);
-      return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+    const realOutfits = (byYear[y]||[]).slice().sort((a,b)=>{
+      const ai = GRAND_SLAMS.indexOf(a.tournament); const bi = GRAND_SLAMS.indexOf(b.tournament);
+      return (ai===-1?99:ai)-(bi===-1?99:bi);
     });
-
-    // Group by tournament to detect multiples
     const byTournament = {};
     realOutfits.forEach(o => {
-      if(!byTournament[o.tournament]) byTournament[o.tournament] = [];
+      if(!byTournament[o.tournament]) byTournament[o.tournament]=[];
       byTournament[o.tournament].push(o);
     });
-
     const coveredMajors = GRAND_SLAMS.filter(s => byTournament[s]);
     const outfitCount = realOutfits.length;
 
-    let cards = '';
-
-    // For each grand slam slot: show all real outfits, OR one placeholder
+    let cells = '';
     GRAND_SLAMS.forEach(slam => {
       if(byTournament[slam]){
-        byTournament[slam].forEach(o => {
-          cards += buildRealCard(o);
-        });
+        const group = byTournament[slam];
+        if(group.length === 1){
+          cells += buildRealCard(group[0], flatSortedOutfits.indexOf(group[0]));
+        } else {
+          // Multi-outfit group for same tournament in same year
+          const innerCards = group.map(o => buildRealCard(o, flatSortedOutfits.indexOf(o), true)).join('');
+          cells += `<div class="card-group multi" style="grid-column:span ${Math.min(group.length,3)}">
+            <span class="multi-badge">${group.length} looks</span>
+            <div class="card-group-inner">${innerCards}</div>
+          </div>`;
+        }
       } else if(settings.showEmptySlots){
-        cards += buildEmptyCard(slam, y);
+        cells += buildEmptyCard(slam, y);
       }
     });
-
-    // Non-grand-slam outfits (Other Tournament, Exhibition, etc.)
+    // Non-grand-slam outfits
     realOutfits.forEach(o => {
       if(!GRAND_SLAMS.includes(o.tournament)){
-        cards += buildRealCard(o);
+        cells += buildRealCard(o, flatSortedOutfits.indexOf(o));
       }
     });
 
-    html += `
-      <div class="year-section">
-        <div class="year-heading">
-          <h2>${y}</h2>
-          <span>${outfitCount} outfit${outfitCount !== 1 ? 's' : ''} &nbsp;·&nbsp; ${coveredMajors.length} of ${GRAND_SLAMS.length} majors</span>
-        </div>
-        <div class="${layoutClass}">${cards}</div>
-      </div>`;
+    html += `<div class="year-section">
+      <div class="year-heading">
+        <h2>${y}</h2>
+        <span>${outfitCount} outfit${outfitCount!==1?'s':''} &nbsp;·&nbsp; ${coveredMajors.length} of ${GRAND_SLAMS.length} majors</span>
+      </div>
+      <div class="year-grid layout-${layout}">${cells}</div>
+    </div>`;
   });
 
   root.innerHTML = html;
 }
 
-function buildRealCard(o){
-  const idx = flatSortedOutfits.indexOf(o);
+function buildRealCard(o, idx, insideGroup=false){
   const colorVal = COLOR_MAP[o.colors?.[0]] || '#888';
   const dot = settings.colorDot && o.colors?.[0] ? `<span class="card-color-dot" style="background:${colorVal}"></span>` : '';
-  let lbl = '';
-  if(settings.cardLabel === 'notes') lbl = o.notes ? o.notes.slice(0,45) + (o.notes.length > 45 ? '…' : '') : (o.tournament || '');
-  else if(settings.cardLabel === 'tournament') lbl = o.tournament || '';
-  return `<div class="card" onclick="openLightbox(${idx})">
+  let lbl = settings.cardLabel==='tournament' ? (o.tournament||'') :
+    (o.notes ? o.notes.slice(0,45)+(o.notes.length>45?'…':'') : (o.tournament||''));
+  const wrapClass = insideGroup ? '' : 'card-group';
+  return `<div class="${wrapClass}"><div class="card" onclick="openLightbox(${idx})">
     <img src="${o.imageUrl}" alt="${o.tournament||''} ${o.year||''}" loading="lazy" onerror="this.src='';this.style.background='#222'">
     ${dot}
     <div class="card-overlay">
-      <div class="card-year">${o.year || ''}${o.tournament ? ' · ' + o.tournament : ''}</div>
+      <div class="card-year-lbl">${o.year||''}${o.tournament?' · '+o.tournament:''}</div>
       <div class="card-label">${lbl}</div>
     </div>
-  </div>`;
+  </div></div>`;
 }
 
 function buildEmptyCard(slam, year){
@@ -582,204 +779,251 @@ function buildEmptyCard(slam, year){
 /* ===== LIGHTBOX ===== */
 function openLightbox(i){
   if(!settings.lightbox) return;
-  lbIndex = i;
-  showLbEntry();
+  lbIndex = i; showLbEntry();
   document.getElementById('lightbox').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
-
 function showLbEntry(){
-  const o = flatSortedOutfits[lbIndex];
-  if(!o) return;
+  const o = flatSortedOutfits[lbIndex]; if(!o) return;
   document.getElementById('lb-img').src = o.imageUrl;
   document.getElementById('lb-year').textContent = [o.year, o.tournament].filter(Boolean).join(' · ');
   document.getElementById('lb-title').textContent = o.tournament || '';
   document.getElementById('lb-notes').textContent = o.notes || '';
-  const colors = (o.colors || []).map(c => `<span class="color-tag-inline" style="background:${COLOR_MAP[c]||'#888'}"></span>${c}`).join(' ');
+  const colors = (o.colors||[]).map(c=>`<span class="color-tag-inline" style="background:${COLOR_MAP[c]||'#888'}"></span>${c}`).join(' ');
   document.getElementById('lb-meta').innerHTML = [
-    o.tournament ? `<div class="lb-meta-row"><span>Tournament</span><span>${o.tournament}</span></div>` : '',
-    o.year ? `<div class="lb-meta-row"><span>Year</span><span>${o.year}</span></div>` : '',
-    colors ? `<div class="lb-meta-row"><span>Colors</span><span>${colors}</span></div>` : ''
+    o.tournament?`<div class="lb-meta-row"><span>Tournament</span><span>${o.tournament}</span></div>`:'',
+    o.year?`<div class="lb-meta-row"><span>Year</span><span>${o.year}</span></div>`:'',
+    colors?`<div class="lb-meta-row"><span>Colors</span><span>${colors}</span></div>`:''
   ].join('');
 }
+function navigateLb(dir){ lbIndex=(lbIndex+dir+flatSortedOutfits.length)%flatSortedOutfits.length; showLbEntry(); }
+function closeLightbox(){ document.getElementById('lightbox').classList.remove('open'); document.body.style.overflow=''; }
+function closeLightboxBg(e){ if(e.target===document.getElementById('lightbox')) closeLightbox(); }
 
-function navigateLb(dir){
-  lbIndex = (lbIndex + dir + flatSortedOutfits.length) % flatSortedOutfits.length;
-  showLbEntry();
-}
-
-function closeLightbox(){
-  document.getElementById('lightbox').classList.remove('open');
-  document.body.style.overflow = '';
-}
-
-function closeLightboxBg(e){
-  if(e.target === document.getElementById('lightbox')) closeLightbox();
-}
-
-/* ===== ADMIN FORM ===== */
-function selectTournament(btn, val){
-  document.querySelectorAll('.t-btn').forEach(b => b.classList.remove('active'));
+/* ===== TOURNAMENT PICKER (shared for add + edit) ===== */
+function selectTournament(btn, val, mode){
+  const container = mode==='edit' ? document.getElementById('edit-tournament-btns') : document.getElementById('add-tournament-btns');
+  container.querySelectorAll('.t-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  selectedTournament = val;
-  const otherWrap = document.getElementById('other-tournament-wrap');
-  if(val === 'Other'){
-    otherWrap.classList.add('visible');
-    document.getElementById('other-tournament').focus();
+  const otherWrapId = mode==='edit' ? 'edit-other-wrap' : 'other-tournament-wrap';
+  const otherInputId = mode==='edit' ? 'edit-other-tournament' : 'other-tournament';
+  if(val==='Other'){
+    document.getElementById(otherWrapId).classList.add('visible');
+    document.getElementById(otherInputId).focus();
   } else {
-    otherWrap.classList.remove('visible');
+    document.getElementById(otherWrapId).classList.remove('visible');
   }
+  if(mode==='edit') editTournament=val;
+  else addTournament=val;
+}
+function getTournamentValue(mode){
+  if(mode==='edit'){
+    return editTournament==='Other' ? document.getElementById('edit-other-tournament').value.trim() : editTournament;
+  }
+  return addTournament==='Other' ? document.getElementById('other-tournament').value.trim() : addTournament;
 }
 
-function getTournamentValue(){
-  if(selectedTournament === 'Other') return document.getElementById('other-tournament').value.trim();
-  return selectedTournament;
-}
-
-function toggleColor(el, color){
+/* ===== COLOR PICKER (shared) ===== */
+function toggleColor(el, color, mode){
+  const arr = mode==='edit' ? editColors : addColors;
   if(el.classList.contains('selected')){
     el.classList.remove('selected');
-    selectedColors = selectedColors.filter(c => c !== color);
+    const i = arr.indexOf(color); if(i>-1) arr.splice(i,1);
   } else {
     el.classList.add('selected');
-    selectedColors.push(color);
+    arr.push(color);
   }
 }
 
-function toggleUrlMode(){
-  urlModeActive = !urlModeActive;
-  document.getElementById('url-mode').classList.toggle('active', urlModeActive);
-}
-
+/* ===== ADD FORM ===== */
 function previewUrl(url){
   if(!url) return;
-  const img = document.getElementById('preview-img');
-  img.src = url; img.style.display = 'block';
+  const img = document.getElementById('preview-img'); img.src=url; img.style.display='block';
 }
-
 function handleFileSelect(e){
-  const file = e.target.files[0]; if(!file) return;
-  selectedFile = file;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    const img = document.getElementById('preview-img');
-    img.src = ev.target.result; img.style.display = 'block';
-  };
+  const file=e.target.files[0]; if(!file) return;
+  addFile=file;
+  const reader=new FileReader();
+  reader.onload=ev=>{ const img=document.getElementById('preview-img'); img.src=ev.target.result; img.style.display='block'; };
   reader.readAsDataURL(file);
 }
-
 async function uploadToCloudinary(file){
-  const cloudName = localStorage.getItem('cl_cloud');
-  const preset = localStorage.getItem('cl_preset');
-  if(!cloudName || !preset){
-    document.getElementById('cloudinary-modal').classList.add('open');
-    return null;
-  }
-  const fd = new FormData();
-  fd.append('file', file); fd.append('upload_preset', preset);
-  const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {method:'POST', body:fd});
-  const data = await res.json();
-  return data.secure_url || null;
+  const cn=localStorage.getItem('cl_cloud'), preset=localStorage.getItem('cl_preset');
+  if(!cn||!preset){ document.getElementById('cloudinary-modal').classList.add('open'); return null; }
+  const fd=new FormData(); fd.append('file',file); fd.append('upload_preset',preset);
+  const res=await fetch(`https://api.cloudinary.com/v1_1/${cn}/image/upload`,{method:'POST',body:fd});
+  const data=await res.json(); return data.secure_url||null;
 }
-
 async function addEntry(){
-  const year = document.getElementById('f-year').value;
-  const tournament = getTournamentValue();
-  const notes = document.getElementById('f-notes').value;
-  let imageUrl = document.getElementById('image-url-input').value || '';
-
+  const year=document.getElementById('f-year').value;
+  const tournament=getTournamentValue('add');
+  const notes=document.getElementById('f-notes').value;
+  let imageUrl=document.getElementById('image-url-input').value||'';
   if(!year){ showToast('Please enter a year'); return; }
   if(!tournament){ showToast('Please select a tournament'); return; }
-
-  if(!imageUrl && selectedFile){
-    document.getElementById('add-btn').textContent = 'Uploading…';
-    imageUrl = await uploadToCloudinary(selectedFile);
-    document.getElementById('add-btn').textContent = 'Add to Gallery';
+  if(!imageUrl && addFile){
+    document.getElementById('add-btn').textContent='Uploading…';
+    imageUrl=await uploadToCloudinary(addFile);
+    document.getElementById('add-btn').textContent='Add to Gallery';
     if(!imageUrl) return;
   }
   if(!imageUrl){ showToast('Please provide an image URL or upload a file'); return; }
-
-  outfits.push({
-    id: Date.now().toString(),
-    imageUrl,
-    year: parseInt(year),
-    tournament,
-    notes,
-    colors: [...selectedColors]
-  });
-  saveData(); resetForm(); renderEntries(); showToast('Outfit added!');
+  const outfit={id:Date.now().toString(),imageUrl,year:parseInt(year),tournament,notes,colors:[...addColors]};
+  try{
+    await dbInsert(outfit);
+    outfits.push(outfit);
+    resetAddForm(); renderEntries(); renderGallery(); showToast('Outfit added!');
+  }catch(e){ console.error(e); showToast('Error saving to database'); }
 }
-
-function resetForm(){
-  document.getElementById('f-year').value = '';
-  document.getElementById('f-notes').value = '';
-  document.getElementById('image-url-input').value = '';
-  document.getElementById('preview-img').style.display = 'none';
-  document.getElementById('file-input').value = '';
-  document.getElementById('other-tournament').value = '';
+function resetAddForm(){
+  document.getElementById('f-year').value='';
+  document.getElementById('f-notes').value='';
+  document.getElementById('image-url-input').value='';
+  document.getElementById('preview-img').style.display='none';
+  document.getElementById('file-input').value='';
+  document.getElementById('other-tournament').value='';
   document.getElementById('other-tournament-wrap').classList.remove('visible');
-  document.querySelectorAll('.t-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.color-option.selected').forEach(el => el.classList.remove('selected'));
-  selectedColors = []; selectedFile = null; urlModeActive = false; selectedTournament = '';
-  document.getElementById('url-mode').classList.remove('active');
+  document.getElementById('add-tournament-btns').querySelectorAll('.t-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('add-color-options').querySelectorAll('.color-option.selected').forEach(el=>el.classList.remove('selected'));
+  addColors=[]; addFile=null; addTournament='';
 }
 
+/* ===== EDIT MODAL ===== */
+function openEditModal(id){
+  const o = outfits.find(x=>x.id===id); if(!o) return;
+  editId=id; editColors=[...(o.colors||[])]; editTournament=o.tournament||'';
+
+  document.getElementById('edit-year').value=o.year||'';
+  document.getElementById('edit-notes').value=o.notes||'';
+
+  // Reset tournament buttons
+  const btns=document.getElementById('edit-tournament-btns');
+  btns.querySelectorAll('.t-btn').forEach(b=>{
+    const val=b.textContent.replace('…','').trim();
+    const isOther=!GRAND_SLAMS.includes(o.tournament)&&b.textContent.includes('Other');
+    const isMatch=b.getAttribute('onclick')?.includes("'"+o.tournament+"'");
+    b.classList.toggle('active', isMatch||isOther);
+  });
+  // Highlight correct button
+  document.getElementById('edit-other-wrap').classList.remove('visible');
+  document.getElementById('edit-other-tournament').value='';
+  if(GRAND_SLAMS.includes(o.tournament)){
+    btns.querySelectorAll('.t-btn').forEach(b=>{
+      if(b.getAttribute('onclick')?.includes("'"+o.tournament+"'")) b.classList.add('active');
+    });
+  } else if(o.tournament){
+    btns.querySelectorAll('.t-btn').forEach(b=>{
+      if(b.textContent.includes('Other')) b.classList.add('active');
+    });
+    document.getElementById('edit-other-wrap').classList.add('visible');
+    document.getElementById('edit-other-tournament').value=o.tournament;
+    editTournament='Other';
+  }
+
+  // Colors
+  document.getElementById('edit-color-options').querySelectorAll('.color-option').forEach(el=>{
+    const c=el.getAttribute('onclick')?.match(/'(\w+)'/)?.[1];
+    el.classList.toggle('selected', c && editColors.includes(c));
+  });
+
+  document.getElementById('edit-modal').classList.add('open');
+}
+function closeEditModal(){
+  document.getElementById('edit-modal').classList.remove('open');
+  editId=null; editColors=[]; editTournament='';
+}
+async function saveEdit(){
+  const o=outfits.find(x=>x.id===editId); if(!o) return;
+  const year=document.getElementById('edit-year').value;
+  const tournament=getTournamentValue('edit');
+  const notes=document.getElementById('edit-notes').value;
+  if(!year){ showToast('Please enter a year'); return; }
+  if(!tournament){ showToast('Please select a tournament'); return; }
+  o.year=parseInt(year); o.tournament=tournament; o.notes=notes; o.colors=[...editColors];
+  try{
+    await dbUpdate(o);
+    closeEditModal(); renderEntries(); renderGallery(); showToast('Saved!');
+  }catch(e){ console.error(e); showToast('Error saving to database'); }
+}
+
+/* ===== ENTRIES LIST ===== */
 function renderEntries(){
-  document.getElementById('entry-count').textContent = outfits.length;
-  const list = document.getElementById('entries-list');
-  if(!outfits.length){
-    list.innerHTML = '<p style="font-size:0.8rem;color:var(--text-muted)">No outfits added yet.</p>';
+  document.getElementById('entry-count').textContent=outfits.length;
+  const list=document.getElementById('entries-list');
+  const q=(document.getElementById('entry-search').value||'').toLowerCase().trim();
+  let filtered=outfits;
+  if(q){
+    filtered=outfits.filter(o=>{
+      return (o.tournament||'').toLowerCase().includes(q)
+        || String(o.year||'').includes(q)
+        || (o.notes||'').toLowerCase().includes(q)
+        || (o.colors||[]).join(' ').toLowerCase().includes(q);
+    });
+  }
+  if(!filtered.length){
+    list.innerHTML=q?'<p style="font-size:0.8rem;color:var(--text-muted)">No results.</p>':'<p style="font-size:0.8rem;color:var(--text-muted)">No outfits added yet.</p>';
     return;
   }
-  list.innerHTML = [...outfits].reverse().map(o => `
+  // Sort by year desc for the list
+  const sorted=[...filtered].sort((a,b)=>(b.year||0)-(a.year||0));
+  list.innerHTML=sorted.map(o=>`
     <div class="entry-row">
       <img class="entry-thumb" src="${o.imageUrl}" onerror="this.style.background='#333'" alt="">
       <div class="entry-info">
-        <div class="entry-name">${o.tournament || 'Untitled'} ${o.year || ''}</div>
-        <div class="entry-meta">${o.colors?.length ? o.colors.join(', ') : ''}</div>
+        <div class="entry-name">${o.tournament||'Untitled'} ${o.year||''}</div>
+        <div class="entry-meta">${o.colors?.length?o.colors.join(', '):''} ${o.notes?'· '+o.notes.slice(0,30):''}</div>
       </div>
-      <button class="btn-danger" onclick="deleteEntry('${o.id}')">Delete</button>
+      <div class="entry-actions">
+        <button class="btn-edit" onclick="openEditModal('${o.id}')">Edit</button>
+        <button class="btn-danger" onclick="deleteEntry('${o.id}')">Del</button>
+      </div>
     </div>`).join('');
 }
-
-function deleteEntry(id){
+async function deleteEntry(id){
   if(!confirm('Delete this outfit?')) return;
-  outfits = outfits.filter(o => o.id !== id);
-  saveData(); renderEntries(); showToast('Deleted');
+  try{
+    await dbDelete(id);
+    outfits=outfits.filter(o=>o.id!==id); renderEntries(); renderGallery(); showToast('Deleted');
+  }catch(e){ console.error(e); showToast('Error deleting from database'); }
 }
 
+/* ===== IMPORT/EXPORT ===== */
 function exportData(){
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([JSON.stringify(outfits, null, 2)], {type:'application/json'}));
-  a.download = 'serena-outfits.json'; a.click();
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(outfits,null,2)],{type:'application/json'}));
+  a.download='serena-outfits.json'; a.click();
 }
-
-function importData(e){
-  const reader = new FileReader();
-  reader.onload = ev => {
+async function importData(e){
+  const reader=new FileReader();
+  reader.onload=async ev=>{
     try{
-      const d = JSON.parse(ev.target.result);
-      if(Array.isArray(d)){ outfits = d; saveData(); renderEntries(); renderGallery(); showToast(d.length + ' outfits imported!'); }
-    } catch(err){ showToast('Invalid JSON'); }
+      const d=JSON.parse(ev.target.result);
+      if(!Array.isArray(d)){ showToast('Invalid JSON'); return; }
+      showToast('Importing '+d.length+' outfits…');
+      await sbFetch('outfits',{method:'POST',prefer:'resolution=ignore-duplicates',body:JSON.stringify(d.map(outfitToRow))});
+      outfits=d; renderEntries(); renderGallery(); showToast(d.length+' outfits imported!');
+    }catch(err){ console.error(err); showToast('Import failed'); }
   };
   reader.readAsText(e.target.files[0]);
 }
 
+/* ===== UTILS ===== */
 function showToast(msg){
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
+  const t=document.getElementById('toast'); t.textContent=msg;
+  t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500);
 }
-
-document.addEventListener('keydown', e => {
+document.addEventListener('keydown',e=>{
   if(!document.getElementById('lightbox').classList.contains('open')) return;
-  if(e.key === 'Escape') closeLightbox();
-  if(e.key === 'ArrowRight') navigateLb(1);
-  if(e.key === 'ArrowLeft') navigateLb(-1);
+  if(e.key==='Escape') closeLightbox();
+  if(e.key==='ArrowRight') navigateLb(1);
+  if(e.key==='ArrowLeft') navigateLb(-1);
+});
+// Close edit modal on backdrop click
+document.getElementById('edit-modal').addEventListener('click',e=>{
+  if(e.target===document.getElementById('edit-modal')) closeEditModal();
 });
 
-loadData();
-renderGallery();
+loadData(); // async — renders gallery when data is ready
 </script>
 </body>
 </html>
