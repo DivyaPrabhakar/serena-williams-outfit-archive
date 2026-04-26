@@ -538,17 +538,68 @@ const ALL_TOURNAMENTS = ['Australian Open','Roland Garros','Wimbledon','US Open'
 const ACTIVE_YEARS = [];
 for(let y = 1995; y <= 2022; y++) ACTIVE_YEARS.push(y);
 
-// Years Serena was absent (A) from each slam — sourced from Wikipedia career statistics
-const DID_NOT_PLAY = {
+// ── SINGLES participation data ─────────────────────────────────────────────
+// Source: Wikipedia career statistics. A = absent, NH = not held.
+const SINGLES_DID_NOT_PLAY = {
   'Australian Open': new Set([1995,1996,1997,2002,2004,2011,2018,2022]),
   'Roland Garros':   new Set([1995,1996,1997,2000,2005,2006,2011,2017,2022]),
   'Wimbledon':       new Set([1995,1996,1997,1999,2006,2017]),
   'US Open':         new Set([1995,1996,1997,2003,2010,2017,2021]),
 };
-// Events that were not held (nobody played — e.g. Wimbledon 2020 cancelled for COVID)
-const NOT_HELD = {
+const SINGLES_NOT_HELD = {
   'Wimbledon': new Set([2020]),
 };
+
+// ── DOUBLES participation data ─────────────────────────────────────────────
+// Source: Wikipedia career statistics. Kept separate for future split view.
+const DOUBLES_DID_NOT_PLAY = {
+  'Australian Open': new Set([1997,2000,2002,2004,2005,2006,2007,2011,2012,2014,2015,2016,2017,2018,2019,2020,2021,2022]),
+  'Roland Garros':   new Set([1997,1998,2000,2001,2002,2003,2004,2005,2006,2007,2008,2011,2012,2014,2015,2017,2019,2020,2021,2022]),
+  'Wimbledon':       new Set([1997,1999,2004,2005,2006,2011,2013,2015,2017,2018,2019,2021,2022]),
+  'US Open':         new Set([1998,2002,2003,2004,2005,2006,2007,2008,2010,2011,2015,2016,2017,2018,2019,2020,2021]),
+  'Olympics':        new Set([2004,2020]),
+};
+const DOUBLES_NOT_HELD = {
+  'Wimbledon': new Set([2020]),
+  'Olympics':  new Set([1997,1998,1999,2001,2002,2003,2005,2006,2007,2009,2010,2011,2013,2014,2015,2017,2018,2019,2021,2022]),
+};
+
+// ── MIXED DOUBLES participation data ──────────────────────────────────────
+// Source: Wikipedia career statistics. Kept separate for future split view.
+const MIXED_DID_NOT_PLAY = {
+  'Australian Open': new Set([2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022]),
+  'Roland Garros':   new Set([1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2013,2014,2015,2016,2017,2018,2019,2021,2022]),
+  'Wimbledon':       new Set([1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2021,2022]),
+  'US Open':         new Set([1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2021,2022]),
+};
+const MIXED_NOT_HELD = {
+  'Roland Garros': new Set([2020]),
+  'Wimbledon':     new Set([2020]),
+  'US Open':       new Set([2020]),
+};
+
+// ── Combined view (singles + doubles + mixed merged) ──────────────────────
+// A slot shows "did not play" only if she was absent from ALL THREE disciplines.
+// A slot shows "not held" only if the event was cancelled for everyone.
+// An empty outfit box appears whenever she participated in any capacity.
+const DID_NOT_PLAY = {};
+const NOT_HELD = {};
+ALL_TOURNAMENTS.forEach(slam => {
+  const singlesDNP = SINGLES_DID_NOT_PLAY[slam] || new Set();
+  const doublesDNP = DOUBLES_DID_NOT_PLAY[slam] || new Set();
+  const mixedDNP   = MIXED_DID_NOT_PLAY[slam]   || new Set();
+  const singlesNH  = SINGLES_NOT_HELD[slam]      || new Set();
+  const doublesNH  = DOUBLES_NOT_HELD[slam]      || new Set();
+  const mixedNH    = MIXED_NOT_HELD[slam]        || new Set();
+  // Not held = event cancelled (all three agree it wasn't held)
+  const nhYears = new Set([...singlesNH].filter(y => doublesNH.has(y) && mixedNH.has(y)));
+  // Did not play = absent from singles AND doubles AND mixed (and event was held)
+  const dnpYears = new Set(
+    [...singlesDNP].filter(y => doublesDNP.has(y) && mixedDNP.has(y) && !nhYears.has(y))
+  );
+  if(dnpYears.size) DID_NOT_PLAY[slam] = dnpYears;
+  if(nhYears.size)  NOT_HELD[slam]     = nhYears;
+});
 
 // Returns the slots to show for a given year (grand slams + olympics if applicable)
 function slotsForYear(y){
