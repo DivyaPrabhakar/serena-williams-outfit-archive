@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Serena — The Looks</title>
+<title>The Serena Williams Fit-dex</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -129,6 +129,27 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1.25re
 .lb-nav button{flex:1;background:none;border:1px solid #333;color:var(--text-muted);font-family:'DM Sans',sans-serif;font-size:0.75rem;padding:0.5rem;cursor:pointer;transition:all 0.2s;letter-spacing:0.05em}
 .lb-nav button:hover{border-color:var(--gold);color:var(--gold)}
 
+/* ===== WANTED (missing outfits log) ===== */
+.wanted-panel{border-top:1px solid #1e1e1e;background:var(--dark)}
+.wanted-toggle{width:100%;display:flex;align-items:center;gap:0.75rem;padding:1rem 2rem;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--text-muted);text-align:left}
+.wanted-toggle:hover{background:#111}
+.wanted-toggle-left{display:flex;align-items:center;gap:0.6rem;flex:1}
+.wanted-dex-icon{font-family:'Playfair Display',serif;font-size:0.95rem;font-weight:900;color:var(--gold);letter-spacing:0.04em;opacity:0.75}
+.wanted-title{font-size:0.8rem;letter-spacing:0.1em;text-transform:uppercase}
+.wanted-count-badge{background:#1a1a1a;border:1px solid #2a2a2a;color:var(--text-muted);font-size:0.7rem;letter-spacing:0.08em;padding:0.2rem 0.6rem;border-radius:2px}
+.wanted-chevron{font-size:0.75rem;color:#444;transition:transform 0.2s}
+.wanted-chevron.open{transform:rotate(180deg)}
+.wanted-body{padding:0 2rem 2rem;animation:fadeIn 0.15s ease}
+.wanted-intro{font-size:0.78rem;color:var(--text-muted);margin-bottom:1.25rem;line-height:1.6;max-width:560px}
+.wanted-intro strong{color:var(--text)}
+.wanted-grid{display:flex;flex-direction:column;gap:0}
+.wanted-year-row{display:flex;align-items:center;gap:0.75rem;padding:0.45rem 0;border-bottom:1px solid #191919}
+.wanted-year-row:last-child{border-bottom:none}
+.wanted-year{font-family:'Playfair Display',serif;font-size:0.95rem;font-weight:700;color:#555;min-width:3.2rem;flex-shrink:0}
+.wanted-tags{display:flex;flex-wrap:wrap;gap:0.3rem}
+.wanted-tag{font-size:0.68rem;letter-spacing:0.07em;text-transform:uppercase;color:#555;background:#151515;border:1px solid #252525;padding:0.2rem 0.55rem;border-radius:2px}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+
 /* ===== ADMIN ===== */
 .admin-wrap{max-width:1200px;margin:0 auto;padding:2rem}
 .admin-header{margin-bottom:2rem}
@@ -247,7 +268,7 @@ input[type=number]{-moz-appearance:textfield}
 <body>
 
 <nav>
-  <div class="nav-logo">SERENA <span>/ THE LOOKS</span></div>
+  <div class="nav-logo">FIT-DEX <span>/ SERENA</span></div>
   <div class="nav-tabs">
     <button class="tab-btn active" onclick="showPage('viewer',this)">Gallery</button>
     <button class="tab-btn" onclick="showPage('admin',this)">Admin</button>
@@ -257,8 +278,8 @@ input[type=number]{-moz-appearance:textfield}
 <!-- ===== VIEWER ===== -->
 <div id="page-viewer" class="page active">
   <div class="viewer-header">
-    <h1>THE <span>LOOKS</span></h1>
-    <p>A visual archive of Serena Williams on court</p>
+    <h1>THE SERENA WILLIAMS <span>FIT-DEX</span></h1>
+    <p>Gotta catalogue them all</p>
   </div>
 
   <!-- Filter bars — populated dynamically after data loads -->
@@ -278,6 +299,22 @@ input[type=number]{-moz-appearance:textfield}
     <span class="count-badge" id="count-badge"></span>
   </div>
   <div id="gallery-root"></div>
+
+  <!-- Missing outfits log -->
+  <div class="wanted-panel" id="wanted-panel">
+    <button class="wanted-toggle" onclick="toggleWanted()" aria-expanded="false" aria-controls="wanted-body">
+      <span class="wanted-toggle-left">
+        <span class="wanted-dex-icon">??</span>
+        <span class="wanted-title">Missing from the Dex</span>
+      </span>
+      <span class="wanted-count-badge" id="wanted-count-badge">—</span>
+      <span class="wanted-chevron" id="wanted-chevron">▾</span>
+    </button>
+    <div class="wanted-body" id="wanted-body" hidden>
+      <p class="wanted-intro">These are grand slam &amp; Olympic appearances where <strong>we haven't catalogued her outfit yet</strong>. Know the look? Help complete the Fit-dex.</p>
+      <div class="wanted-grid" id="wanted-list"></div>
+    </div>
+  </div>
 </div>
 
 <!-- ===== ADMIN ===== -->
@@ -328,14 +365,7 @@ input[type=number]{-moz-appearance:textfield}
 
           <div class="field-group">
             <label>Tournament</label>
-            <div class="tournament-buttons" id="add-tournament-btns">
-              <button class="t-btn" onclick="selectTournament(this,'Australian Open','add')">Australian Open</button>
-              <button class="t-btn" onclick="selectTournament(this,'Roland Garros','add')">Roland Garros</button>
-              <button class="t-btn" onclick="selectTournament(this,'Wimbledon','add')">Wimbledon</button>
-              <button class="t-btn" onclick="selectTournament(this,'US Open','add')">US Open</button>
-              <button class="t-btn" onclick="selectTournament(this,'Olympics','add')">Olympics</button>
-              <button class="t-btn" onclick="selectTournament(this,'Other','add')">Other…</button>
-            </div>
+            <div class="tournament-buttons" id="add-tournament-btns"></div>
             <div class="other-input" id="other-tournament-wrap">
               <input type="text" id="other-tournament" placeholder="Enter tournament name…">
             </div>
@@ -355,11 +385,6 @@ input[type=number]{-moz-appearance:textfield}
               <div class="color-option" onclick="toggleColor(this,'Orange','add')"><span class="color-dot-sm" style="background:#e67e22"></span>Orange</div>
               <div class="color-option" onclick="toggleColor(this,'Multi','add')"><span class="color-dot-sm" style="background:linear-gradient(135deg,#e91e8c,#2980b9)"></span>Multi</div>
             </div>
-          </div>
-
-          <div class="field-group">
-            <label>Notes / Description</label>
-            <textarea id="f-notes" placeholder="e.g. Nike catsuit, worn during pregnancy comeback at Roland Garros…"></textarea>
           </div>
 
           <button class="btn-primary" onclick="addEntry()" id="add-btn">Add to Gallery</button>
@@ -462,14 +487,7 @@ input[type=number]{-moz-appearance:textfield}
     </div>
     <div class="modal-field">
       <label>Tournament</label>
-      <div class="tournament-buttons" id="edit-tournament-btns" style="margin-bottom:0.4rem">
-        <button class="t-btn" onclick="selectTournament(this,'Australian Open','edit')">Australian Open</button>
-        <button class="t-btn" onclick="selectTournament(this,'Roland Garros','edit')">Roland Garros</button>
-        <button class="t-btn" onclick="selectTournament(this,'Wimbledon','edit')">Wimbledon</button>
-        <button class="t-btn" onclick="selectTournament(this,'US Open','edit')">US Open</button>
-        <button class="t-btn" onclick="selectTournament(this,'Olympics','edit')">Olympics</button>
-        <button class="t-btn" onclick="selectTournament(this,'Other','edit')">Other…</button>
-      </div>
+      <div class="tournament-buttons" id="edit-tournament-btns" style="margin-bottom:0.4rem"></div>
       <div class="other-input" id="edit-other-wrap">
         <input type="text" id="edit-other-tournament" placeholder="Enter tournament name…">
       </div>
@@ -488,10 +506,6 @@ input[type=number]{-moz-appearance:textfield}
         <div class="color-option" onclick="toggleColor(this,'Orange','edit')"><span class="color-dot-sm" style="background:#e67e22"></span>Orange</div>
         <div class="color-option" onclick="toggleColor(this,'Multi','edit')"><span class="color-dot-sm" style="background:linear-gradient(135deg,#e91e8c,#2980b9)"></span>Multi</div>
       </div>
-    </div>
-    <div class="modal-field">
-      <label>Notes</label>
-      <textarea id="edit-notes" placeholder="Description…"></textarea>
     </div>
     <div class="modal-btns">
       <button class="btn-secondary" onclick="closeEditModal()" style="flex:1">Cancel</button>
@@ -732,9 +746,8 @@ function buildFilterBars(){
   // Tournament buttons — unique tournaments in data + fixed grand slams
   const tBar = document.getElementById('tournament-filter-bar');
   const usedTournaments = [...new Set(outfits.map(o=>o.tournament).filter(Boolean))];
-  // Order: grand slams first, then others alphabetically
-  const ordered = [...ALL_TOURNAMENTS.filter(t=>usedTournaments.includes(t)),
-    ...usedTournaments.filter(t=>!ALL_TOURNAMENTS.includes(t)).sort()];
+  // Viewer filter: grand slams + Olympics only (no custom tournaments)
+  const ordered = ALL_TOURNAMENTS.filter(t=>usedTournaments.includes(t));
   // Remove old dynamic buttons (keep "All")
   tBar.querySelectorAll('.f-btn:not(#f-all)').forEach(b=>b.remove());
   ordered.forEach(t=>{
@@ -761,6 +774,8 @@ function renderGallery(){
   const badge = document.getElementById('count-badge');
   const modeLabel = document.getElementById('viewer-mode-label');
   const layout = settings.layout || 'grid';
+
+  buildWantedPanel();
 
   // Build filter bars from live data
   buildFilterBars();
@@ -990,6 +1005,29 @@ function closeLightbox(){ document.getElementById('lightbox').classList.remove('
 function closeLightboxBg(e){ if(e.target===document.getElementById('lightbox')) closeLightbox(); }
 
 /* ===== TOURNAMENT PICKER (shared for add + edit) ===== */
+function renderTournamentButtons(mode){
+  const containerId = mode==='edit' ? 'edit-tournament-btns' : 'add-tournament-btns';
+  const container = document.getElementById(containerId);
+  const otherWrapId = mode==='edit' ? 'edit-other-wrap' : 'other-tournament-wrap';
+  const otherInputId = mode==='edit' ? 'edit-other-tournament' : 'other-tournament';
+  const currentVal = mode==='edit' ? editTournament : addTournament;
+  const fixed = [...GRAND_SLAMS, 'Olympics'];
+  const extras = [...new Set(outfits.map(o=>o.tournament).filter(t=>t&&!fixed.includes(t)))].sort();
+  const all = [...fixed, ...extras, 'Other'];
+  const isOtherActive = currentVal && !fixed.includes(currentVal) && !extras.includes(currentVal);
+  container.innerHTML = all.map(t=>{
+    const label = t==='Other' ? 'Other…' : t;
+    const isActive = (t===currentVal) || (t==='Other' && isOtherActive);
+    return `<button class="t-btn${isActive?' active':''}" data-val="${t.replace(/"/g,'&quot;')}" onclick="selectTournament(this,this.dataset.val,'${mode}')">${label}</button>`;
+  }).join('');
+  if(isOtherActive){
+    document.getElementById(otherWrapId).classList.add('visible');
+    document.getElementById(otherInputId).value = currentVal||'';
+    if(mode==='edit') editTournament='Other'; else addTournament='Other';
+  } else {
+    document.getElementById(otherWrapId).classList.remove('visible');
+  }
+}
 function selectTournament(btn, val, mode){
   const container = mode==='edit' ? document.getElementById('edit-tournament-btns') : document.getElementById('add-tournament-btns');
   container.querySelectorAll('.t-btn').forEach(b=>b.classList.remove('active'));
@@ -1046,7 +1084,6 @@ async function uploadToCloudinary(file){
 async function addEntry(){
   const year=document.getElementById('f-year').value;
   const tournament=getTournamentValue('add');
-  const notes=document.getElementById('f-notes').value;
   let imageUrl=document.getElementById('image-url-input').value||'';
   if(!year){ showToast('Please enter a year'); return; }
   if(!tournament){ showToast('Please select a tournament'); return; }
@@ -1057,7 +1094,7 @@ async function addEntry(){
     if(!imageUrl) return;
   }
   if(!imageUrl){ showToast('Please provide an image URL or upload a file'); return; }
-  const outfit={id:Date.now().toString(),imageUrl,year:parseInt(year),tournament,notes,colors:[...addColors]};
+  const outfit={id:Date.now().toString(),imageUrl,year:parseInt(year),tournament,notes:null,colors:[...addColors]};
   try{
     await dbInsert(outfit);
     outfits.push(outfit);
@@ -1066,15 +1103,13 @@ async function addEntry(){
 }
 function resetAddForm(){
   document.getElementById('f-year').value='';
-  document.getElementById('f-notes').value='';
   document.getElementById('image-url-input').value='';
   document.getElementById('preview-img').style.display='none';
   document.getElementById('file-input').value='';
   document.getElementById('other-tournament').value='';
-  document.getElementById('other-tournament-wrap').classList.remove('visible');
-  document.getElementById('add-tournament-btns').querySelectorAll('.t-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('add-color-options').querySelectorAll('.color-option.selected').forEach(el=>el.classList.remove('selected'));
   addColors=[]; addFile=null; addTournament='';
+  renderTournamentButtons('add');
 }
 
 /* ===== EDIT MODAL ===== */
@@ -1083,31 +1118,7 @@ function openEditModal(id){
   editId=id; editColors=[...(o.colors||[])]; editTournament=o.tournament||'';
 
   document.getElementById('edit-year').value=o.year||'';
-  document.getElementById('edit-notes').value=o.notes||'';
-
-  // Reset tournament buttons
-  const btns=document.getElementById('edit-tournament-btns');
-  btns.querySelectorAll('.t-btn').forEach(b=>{
-    const val=b.textContent.replace('…','').trim();
-    const isOther=!GRAND_SLAMS.includes(o.tournament)&&b.textContent.includes('Other');
-    const isMatch=b.getAttribute('onclick')?.includes("'"+o.tournament+"'");
-    b.classList.toggle('active', isMatch||isOther);
-  });
-  // Highlight correct button
-  document.getElementById('edit-other-wrap').classList.remove('visible');
-  document.getElementById('edit-other-tournament').value='';
-  if(GRAND_SLAMS.includes(o.tournament)){
-    btns.querySelectorAll('.t-btn').forEach(b=>{
-      if(b.getAttribute('onclick')?.includes("'"+o.tournament+"'")) b.classList.add('active');
-    });
-  } else if(o.tournament){
-    btns.querySelectorAll('.t-btn').forEach(b=>{
-      if(b.textContent.includes('Other')) b.classList.add('active');
-    });
-    document.getElementById('edit-other-wrap').classList.add('visible');
-    document.getElementById('edit-other-tournament').value=o.tournament;
-    editTournament='Other';
-  }
+  renderTournamentButtons('edit');
 
   // Colors
   document.getElementById('edit-color-options').querySelectorAll('.color-option').forEach(el=>{
@@ -1125,18 +1136,52 @@ async function saveEdit(){
   const o=outfits.find(x=>x.id===editId); if(!o) return;
   const year=document.getElementById('edit-year').value;
   const tournament=getTournamentValue('edit');
-  const notes=document.getElementById('edit-notes').value;
   if(!year){ showToast('Please enter a year'); return; }
   if(!tournament){ showToast('Please select a tournament'); return; }
-  o.year=parseInt(year); o.tournament=tournament; o.notes=notes; o.colors=[...editColors];
+  o.year=parseInt(year); o.tournament=tournament; o.colors=[...editColors];
   try{
     await dbUpdate(o);
     closeEditModal(); renderEntries(); renderGallery(); showToast('Saved!');
   }catch(e){ console.error(e); showToast('Error saving to database'); }
 }
 
+/* ===== MISSING OUTFITS (WANTED) PANEL ===== */
+function buildWantedPanel(){
+  const coveredSet = new Set(outfits.map(o=>`${o.tournament}|${o.year}`));
+  const missing = [];
+  for(const y of ACTIVE_YEARS){
+    for(const slam of slotsForYear(y)){
+      if(slotStatus(slam,y)==='played' && !coveredSet.has(`${slam}|${y}`)){
+        missing.push({tournament:slam, year:y});
+      }
+    }
+  }
+  const badge = document.getElementById('wanted-count-badge');
+  if(badge) badge.textContent = missing.length ? `${missing.length} uncatalogued` : 'Complete!';
+  const list = document.getElementById('wanted-list');
+  if(!list) return;
+  if(!missing.length){ list.innerHTML='<p style="font-size:0.78rem;color:#555;padding:0.5rem 0">All appearances catalogued — the Fit-dex is complete!</p>'; return; }
+  const byYear={};
+  missing.forEach(m=>{ if(!byYear[m.year]) byYear[m.year]=[]; byYear[m.year].push(m.tournament); });
+  list.innerHTML = Object.keys(byYear).sort((a,b)=>a-b).map(y=>`
+    <div class="wanted-year-row">
+      <span class="wanted-year">${y}</span>
+      <div class="wanted-tags">${byYear[y].map(t=>`<span class="wanted-tag">${t}</span>`).join('')}</div>
+    </div>`).join('');
+}
+function toggleWanted(){
+  const body = document.getElementById('wanted-body');
+  const chevron = document.getElementById('wanted-chevron');
+  const btn = body.previousElementSibling;
+  const isOpen = !body.hidden;
+  body.hidden = isOpen;
+  chevron.classList.toggle('open', !isOpen);
+  btn.setAttribute('aria-expanded', String(!isOpen));
+}
+
 /* ===== ENTRIES LIST ===== */
 function renderEntries(){
+  renderTournamentButtons('add');
   document.getElementById('entry-count').textContent=outfits.length;
   const list=document.getElementById('entries-list');
   const q=(document.getElementById('entry-search').value||'').toLowerCase().trim();
