@@ -79,12 +79,36 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1.25re
 .card-color-dot{position:absolute;top:0.75rem;right:0.75rem;width:10px;height:10px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.4)}
 
 /* Empty placeholder */
-.card-empty{background:var(--dark);position:relative;aspect-ratio:3/4;border:1.5px dashed #232323;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5rem}
-.card-empty-icon{font-size:1.2rem;color:#2a2a2a}
-.card-empty-label{font-size:0.68rem;color:#333;letter-spacing:0.08em;text-transform:uppercase;text-align:center;padding:0 0.75rem;line-height:1.4}
+.card-empty{background:var(--dark);position:relative;aspect-ratio:3/4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5rem}
+/* Unfound — we think it exists, we just haven't sourced it yet */
+.card-empty.unfound{border:1.5px dashed #232323}
+.card-empty.unfound .card-empty-icon{font-size:1.2rem;color:#2a2a2a}
+.card-empty.unfound .card-empty-label{font-size:0.68rem;color:#333;letter-spacing:0.08em;text-transform:uppercase;text-align:center;padding:0 0.75rem;line-height:1.4}
+/* Did not play — Serena was absent that year */
+.card-empty.dnp{border:1px solid #1e1e1e}
+.card-empty.dnp .card-empty-icon{font-size:0.75rem;color:#2a2a2a;letter-spacing:0.06em;text-transform:uppercase}
+.card-empty.dnp .card-empty-label{font-size:0.65rem;color:#2a2a2a;letter-spacing:0.06em;text-transform:uppercase;text-align:center;padding:0 0.5rem;line-height:1.4}
+/* Not held — event was cancelled (e.g. Wimbledon 2020) */
+.card-empty.not-held{border:1px solid #1a1a1a}
+.card-empty.not-held .card-empty-icon{font-size:0.75rem;color:#222;letter-spacing:0.06em;text-transform:uppercase}
+.card-empty.not-held .card-empty-label{font-size:0.65rem;color:#222;letter-spacing:0.06em;text-transform:uppercase;text-align:center;padding:0 0.5rem;line-height:1.4}
 
 .empty-state{text-align:center;padding:4rem 2rem;color:var(--text-muted)}
 .empty-state h3{font-family:'Playfair Display',serif;font-size:1.5rem;margin-bottom:0.5rem;color:var(--text)}
+
+/* ===== FEATURE BREAK — Option 3 multi-look treatment ===== */
+.feature-break{grid-column:1/-1;margin:0;background:var(--dark2);border-top:1px solid #2a2a2a;border-bottom:1px solid #2a2a2a}
+.feature-header{display:flex;align-items:center;justify-content:space-between;padding:0.85rem 1rem 0.6rem}
+.feature-title{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--gold)}
+.feature-sub{font-size:0.7rem;color:var(--text-muted);letter-spacing:0.06em;text-transform:uppercase}
+.feature-strip{display:flex;gap:1px;overflow-x:auto;scrollbar-width:thin;scrollbar-color:#333 transparent;background:#1a1a1a}
+.feature-strip::-webkit-scrollbar{height:3px}
+.feature-strip::-webkit-scrollbar-thumb{background:#333;border-radius:2px}
+.feature-strip .card{flex:0 0 220px;min-width:160px}
+.feature-strip.layout-small .card{flex:0 0 160px}
+.feature-strip.layout-wide .card{flex:0 0 300px}
+/* filter bar second row */
+.filter-bar+.filter-bar{border-top:none;padding-top:0.25rem;padding-bottom:1rem}
 
 /* ===== LIGHTBOX ===== */
 .lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:1000;align-items:center;justify-content:center;padding:2rem}
@@ -237,15 +261,16 @@ input[type=number]{-moz-appearance:textfield}
     <p>A visual archive of Serena Williams on court</p>
   </div>
 
-  <!-- Tournament filter bar -->
-  <div class="filter-bar">
-    <span class="filter-bar-label">Filter</span>
-    <button class="f-btn active" onclick="setFilter('all',this)">All Years</button>
-    <button class="f-btn" onclick="setFilter('Australian Open',this)">Australian Open</button>
-    <button class="f-btn" onclick="setFilter('Roland Garros',this)">Roland Garros</button>
-    <button class="f-btn" onclick="setFilter('Wimbledon',this)">Wimbledon</button>
-    <button class="f-btn" onclick="setFilter('US Open',this)">US Open</button>
-    <button class="f-btn" onclick="setFilter('Olympics',this)">Olympics</button>
+  <!-- Filter bars — populated dynamically after data loads -->
+  <div id="filter-bars">
+    <div class="filter-bar" id="tournament-filter-bar">
+      <span class="filter-bar-label">Tournament</span>
+      <button class="f-btn active" id="f-all" onclick="setTournamentFilter('all',this)">All</button>
+    </div>
+    <div class="filter-bar" id="year-filter-bar" style="padding-top:0;border-top:none">
+      <span class="filter-bar-label">Year</span>
+      <button class="f-btn active" id="f-year-all" onclick="setYearFilter('all',this)">All Years</button>
+    </div>
   </div>
 
   <div class="viewer-meta-bar">
@@ -388,6 +413,10 @@ input[type=number]{-moz-appearance:textfield}
             <button class="btn-secondary" onclick="document.getElementById('import-input').click()">Import JSON</button>
             <input type="file" id="import-input" accept=".json" style="display:none" onchange="importData(event)">
           </div>
+          <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid #222">
+            <p style="font-size:0.75rem;color:var(--text-muted);margin-bottom:0.6rem">If you had outfits saved locally before the database was set up, migrate them here.</p>
+            <button class="btn-secondary" style="width:100%" onclick="forceMigrate()">Migrate from local storage</button>
+          </div>
         </div>
 
         <!-- Entries with search -->
@@ -489,9 +518,38 @@ input[type=number]{-moz-appearance:textfield}
 const SETTINGS_KEY = 'serena_settings';
 const MIGRATION_KEY = 'serena_migrated_v1';
 const COLOR_MAP = {White:'#eee',Black:'#111',Red:'#c0392b',Gold:'#C9A84C',Blue:'#2980b9',Purple:'#8e44ad',Pink:'#e91e8c',Green:'#27ae60',Orange:'#e67e22',Multi:'linear-gradient(135deg,#e91e8c,#2980b9)'};
-const GRAND_SLAMS = ['Australian Open','Roland Garros','Wimbledon','US Open','Olympics'];
+const GRAND_SLAMS = ['Australian Open','Roland Garros','Wimbledon','US Open'];
+const OLYMPICS_YEARS = new Set([1996,2000,2004,2008,2012,2016,2020,2021]);
+const ALL_TOURNAMENTS = ['Australian Open','Roland Garros','Wimbledon','US Open','Olympics'];
 const ACTIVE_YEARS = [];
 for(let y = 1995; y <= 2022; y++) ACTIVE_YEARS.push(y);
+
+// Years Serena was absent (A) from each slam — sourced from Wikipedia career statistics
+const DID_NOT_PLAY = {
+  'Australian Open': new Set([1995,1996,1997,2002,2004,2011,2018,2022]),
+  'Roland Garros':   new Set([1995,1996,1997,2000,2005,2006,2011,2017,2022]),
+  'Wimbledon':       new Set([1995,1996,1997,1999,2006,2017]),
+  'US Open':         new Set([1995,1996,1997,2003,2010,2017,2021]),
+};
+// Events that were not held (nobody played — e.g. Wimbledon 2020 cancelled for COVID)
+const NOT_HELD = {
+  'Wimbledon': new Set([2020]),
+};
+
+// Returns the slots to show for a given year (grand slams + olympics if applicable)
+function slotsForYear(y){
+  const slots = [...GRAND_SLAMS];
+  if(OLYMPICS_YEARS.has(Number(y))) slots.push('Olympics');
+  return slots;
+}
+
+// Returns 'played' | 'did-not-play' | 'not-held' for a slam+year combo
+function slotStatus(slam, year){
+  const y = Number(year);
+  if(NOT_HELD[slam]?.has(y)) return 'not-held';
+  if(DID_NOT_PLAY[slam]?.has(y)) return 'did-not-play';
+  return 'played';
+}
 
 // All database calls go through our Netlify serverless function.
 // No Supabase credentials ever appear in this file.
@@ -523,7 +581,8 @@ let outfits = [];
 let settings = {layout:'grid', lightbox:true, colorDot:true, showEmptySlots:true, cardLabel:'notes'};
 let flatSortedOutfits = [];
 let lbIndex = 0;
-let activeFilter = 'all';
+let activeFilter = 'all';  // tournament filter
+let activeYearFilter = 'all'; // year filter
 
 // Add-form state
 let addColors = [], addTournament = '', addFile = null;
@@ -546,20 +605,37 @@ async function loadData(){
     showToast('Could not load gallery — please refresh');
     outfits=[];
   }
+  buildFilterBars();
   renderGallery();
 }
-async function migrateFromLocalStorage(){
+async function migrateFromLocalStorage(force=false){
   // Migration runs after login so adminToken is set
-  if(localStorage.getItem(MIGRATION_KEY)) return;
+  if(!force && localStorage.getItem(MIGRATION_KEY)) return;
   let local=[];
   try{local=JSON.parse(localStorage.getItem('serena_outfits')||'[]');}catch(e){local=[];}
-  if(!local.length){localStorage.setItem(MIGRATION_KEY,'1');return;}
-  showToast('Migrating '+local.length+' saved outfits to database…');
-  try{
-    await apiFetch({method:'POST',body:local.map(outfitToRow),bulk:true});
+  if(!local.length){
     localStorage.setItem(MIGRATION_KEY,'1');
-    showToast(local.length+' outfits migrated ✓');
-  }catch(e){console.error('Migration failed:',e);showToast('Migration failed — local data is safe');}
+    if(force) showToast('No local data found to migrate.');
+    return;
+  }
+  showToast('Migrating '+local.length+' outfits to database…');
+  try{
+    const result = await apiFetch({method:'POST',body:local.map(outfitToRow),bulk:true});
+    localStorage.setItem(MIGRATION_KEY,'1');
+    showToast(local.length+' outfits migrated successfully!');
+    // Reload outfits from DB
+    const rows = await apiFetch({method:'GET'});
+    outfits = (rows||[]).map(rowToOutfit);
+    renderGallery(); renderEntries();
+  }catch(e){
+    console.error('Migration failed:',e);
+    showToast('Migration failed: '+e.message);
+  }
+}
+async function forceMigrate(){
+  if(!adminToken){ showToast('Please log into admin first'); return; }
+  localStorage.removeItem(MIGRATION_KEY);
+  await migrateFromLocalStorage(true);
 }
 async function dbInsert(o){return apiFetch({method:'POST',body:outfitToRow(o)});}
 async function dbUpdate(o){return apiFetch({method:'PATCH',id:o.id,body:outfitToRow(o)});}
@@ -639,12 +715,44 @@ async function checkPw(){
   }
 }
 
-/* ===== FILTER ===== */
-function setFilter(val, btn){
+/* ===== FILTERS ===== */
+function setTournamentFilter(val, btn){
   activeFilter = val;
-  document.querySelectorAll('.f-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#tournament-filter-bar .f-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   renderGallery();
+}
+function setYearFilter(val, btn){
+  activeYearFilter = val;
+  document.querySelectorAll('#year-filter-bar .f-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderGallery();
+}
+function buildFilterBars(){
+  // Tournament buttons — unique tournaments in data + fixed grand slams
+  const tBar = document.getElementById('tournament-filter-bar');
+  const usedTournaments = [...new Set(outfits.map(o=>o.tournament).filter(Boolean))];
+  // Order: grand slams first, then others alphabetically
+  const ordered = [...ALL_TOURNAMENTS.filter(t=>usedTournaments.includes(t)),
+    ...usedTournaments.filter(t=>!ALL_TOURNAMENTS.includes(t)).sort()];
+  // Remove old dynamic buttons (keep "All")
+  tBar.querySelectorAll('.f-btn:not(#f-all)').forEach(b=>b.remove());
+  ordered.forEach(t=>{
+    const b=document.createElement('button');
+    b.className='f-btn'; b.textContent=t;
+    b.onclick=()=>{setTournamentFilter(t,b);};
+    tBar.appendChild(b);
+  });
+  // Year buttons
+  const yBar = document.getElementById('year-filter-bar');
+  yBar.querySelectorAll('.f-btn:not(#f-year-all)').forEach(b=>b.remove());
+  const years=[...new Set(outfits.map(o=>o.year).filter(Boolean))].sort((a,b)=>a-b);
+  years.forEach(y=>{
+    const b=document.createElement('button');
+    b.className='f-btn'; b.textContent=y;
+    b.onclick=()=>{setYearFilter(y,b);};
+    yBar.appendChild(b);
+  });
 }
 
 /* ===== GALLERY RENDER ===== */
@@ -654,46 +762,80 @@ function renderGallery(){
   const modeLabel = document.getElementById('viewer-mode-label');
   const layout = settings.layout || 'grid';
 
-  if(activeFilter !== 'all'){
-    // TOURNAMENT FILTER VIEW — one card per year (or multiple if multiple outfits)
+  // Build filter bars from live data
+  buildFilterBars();
+
+  // Apply both filters
+  let visible = outfits;
+  if(activeFilter !== 'all') visible = visible.filter(o=>o.tournament===activeFilter);
+  if(activeYearFilter !== 'all') visible = visible.filter(o=>String(o.year)===String(activeYearFilter));
+
+  // TOURNAMENT FILTER VIEW (no year filter active) — show one column per year
+  if(activeFilter !== 'all' && activeYearFilter === 'all'){
     modeLabel.textContent = activeFilter + ' — all years';
-    const filtered = outfits.filter(o => o.tournament === activeFilter)
-      .sort((a,b) => (a.year||0) - (b.year||0));
+    const sorted = visible.slice().sort((a,b)=>(a.year||0)-(b.year||0));
+    flatSortedOutfits = sorted;
+    badge.textContent = sorted.length + ' outfits';
 
-    flatSortedOutfits = filtered;
-    badge.textContent = filtered.length + ' outfits';
-
-    if(!filtered.length && !settings.showEmptySlots){
-      root.innerHTML = '<div class="empty-state"><h3>No outfits yet for ' + activeFilter + '</h3></div>';
-      return;
-    }
-
-    // Build year list
-    const yearsWithOutfits = new Set(filtered.map(o => o.year));
-    let years = settings.showEmptySlots
-      ? ACTIVE_YEARS.filter(y => GRAND_SLAMS.includes(activeFilter) || yearsWithOutfits.has(y))
-      : [...yearsWithOutfits].sort((a,b)=>a-b);
-    if(settings.showEmptySlots && GRAND_SLAMS.includes(activeFilter)){
-      years = ACTIVE_YEARS; // show all active years with placeholders
-    }
-
-    // Group by year
     const byYear = {};
-    filtered.forEach(o => {
-      if(!byYear[o.year]) byYear[o.year] = [];
-      byYear[o.year].push(o);
-    });
+    sorted.forEach(o=>{ if(!byYear[o.year]) byYear[o.year]=[]; byYear[o.year].push(o); });
+
+    // Years to show: outfit years + placeholders for active years if grand slam
+    let years;
+    if(settings.showEmptySlots && ALL_TOURNAMENTS.includes(activeFilter)){
+      years = ACTIVE_YEARS.filter(y => {
+        if(activeFilter==='Olympics') return OLYMPICS_YEARS.has(y);
+        return true;
+      });
+    } else {
+      years = [...new Set(sorted.map(o=>o.year))].sort((a,b)=>a-b);
+    }
+    // Start from first year with outfits
+    const firstOutfitYear = sorted[0]?.year;
+    if(firstOutfitYear) years = years.filter(y=>y>=firstOutfitYear);
 
     let html = `<div class="tournament-view-grid layout-${layout}">`;
-    years.forEach(y => {
+    years.forEach(y=>{
       const group = byYear[y];
-      if(group && group.length > 0){
-        group.forEach(o => {
-          const idx = flatSortedOutfits.indexOf(o);
-          html += buildRealCard(o, idx);
-        });
-      } else if(settings.showEmptySlots){
-        html += buildEmptyCard(activeFilter, y);
+      if(group?.length) group.forEach(o=>{ html += buildRealCard(o, flatSortedOutfits.indexOf(o)); });
+      else if(settings.showEmptySlots) html += buildEmptyCard(activeFilter, y);
+    });
+    html += '</div>';
+    root.innerHTML = html;
+    return;
+  }
+
+  // YEAR FILTER VIEW — single year, all tournaments
+  if(activeYearFilter !== 'all'){
+    modeLabel.textContent = activeYearFilter + ' — all outfits';
+    const sorted = visible.slice().sort((a,b)=>{
+      const ai=ALL_TOURNAMENTS.indexOf(a.tournament); const bi=ALL_TOURNAMENTS.indexOf(b.tournament);
+      return (ai===-1?99:ai)-(bi===-1?99:bi);
+    });
+    flatSortedOutfits = sorted;
+    badge.textContent = sorted.length + ' outfits';
+    if(!sorted.length){
+      root.innerHTML = '<div class="empty-state"><h3>No outfits for '+activeYearFilter+'</h3></div>';
+      return;
+    }
+    // Group by tournament for feature-break treatment
+    const byTournament = {};
+    sorted.forEach(o=>{ if(!byTournament[o.tournament]) byTournament[o.tournament]=[]; byTournament[o.tournament].push(o); });
+    const slots = slotsForYear(activeYearFilter);
+    // also add any non-slot tournaments
+    sorted.forEach(o=>{ if(!slots.includes(o.tournament)&&!slots.includes('other:'+o.tournament)) slots.push(o.tournament); });
+
+    let html = `<div class="year-grid layout-${layout}" style="padding:0 2rem 3rem">`;
+    slots.forEach(slam=>{
+      const group = byTournament[slam];
+      if(group?.length){
+        if(group.length===1){
+          html += buildRealCard(group[0], flatSortedOutfits.indexOf(group[0]));
+        } else {
+          html += buildFeatureBreak(slam, activeYearFilter, group, layout);
+        }
+      } else if(settings.showEmptySlots && ALL_TOURNAMENTS.includes(slam)){
+        html += buildEmptyCard(slam, activeYearFilter);
       }
     });
     html += '</div>';
@@ -701,112 +843,125 @@ function renderGallery(){
     return;
   }
 
-  // ALL-YEARS VIEW — row per year, grand slam groups
+  // ── ALL-YEARS VIEW — default ──────────────────────────────────────────────
   modeLabel.textContent = 'Sorted chronologically by year';
-
   const byYear = {};
-  outfits.forEach(o => {
-    const y = o.year || 'Unknown';
-    if(!byYear[y]) byYear[y] = [];
-    byYear[y].push(o);
-  });
+  outfits.forEach(o=>{ const y=o.year||'Unknown'; if(!byYear[y]) byYear[y]=[]; byYear[y].push(o); });
 
+  // Determine year range — start from first year with actual outfits
+  const outfitYears = Object.keys(byYear).map(Number).filter(n=>!isNaN(n)).sort((a,b)=>a-b);
+  const firstYear = outfitYears[0] || 1995;
   let years;
   if(settings.showEmptySlots){
-    const outfitYears = Object.keys(byYear).map(Number).filter(n => !isNaN(n));
-    years = Array.from(new Set([...ACTIVE_YEARS, ...outfitYears])).sort((a,b)=>a-b);
+    years = Array.from(new Set([...ACTIVE_YEARS.filter(y=>y>=firstYear), ...outfitYears])).sort((a,b)=>a-b);
   } else {
-    years = Object.keys(byYear).map(y => isNaN(y)?y:Number(y)).sort((a,b)=>a-b);
+    years = outfitYears;
   }
 
   if(!years.length){
     root.innerHTML = '<div class="empty-state"><h3>No outfits yet</h3><p>Head to the Admin tab to start building the archive.</p></div>';
-    badge.textContent = ''; return;
+    badge.textContent=''; return;
   }
 
-  // Build flat list for lightbox
+  // Build flat list for lightbox (real outfits only)
   flatSortedOutfits = [];
-  years.forEach(y => {
+  years.forEach(y=>{
     const row = (byYear[y]||[]).slice().sort((a,b)=>{
-      const ai = GRAND_SLAMS.indexOf(a.tournament); const bi = GRAND_SLAMS.indexOf(b.tournament);
+      const ai=ALL_TOURNAMENTS.indexOf(a.tournament); const bi=ALL_TOURNAMENTS.indexOf(b.tournament);
       return (ai===-1?99:ai)-(bi===-1?99:bi);
     });
     flatSortedOutfits.push(...row);
   });
-
   badge.textContent = outfits.length + ' outfits';
 
   let html = '';
-  years.forEach(y => {
+  years.forEach(y=>{
     const realOutfits = (byYear[y]||[]).slice().sort((a,b)=>{
-      const ai = GRAND_SLAMS.indexOf(a.tournament); const bi = GRAND_SLAMS.indexOf(b.tournament);
+      const ai=ALL_TOURNAMENTS.indexOf(a.tournament); const bi=ALL_TOURNAMENTS.indexOf(b.tournament);
       return (ai===-1?99:ai)-(bi===-1?99:bi);
     });
     const byTournament = {};
-    realOutfits.forEach(o => {
-      if(!byTournament[o.tournament]) byTournament[o.tournament]=[];
-      byTournament[o.tournament].push(o);
-    });
-    const coveredMajors = GRAND_SLAMS.filter(s => byTournament[s]);
+    realOutfits.forEach(o=>{ if(!byTournament[o.tournament]) byTournament[o.tournament]=[]; byTournament[o.tournament].push(o); });
+
+    const slots = slotsForYear(y);
+    const coveredSlots = slots.filter(s=>byTournament[s]);
     const outfitCount = realOutfits.length;
 
     let cells = '';
-    GRAND_SLAMS.forEach(slam => {
+    slots.forEach(slam=>{
       if(byTournament[slam]){
         const group = byTournament[slam];
-        if(group.length === 1){
+        if(group.length===1){
           cells += buildRealCard(group[0], flatSortedOutfits.indexOf(group[0]));
         } else {
-          // Multi-outfit group for same tournament in same year
-          const innerCards = group.map(o => buildRealCard(o, flatSortedOutfits.indexOf(o), true)).join('');
-          cells += `<div class="card-group multi" style="grid-column:span ${Math.min(group.length,3)}">
-            <span class="multi-badge">${group.length} looks</span>
-            <div class="card-group-inner">${innerCards}</div>
-          </div>`;
+          // Option 3: feature break — full width strip
+          cells += buildFeatureBreak(slam, y, group, layout);
         }
       } else if(settings.showEmptySlots){
         cells += buildEmptyCard(slam, y);
       }
     });
-    // Non-grand-slam outfits
-    realOutfits.forEach(o => {
-      if(!GRAND_SLAMS.includes(o.tournament)){
-        cells += buildRealCard(o, flatSortedOutfits.indexOf(o));
-      }
+    // Non-slot outfits (other tournaments)
+    realOutfits.forEach(o=>{
+      if(!slots.includes(o.tournament)) cells += buildRealCard(o, flatSortedOutfits.indexOf(o));
     });
 
     html += `<div class="year-section">
       <div class="year-heading">
         <h2>${y}</h2>
-        <span>${outfitCount} outfit${outfitCount!==1?'s':''} &nbsp;·&nbsp; ${coveredMajors.length} of ${GRAND_SLAMS.length} majors</span>
+        <span>${outfitCount} outfit${outfitCount!==1?'s':''} &nbsp;·&nbsp; ${coveredSlots.length} of ${slots.length} majors</span>
       </div>
       <div class="year-grid layout-${layout}">${cells}</div>
     </div>`;
   });
-
   root.innerHTML = html;
 }
 
-function buildRealCard(o, idx, insideGroup=false){
+function buildRealCard(o, idx, inStrip=false){
   const colorVal = COLOR_MAP[o.colors?.[0]] || '#888';
   const dot = settings.colorDot && o.colors?.[0] ? `<span class="card-color-dot" style="background:${colorVal}"></span>` : '';
   let lbl = settings.cardLabel==='tournament' ? (o.tournament||'') :
-    (o.notes ? o.notes.slice(0,45)+(o.notes.length>45?'…':'') : (o.tournament||''));
-  const wrapClass = insideGroup ? '' : 'card-group';
-  return `<div class="${wrapClass}"><div class="card" onclick="openLightbox(${idx})">
+    (o.notes ? o.notes.slice(0,45)+(o.notes.length>45?'\u2026':'') : (o.tournament||''));
+  return `<div class="card" onclick="openLightbox(${idx})">
     <img src="${o.imageUrl}" alt="${o.tournament||''} ${o.year||''}" loading="lazy" onerror="this.src='';this.style.background='#222'">
     ${dot}
     <div class="card-overlay">
       <div class="card-year-lbl">${o.year||''}${o.tournament?' · '+o.tournament:''}</div>
       <div class="card-label">${lbl}</div>
     </div>
-  </div></div>`;
+  </div>`;
 }
 
 function buildEmptyCard(slam, year){
-  return `<div class="card-empty">
+  const status = slotStatus(slam, year);
+  if(status === 'not-held'){
+    return `<div class="card-empty not-held">
+      <div class="card-empty-icon">cancelled</div>
+      <div class="card-empty-label">${slam}<br>${year}</div>
+    </div>`;
+  }
+  if(status === 'did-not-play'){
+    return `<div class="card-empty dnp">
+      <div class="card-empty-icon">did not play</div>
+      <div class="card-empty-label">${slam}<br>${year}</div>
+    </div>`;
+  }
+  // 'played' — she played but we haven't sourced the outfit yet
+  return `<div class="card-empty unfound">
     <div class="card-empty-icon">+</div>
     <div class="card-empty-label">${slam}<br>${year}</div>
+  </div>`;
+}
+
+// Option 3: full-width feature break for multi-look tournaments
+function buildFeatureBreak(slam, year, group, layout){
+  const cards = group.map(o=>buildRealCard(o, flatSortedOutfits.indexOf(o), true)).join('');
+  return `<div class="feature-break">
+    <div class="feature-header">
+      <span class="feature-title">${slam} ${year}</span>
+      <span class="feature-sub">${group.length} looks across the tournament</span>
+    </div>
+    <div class="feature-strip layout-${layout}">${cards}</div>
   </div>`;
 }
 
