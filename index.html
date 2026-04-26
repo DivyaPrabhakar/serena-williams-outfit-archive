@@ -130,7 +130,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1.25re
 .lb-nav button:hover{border-color:var(--gold);color:var(--gold)}
 
 /* ===== WANTED (missing outfits log) ===== */
-.wanted-panel{border-top:1px solid #1e1e1e;background:var(--dark)}
+.wanted-panel{border-top:1px solid #2a2a2a;border-bottom:1px solid #2a2a2a;background:var(--dark2)}
 .wanted-toggle{width:100%;display:flex;align-items:center;gap:0.75rem;padding:1rem 2rem;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--text-muted);text-align:left}
 .wanted-toggle:hover{background:#111}
 .wanted-toggle-left{display:flex;align-items:center;gap:0.6rem;flex:1}
@@ -294,12 +294,6 @@ input[type=number]{-moz-appearance:textfield}
     </div>
   </div>
 
-  <div class="viewer-meta-bar">
-    <span class="viewer-mode-label" id="viewer-mode-label">Sorted chronologically by year</span>
-    <span class="count-badge" id="count-badge"></span>
-  </div>
-  <div id="gallery-root"></div>
-
   <!-- Missing outfits log -->
   <div class="wanted-panel" id="wanted-panel">
     <button class="wanted-toggle" onclick="toggleWanted()" aria-expanded="false" aria-controls="wanted-body">
@@ -315,6 +309,12 @@ input[type=number]{-moz-appearance:textfield}
       <div class="wanted-grid" id="wanted-list"></div>
     </div>
   </div>
+
+  <div class="viewer-meta-bar">
+    <span class="viewer-mode-label" id="viewer-mode-label">Sorted chronologically by year</span>
+    <span class="count-badge" id="count-badge"></span>
+  </div>
+  <div id="gallery-root"></div>
 </div>
 
 <!-- ===== ADMIN ===== -->
