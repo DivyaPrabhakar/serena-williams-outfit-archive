@@ -2,7 +2,7 @@ import { useState, useRef, useCallback, useMemo, useEffect } from 'react'
 import {
   GRAND_SLAMS, OLYMPICS_YEARS, ROUND_SEQUENCE, COLOR_MAP,
 } from '../../lib/constants'
-import { getValidRounds } from '../../lib/rounds'
+import { getValidRounds, getRoundsForSlot } from '../../lib/rounds'
 
 // Tournaments where she played mixed doubles
 const MIXED_SLAMS = ['Australian Open', 'Roland Garros', 'Wimbledon', 'US Open']
@@ -91,9 +91,18 @@ export default function AddOutfitForm({ onAdd }) {
   }, [f.tournament])
 
   const validRounds = useMemo(() => {
-    if (!f.discipline || !effectiveTournament || !yearNum) return []
-    const rounds = getValidRounds(effectiveTournament, yearNum, f.discipline)
-    return rounds.length > 0 ? rounds : ROUND_SEQUENCE
+    if (!effectiveTournament || !yearNum) return []
+    if (f.discipline) {
+      const rounds = getValidRounds(effectiveTournament, yearNum, f.discipline)
+      return rounds.length > 0 ? rounds : ROUND_SEQUENCE
+    }
+    const max = Math.max(
+      getRoundsForSlot(effectiveTournament, yearNum, 'Singles'),
+      getRoundsForSlot(effectiveTournament, yearNum, 'Doubles'),
+      getRoundsForSlot(effectiveTournament, yearNum, 'Mixed'),
+      0,
+    )
+    return max > 0 ? ROUND_SEQUENCE.slice(0, max) : ROUND_SEQUENCE
   }, [f.discipline, effectiveTournament, yearNum])
 
   // ── Image handlers ──────────────────────────────────────────────────────
@@ -272,7 +281,26 @@ export default function AddOutfitForm({ onAdd }) {
         <InlineError msg={errors.tournament} />
       </div>
 
-      {/* 4. Discipline */}
+      {/* 4. Round — appears as soon as year + tournament are known */}
+      {yearNum > 0 && effectiveTournament && (
+        <div className="flex flex-col gap-2">
+          <FieldLabel>Round</FieldLabel>
+          <div className="flex flex-wrap gap-2">
+            {validRounds.map(r => (
+              <PickerBtn
+                key={r}
+                active={f.round === r}
+                onClick={() => set('round', r)}
+              >
+                {r}
+              </PickerBtn>
+            ))}
+          </div>
+          <InlineError msg={errors.round} />
+        </div>
+      )}
+
+      {/* 5. Discipline */}
       {f.tournament && (
         <div className="flex flex-col gap-2">
           <FieldLabel>Discipline</FieldLabel>
@@ -288,29 +316,6 @@ export default function AddOutfitForm({ onAdd }) {
             ))}
           </div>
           <InlineError msg={errors.discipline} />
-        </div>
-      )}
-
-      {/* 5. Round */}
-      {f.discipline && (
-        <div className="flex flex-col gap-2">
-          <FieldLabel>Round</FieldLabel>
-          {!yearNum || !effectiveTournament ? (
-            <p className="text-[#555] text-xs italic">Select year and tournament first</p>
-          ) : (
-            <div className="flex flex-wrap gap-2">
-              {validRounds.map(r => (
-                <PickerBtn
-                  key={r}
-                  active={f.round === r}
-                  onClick={() => set('round', r)}
-                >
-                  {f.discipline} {r}
-                </PickerBtn>
-              ))}
-            </div>
-          )}
-          <InlineError msg={errors.round} />
         </div>
       )}
 

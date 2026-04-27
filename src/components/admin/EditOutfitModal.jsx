@@ -2,7 +2,7 @@ import { useState, useRef, useCallback, useMemo, useEffect } from 'react'
 import {
   GRAND_SLAMS, OLYMPICS_YEARS, ROUND_SEQUENCE, COLOR_MAP,
 } from '../../lib/constants'
-import { getValidRounds } from '../../lib/rounds'
+import { getValidRounds, getRoundsForSlot } from '../../lib/rounds'
 
 const MIXED_SLAMS = ['Australian Open', 'Roland Garros', 'Wimbledon', 'US Open']
 const COLORS      = Object.keys(COLOR_MAP)
@@ -74,8 +74,13 @@ export default function EditOutfitModal({ outfit, onSave, onClose }) {
   const [errors,          setErrors]          = useState({})
   const fileRef = useRef(null)
 
-  // Reset round when discipline/year/tournament changes
-  useEffect(() => { setRound('') }, [discipline, year, tournament])
+  // Reset round when discipline/year/tournament changes, but not on first render
+  // (first render initialises round from the outfit prop — clearing it is a bug)
+  const isFirstRender = useRef(true)
+  useEffect(() => {
+    if (isFirstRender.current) { isFirstRender.current = false; return }
+    setRound('')
+  }, [discipline, year, tournament])
 
   const yearNum             = parseInt(year) || 0
   const effectiveTournament = tournament === 'Other' ? otherTournament.trim() : tournament
@@ -88,9 +93,18 @@ export default function EditOutfitModal({ outfit, onSave, onClose }) {
   }, [tournament])
 
   const validRounds = useMemo(() => {
-    if (!discipline || !effectiveTournament || !yearNum) return []
-    const rounds = getValidRounds(effectiveTournament, yearNum, discipline)
-    return rounds.length > 0 ? rounds : ROUND_SEQUENCE
+    if (!effectiveTournament || !yearNum) return []
+    if (discipline) {
+      const rounds = getValidRounds(effectiveTournament, yearNum, discipline)
+      return rounds.length > 0 ? rounds : ROUND_SEQUENCE
+    }
+    const max = Math.max(
+      getRoundsForSlot(effectiveTournament, yearNum, 'Singles'),
+      getRoundsForSlot(effectiveTournament, yearNum, 'Doubles'),
+      getRoundsForSlot(effectiveTournament, yearNum, 'Mixed'),
+      0,
+    )
+    return max > 0 ? ROUND_SEQUENCE.slice(0, max) : ROUND_SEQUENCE
   }, [discipline, effectiveTournament, yearNum])
 
   const handleFile = useCallback((file) => {
@@ -266,6 +280,25 @@ export default function EditOutfitModal({ outfit, onSave, onClose }) {
             <InlineError msg={errors.tournament} />
           </div>
 
+          {/* Round — appears as soon as year + tournament are known */}
+          {yearNum > 0 && effectiveTournament && (
+            <div className="flex flex-col gap-2">
+              <FieldLabel>Round</FieldLabel>
+              <div className="flex flex-wrap gap-2">
+                {validRounds.map(r => (
+                  <PickerBtn
+                    key={r}
+                    active={round === r}
+                    onClick={() => setRound(r)}
+                  >
+                    {r}
+                  </PickerBtn>
+                ))}
+              </div>
+              <InlineError msg={errors.round} />
+            </div>
+          )}
+
           {/* Discipline */}
           {tournament && (
             <div className="flex flex-col gap-2">
@@ -282,29 +315,6 @@ export default function EditOutfitModal({ outfit, onSave, onClose }) {
                 ))}
               </div>
               <InlineError msg={errors.discipline} />
-            </div>
-          )}
-
-          {/* Round */}
-          {discipline && (
-            <div className="flex flex-col gap-2">
-              <FieldLabel>Round</FieldLabel>
-              {!yearNum || !effectiveTournament ? (
-                <p className="text-[#555] text-xs italic">Select year and tournament first</p>
-              ) : (
-                <div className="flex flex-wrap gap-2">
-                  {validRounds.map(r => (
-                    <PickerBtn
-                      key={r}
-                      active={round === r}
-                      onClick={() => setRound(r)}
-                    >
-                      {discipline} {r}
-                    </PickerBtn>
-                  ))}
-                </div>
-              )}
-              <InlineError msg={errors.round} />
             </div>
           )}
 
