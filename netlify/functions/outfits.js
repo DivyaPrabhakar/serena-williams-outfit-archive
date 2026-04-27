@@ -2,10 +2,10 @@
 // The browser sends the admin password as a header; this function verifies it.
 // Nothing sensitive ever appears in index.html.
 
-const SB_URL = process.env.SUPABASE_URL;
-const SB_KEY = process.env.SUPABASE_KEY;
-const SB_ADMIN_TOKEN = process.env.SUPABASE_ADMIN_TOKEN;
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+const SB_URL = process.env.VITE_SUPABASE_URL;
+const SB_KEY = process.env.VITE_SUPABASE_KEY;
+const SB_ADMIN_TOKEN = process.env.VITE_SUPABASE_ADMIN_TOKEN;
+const ADMIN_PASSWORD = process.env.VITE_SUPABASE_ADMIN_TOKEN;
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
