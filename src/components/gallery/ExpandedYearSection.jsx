@@ -5,7 +5,9 @@ import EmptySlot from './EmptySlot'
 import DimSlot from './DimSlot'
 
 const CARD_WIDTHS = { small: 88, standard: 128, large: 172 }
+const KNOWN_TOURNAMENTS = new Set([...GRAND_SLAMS, 'Olympics'])
 
+// For tournaments in the participation constants (grand slams + Olympics)
 function ExpandedTournamentBlock({ tournament, year, outfitMap, settings, onOpenLightbox }) {
   const cardWidth = CARD_WIDTHS[settings.gridDensity] ?? 128
 
@@ -30,7 +32,6 @@ function ExpandedTournamentBlock({ tournament, year, outfitMap, settings, onOpen
 
   if (disciplineBlocks.length === 0) return null
 
-  // Check if anything will actually render (respects settings)
   const hasVisibleContent = disciplineBlocks.some(({ slots, status }) =>
     status === 'played'
       ? slots.some(s => s.outfit !== null) || settings.showEmptySlots
@@ -103,6 +104,50 @@ function ExpandedTournamentBlock({ tournament, year, outfitMap, settings, onOpen
   )
 }
 
+// For tournaments not in the participation constants — show what's logged, no empty slots
+function UnknownTournamentBlock({ tournament, year, outfits, settings, onOpenLightbox }) {
+  const cardWidth = CARD_WIDTHS[settings.gridDensity] ?? 128
+
+  if (outfits.length === 0) return null
+
+  const byDiscipline = {}
+  for (const o of outfits) {
+    const d = o.discipline ?? 'Singles'
+    if (!byDiscipline[d]) byDiscipline[d] = []
+    byDiscipline[d].push(o)
+  }
+
+  const found = outfits.length
+  const header = `${tournament} ${year} · ${found} outfit${found !== 1 ? 's' : ''} · ${found} found`
+
+  return (
+    <div className="mb-8">
+      <div className="flex items-center gap-2 mb-4">
+        <span className="w-0.5 h-3.5 bg-gold flex-shrink-0 rounded-full" />
+        <span className="text-[10px] uppercase tracking-widest text-gold font-medium">{header}</span>
+      </div>
+      {Object.entries(byDiscipline).map(([discipline, dOutfits]) => {
+        const sorted = [...dOutfits].sort((a, b) => (a.roundNumber ?? 0) - (b.roundNumber ?? 0))
+        return (
+          <div key={discipline} className="mb-4 pl-3">
+            <div className="flex items-center gap-3 mb-2.5">
+              <span className="text-[10px] uppercase tracking-widest text-muted">{discipline}</span>
+              <div className="flex-1 h-px bg-dark3" />
+            </div>
+            <div className="flex gap-2 overflow-x-auto pb-1.5 snap-x snap-mandatory">
+              {sorted.map(outfit => (
+                <div key={outfit.id} className="flex-none snap-start" style={{ width: cardWidth }}>
+                  <OutfitCard outfit={outfit} settings={settings} onClick={() => onOpenLightbox(outfit)} />
+                </div>
+              ))}
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
 export default function ExpandedYearSection({ year, outfitMap, tournaments, yearOutfits, settings, onOpenLightbox }) {
   const cardWidth = CARD_WIDTHS[settings.gridDensity] ?? 128
 
@@ -115,6 +160,20 @@ export default function ExpandedYearSection({ year, outfitMap, tournaments, year
   ].filter(Boolean).join(' · ')
 
   const blocks = tournaments.flatMap(tournament => {
+    if (!KNOWN_TOURNAMENTS.has(tournament)) {
+      const tOutfits = yearOutfits.filter(o => o.tournament === tournament)
+      return [(
+        <UnknownTournamentBlock
+          key={tournament}
+          tournament={tournament}
+          year={year}
+          outfits={tOutfits}
+          settings={settings}
+          onOpenLightbox={onOpenLightbox}
+        />
+      )]
+    }
+
     const combinedStatus = getCombinedSlotStatus(tournament, year)
 
     if (combinedStatus === 'not-held') {
