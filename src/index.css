@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'DM Sans', sans-serif;
+  --font-playfair: 'Playfair Display', serif;
+  --color-dark:       #0D0D0D;
+  --color-dark2:      #1A1A1A;
+  --color-dark3:      #252525;
+  --color-gold:       #C9A84C;
+  --color-gold-light: #F0D98A;
+  --color-ink:        #F0EDE6;
+  --color-muted:      #8A877F;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--color-dark);
+  color: var(--color-ink);
+}
+
+@keyframes slot-highlight {
+  0%   { box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.9); }
+  60%  { box-shadow: 0 0 0 5px rgba(201, 168, 76, 0.4); }
+  100% { box-shadow: 0 0 0 8px rgba(201, 168, 76, 0); }
+}
+
+.slot-highlight {
+  animation: slot-highlight 0.9s ease-out 3;
+  border-radius: 4px;
+}
