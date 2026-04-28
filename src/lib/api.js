@@ -52,13 +52,21 @@ export async function fetchOutfits() {
   return (rows ?? []).map(rowToOutfit)
 }
 
+async function assertOk(res, label) {
+  if (!res.ok) {
+    let detail = ''
+    try { detail = await res.text() } catch {}
+    throw new Error(`${label} (${res.status})${detail ? ': ' + detail : ''}`)
+  }
+}
+
 export async function insertOutfit(outfit, adminToken) {
   const res = await fetch(API, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken },
     body: JSON.stringify(outfitToRow(outfit)),
   })
-  if (!res.ok) throw new Error('Insert failed')
+  await assertOk(res, 'Insert failed')
   return res.json()
 }
 
@@ -68,7 +76,7 @@ export async function updateOutfit(outfit, adminToken) {
     headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken },
     body: JSON.stringify(outfitToRow(outfit)),
   })
-  if (!res.ok) throw new Error('Update failed')
+  await assertOk(res, 'Update failed')
   return res.json()
 }
 
@@ -77,5 +85,5 @@ export async function deleteOutfit(id, adminToken) {
     method: 'DELETE',
     headers: { 'x-admin-token': adminToken },
   })
-  if (!res.ok) throw new Error('Delete failed')
+  await assertOk(res, 'Delete failed')
 }
