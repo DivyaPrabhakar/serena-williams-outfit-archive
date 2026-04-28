@@ -2,10 +2,10 @@
 // The browser sends the admin password as a header; this function verifies it.
 // Nothing sensitive ever appears in index.html.
 
-const SB_URL = process.env.VITE_SUPABASE_URL;
-const SB_KEY = process.env.VITE_SUPABASE_KEY;
-const SB_ADMIN_TOKEN = process.env.VITE_SUPABASE_ADMIN_TOKEN;
-const ADMIN_PASSWORD = process.env.VITE_SUPABASE_ADMIN_TOKEN;
+const SB_URL          = process.env.VITE_SUPABASE_URL;
+const SB_KEY          = process.env.VITE_SUPABASE_KEY;           // anon key — reads
+const SB_SERVICE_KEY  = process.env.SUPABASE_SERVICE_KEY;        // service role — writes (bypasses RLS)
+const ADMIN_PASSWORD  = process.env.VITE_SUPABASE_ADMIN_TOKEN;
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -22,14 +22,14 @@ function unauthorized() {
 }
 
 async function sbFetch(path, opts = {}) {
+  const key = opts.adminWrite ? SB_SERVICE_KEY : SB_KEY;
   const res = await fetch(`${SB_URL}/rest/v1/${path}`, {
     ...opts,
     headers: {
-      'apikey': SB_KEY,
-      'Authorization': `Bearer ${SB_KEY}`,
+      'apikey': key,
+      'Authorization': `Bearer ${key}`,
       'Content-Type': 'application/json',
       'Prefer': opts.prefer || '',
-      ...(opts.adminWrite ? { 'x-admin-token': SB_ADMIN_TOKEN } : {}),
     },
   });
   const text = await res.text();
