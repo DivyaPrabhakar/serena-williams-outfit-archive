@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useMemo, useEffect } from 'react'
+import { useState, useCallback, useMemo, useEffect } from 'react'
 import {
   GRAND_SLAMS, OLYMPICS_YEARS, ROUND_SEQUENCE, COLOR_MAP,
 } from '../../lib/constants'
@@ -74,13 +74,15 @@ export default function EditOutfitModal({ outfit, onSave, onClose }) {
   const [errors,          setErrors]          = useState({})
   const fileRef = useRef(null)
 
-  // Reset round when discipline/year/tournament changes, but not on first render
-  // (first render initialises round from the outfit prop — clearing it is a bug)
-  const isFirstRender = useRef(true)
+  // Only clear discipline if it becomes unavailable (Mixed → Olympics)
   useEffect(() => {
-    if (isFirstRender.current) { isFirstRender.current = false; return }
-    setRound('')
-  }, [discipline, year, tournament])
+    if (discipline === 'Mixed' && tournament === 'Olympics') setDiscipline('')
+  }, [tournament])
+
+  // Only clear round if it falls outside the newly computed valid range
+  useEffect(() => {
+    if (round && validRounds.length > 0 && !validRounds.includes(round)) setRound('')
+  }, [validRounds])
 
   const yearNum             = parseInt(year) || 0
   const effectiveTournament = tournament === 'Other' ? otherTournament.trim() : tournament

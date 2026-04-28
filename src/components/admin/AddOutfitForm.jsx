@@ -76,9 +76,15 @@ export default function AddOutfitForm({ onAdd }) {
 
   const set = (key, val) => setF(prev => ({ ...prev, [key]: val }))
 
-  // Reset dependent fields when parent changes
-  useEffect(() => { set('discipline', ''); set('round', '') }, [f.tournament])
-  useEffect(() => { set('round', '') },                        [f.discipline, f.year])
+  // Only clear discipline if it becomes unavailable (Mixed → Olympics)
+  useEffect(() => {
+    if (f.discipline === 'Mixed' && f.tournament === 'Olympics') set('discipline', '')
+  }, [f.tournament])
+
+  // Only clear round if it falls outside the newly computed valid range
+  useEffect(() => {
+    if (f.round && validRounds.length > 0 && !validRounds.includes(f.round)) set('round', '')
+  }, [validRounds])
 
   const yearNum = parseInt(f.year) || 0
   const effectiveTournament = f.tournament === 'Other' ? f.otherTournament.trim() : f.tournament
