@@ -61,10 +61,11 @@ async function assertOk(res, label) {
 }
 
 export async function insertOutfit(outfit, adminToken) {
+  const row = { id: crypto.randomUUID(), ...outfitToRow(outfit) }
   const res = await fetch(API, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken },
-    body: JSON.stringify(outfitToRow(outfit)),
+    body: JSON.stringify(row),
   })
   await assertOk(res, 'Insert failed')
   return res.json()
