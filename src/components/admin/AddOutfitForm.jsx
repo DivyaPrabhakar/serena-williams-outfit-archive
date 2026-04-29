@@ -76,16 +76,6 @@ export default function AddOutfitForm({ onAdd }) {
 
   const set = (key, val) => setF(prev => ({ ...prev, [key]: val }))
 
-  // Only clear discipline if it becomes unavailable (Mixed → Olympics)
-  useEffect(() => {
-    if (f.discipline === 'Mixed' && f.tournament === 'Olympics') set('discipline', '')
-  }, [f.tournament])
-
-  // Only clear round if it falls outside the newly computed valid range
-  useEffect(() => {
-    if (f.round && validRounds.length > 0 && !validRounds.includes(f.round)) set('round', '')
-  }, [validRounds])
-
   const yearNum = parseInt(f.year) || 0
   const effectiveTournament = f.tournament === 'Other' ? f.otherTournament.trim() : f.tournament
 
@@ -110,6 +100,16 @@ export default function AddOutfitForm({ onAdd }) {
     )
     return max > 0 ? ROUND_SEQUENCE.slice(0, max) : ROUND_SEQUENCE
   }, [f.discipline, effectiveTournament, yearNum])
+
+  // Only clear discipline if it becomes unavailable (Mixed → Olympics)
+  useEffect(() => {
+    if (f.discipline === 'Mixed' && f.tournament === 'Olympics') set('discipline', '')
+  }, [f.tournament])
+
+  // Only clear round if it falls outside the newly computed valid range
+  useEffect(() => {
+    if (f.round && validRounds.length > 0 && !validRounds.includes(f.round)) set('round', '')
+  }, [validRounds])
 
   // ── Image handlers ──────────────────────────────────────────────────────
   const handleFile = useCallback((file) => {

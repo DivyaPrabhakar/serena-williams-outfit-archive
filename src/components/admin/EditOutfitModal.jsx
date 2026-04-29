@@ -74,16 +74,6 @@ export default function EditOutfitModal({ outfit, onSave, onClose }) {
   const [errors,          setErrors]          = useState({})
   const fileRef = useRef(null)
 
-  // Only clear discipline if it becomes unavailable (Mixed → Olympics)
-  useEffect(() => {
-    if (discipline === 'Mixed' && tournament === 'Olympics') setDiscipline('')
-  }, [tournament])
-
-  // Only clear round if it falls outside the newly computed valid range
-  useEffect(() => {
-    if (round && validRounds.length > 0 && !validRounds.includes(round)) setRound('')
-  }, [validRounds])
-
   const yearNum             = parseInt(year) || 0
   const effectiveTournament = tournament === 'Other' ? otherTournament.trim() : tournament
 
@@ -108,6 +98,16 @@ export default function EditOutfitModal({ outfit, onSave, onClose }) {
     )
     return max > 0 ? ROUND_SEQUENCE.slice(0, max) : ROUND_SEQUENCE
   }, [discipline, effectiveTournament, yearNum])
+
+  // Only clear discipline if it becomes unavailable (Mixed → Olympics)
+  useEffect(() => {
+    if (discipline === 'Mixed' && tournament === 'Olympics') setDiscipline('')
+  }, [tournament])
+
+  // Only clear round if it falls outside the newly computed valid range
+  useEffect(() => {
+    if (round && validRounds.length > 0 && !validRounds.includes(round)) setRound('')
+  }, [validRounds])
 
   const handleFile = useCallback((file) => {
     if (!file?.type.startsWith('image/')) return
