@@ -11,6 +11,8 @@ import {
   DOUBLES_NOT_HELD,
   MIXED_DID_NOT_PLAY,
   MIXED_NOT_HELD,
+  NON_SLAM_ROUNDS_SINGLES,
+  NON_SLAM_ROUNDS_DOUBLES,
 } from './constants'
 
 // ── Round label ↔ number conversions ─────────────────────────────────────
@@ -50,11 +52,14 @@ export function getSlotStatus(tournament, year, discipline) {
 export function getRoundsForSlot(tournament, year, discipline) {
   if (getSlotStatus(tournament, year, discipline) !== 'played') return 0
 
-  const roundsMap = discipline === 'Singles' ? ROUNDS_SINGLES
-                  : discipline === 'Doubles' ? ROUNDS_DOUBLES
-                  : ROUNDS_MIXED
-
-  return roundsMap[tournament]?.[Number(year)] ?? 0
+  const y = Number(year)
+  if (discipline === 'Singles') {
+    return ROUNDS_SINGLES[tournament]?.[y] ?? NON_SLAM_ROUNDS_SINGLES[tournament]?.[y] ?? 0
+  }
+  if (discipline === 'Doubles') {
+    return ROUNDS_DOUBLES[tournament]?.[y] ?? NON_SLAM_ROUNDS_DOUBLES[tournament]?.[y] ?? 0
+  }
+  return ROUNDS_MIXED[tournament]?.[y] ?? 0
 }
 
 // Returns round labels for the rounds she actually played, e.g. ['R1','R2','R3','R4','QF']
@@ -89,5 +94,15 @@ export function getCombinedSlotStatus(tournament, year) {
 export function slotsForYear(year) {
   const slots = [...GRAND_SLAMS]
   if (OLYMPICS_YEARS.has(Number(year))) slots.push('Olympics')
+  const y = Number(year)
+  const nonSlamTournaments = new Set([
+    ...Object.keys(NON_SLAM_ROUNDS_SINGLES),
+    ...Object.keys(NON_SLAM_ROUNDS_DOUBLES),
+  ])
+  for (const t of nonSlamTournaments) {
+    if ((NON_SLAM_ROUNDS_SINGLES[t]?.[y] ?? 0) > 0 || (NON_SLAM_ROUNDS_DOUBLES[t]?.[y] ?? 0) > 0) {
+      slots.push(t)
+    }
+  }
   return slots
 }

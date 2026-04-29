@@ -1,11 +1,18 @@
-import { GRAND_SLAMS, DISCIPLINES } from '../../lib/constants'
+import { GRAND_SLAMS, DISCIPLINES, NON_SLAM_ROUNDS_SINGLES, NON_SLAM_ROUNDS_DOUBLES } from '../../lib/constants'
 import { getRoundsForSlot, getSlotStatus, getRoundLabel, getCombinedSlotStatus } from '../../lib/rounds'
 import OutfitCard from './OutfitCard'
 import EmptySlot from './EmptySlot'
 import DimSlot from './DimSlot'
 
 const CARD_WIDTHS = { small: 88, standard: 128, large: 172 }
-const KNOWN_TOURNAMENTS = new Set([...GRAND_SLAMS, 'Olympics'])
+const SLAM_TOURNAMENTS = new Set([...GRAND_SLAMS, 'Olympics'])
+
+function isKnownForYear(tournament, year) {
+  if (SLAM_TOURNAMENTS.has(tournament)) return true
+  const y = Number(year)
+  return (NON_SLAM_ROUNDS_SINGLES[tournament]?.[y] != null) ||
+         (NON_SLAM_ROUNDS_DOUBLES[tournament]?.[y] != null)
+}
 
 // For tournaments in the participation constants (grand slams + Olympics)
 function ExpandedTournamentBlock({ tournament, year, outfitMap, settings, onOpenLightbox }) {
@@ -160,7 +167,7 @@ export default function ExpandedYearSection({ year, outfitMap, tournaments, year
   ].filter(Boolean).join(' · ')
 
   const blocks = tournaments.flatMap(tournament => {
-    if (!KNOWN_TOURNAMENTS.has(tournament)) {
+    if (!isKnownForYear(tournament, year)) {
       const tOutfits = yearOutfits.filter(o => o.tournament === tournament)
       return [(
         <UnknownTournamentBlock
