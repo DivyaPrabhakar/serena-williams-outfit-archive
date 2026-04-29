@@ -221,7 +221,7 @@ export default function ViewerPage() {
                   panelOpen ? 'bg-gold text-dark' : 'bg-dark3 text-muted hover:text-ink'
                 }`}
               >
-                Still hunting
+                Outfits yet to discover
                 <span className={panelOpen ? 'text-dark/70' : 'text-gold'}>({missingCount})</span>
               </button>
             )}
@@ -308,7 +308,7 @@ export default function ViewerPage() {
         />
       )}
 
-      {/* Still hunting panel */}
+      {/* Outfits yet to discover panel */}
       {panelOpen && (
         <MissingPanel
           mode={mode}

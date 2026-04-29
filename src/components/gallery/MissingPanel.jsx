@@ -117,7 +117,7 @@ export default function MissingPanel({ mode, condensedItems, expandedItems, onHi
     >
       {/* Panel header */}
       <div className="flex items-center justify-between px-5 py-3 border-b border-dark3 flex-shrink-0">
-        <h3 className="font-playfair text-base text-gold">Still hunting</h3>
+        <h3 className="font-playfair text-base text-gold">Outfits yet to discover</h3>
         <button
           onClick={onClose}
           className="text-muted hover:text-ink text-xl leading-none transition-colors"
