@@ -39,7 +39,7 @@ export const ROUNDS_DOUBLES = {
   'Roland Garros':   {1999:7, 2009:3, 2010:7, 2013:1, 2016:3, 2018:3},
   'Wimbledon':       {1998:1, 2000:7, 2001:3, 2002:7, 2003:3, 2007:2, 2008:7, 2009:7, 2010:5, 2012:7, 2014:2, 2016:7},
   'US Open':         {1997:1, 1999:7, 2000:6, 2001:3, 2009:7, 2012:3, 2013:6, 2014:5, 2022:1},
-  'Olympics':        {2000:5, 2008:5, 2012:5, 2016:1},
+  'Olympics':        {2000:7, 2008:5, 2012:5, 2016:1},
 }
 
 // ── MIXED DOUBLES rounds played per slam per year ─────────────────────────
@@ -118,8 +118,10 @@ export const NON_SLAM_ROUNDS_DOUBLES = {
 export const COLOR_MAP = {
   White:  '#eee',
   Black:  '#111',
+  Grey:   '#888',
   Red:    '#c0392b',
   Gold:   '#C9A84C',
+  Yellow: '#f1c40f',
   Blue:   '#2980b9',
   Purple: '#8e44ad',
   Pink:   '#e91e8c',
