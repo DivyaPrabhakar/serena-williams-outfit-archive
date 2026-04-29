@@ -1,5 +1,5 @@
 import { GRAND_SLAMS, DISCIPLINES, NON_SLAM_ROUNDS_SINGLES, NON_SLAM_ROUNDS_DOUBLES } from '../../lib/constants'
-import { getRoundsForSlot, getSlotStatus, getRoundLabel, getCombinedSlotStatus } from '../../lib/rounds'
+import { getRoundsForSlot, getSlotStatus, getRoundLabel, getCombinedSlotStatus, getRoundNumbers } from '../../lib/rounds'
 import OutfitCard from './OutfitCard'
 import EmptySlot from './EmptySlot'
 import DimSlot from './DimSlot'
@@ -22,8 +22,7 @@ function ExpandedTournamentBlock({ tournament, year, outfitMap, settings, onOpen
     const roundCount = getRoundsForSlot(tournament, year, discipline)
 
     if (roundCount > 0) {
-      const slots = Array.from({ length: roundCount }, (_, i) => {
-        const roundNumber = i + 1
+      const slots = getRoundNumbers(tournament, year, discipline).map(roundNumber => {
         const outfit = outfitMap.get(`${year}_${tournament}_${discipline}_${roundNumber}`) ?? null
         return { roundNumber, outfit }
       })
@@ -56,7 +55,7 @@ function ExpandedTournamentBlock({ tournament, year, outfitMap, settings, onOpen
     <div className="mb-8">
       <div className="flex items-center gap-2 mb-4">
         <span className="w-0.5 h-3.5 bg-gold flex-shrink-0 rounded-full" />
-        <span className="text-[10px] uppercase tracking-widest text-gold font-medium">{header}</span>
+        <span className="text-xs uppercase tracking-widest text-gold font-medium">{header}</span>
       </div>
 
       {disciplineBlocks.map(({ discipline, slots, status }) => {
@@ -69,13 +68,14 @@ function ExpandedTournamentBlock({ tournament, year, outfitMap, settings, onOpen
         return (
           <div key={discipline} className="mb-4 pl-3">
             <div className="flex items-center gap-3 mb-2.5">
-              <span className="text-[10px] uppercase tracking-widest text-muted">{discipline}</span>
+              <span className="text-xs uppercase tracking-widest text-muted">{discipline}</span>
               <div className="flex-1 h-px bg-dark3" />
             </div>
 
             {status !== 'played' ? (
               <div style={{ width: cardWidth }}>
                 <DimSlot
+                  tournament={tournament}
                   label={status === 'not-held' ? 'Not held' : `Did not play · ${discipline}`}
                 />
               </div>
@@ -131,14 +131,14 @@ function UnknownTournamentBlock({ tournament, year, outfits, settings, onOpenLig
     <div className="mb-8">
       <div className="flex items-center gap-2 mb-4">
         <span className="w-0.5 h-3.5 bg-gold flex-shrink-0 rounded-full" />
-        <span className="text-[10px] uppercase tracking-widest text-gold font-medium">{header}</span>
+        <span className="text-xs uppercase tracking-widest text-gold font-medium">{header}</span>
       </div>
       {Object.entries(byDiscipline).map(([discipline, dOutfits]) => {
         const sorted = [...dOutfits].sort((a, b) => (a.roundNumber ?? 0) - (b.roundNumber ?? 0))
         return (
           <div key={discipline} className="mb-4 pl-3">
             <div className="flex items-center gap-3 mb-2.5">
-              <span className="text-[10px] uppercase tracking-widest text-muted">{discipline}</span>
+              <span className="text-xs uppercase tracking-widest text-muted">{discipline}</span>
               <div className="flex-1 h-px bg-dark3" />
             </div>
             <div className="flex gap-2 overflow-x-auto pb-1.5 snap-x snap-mandatory">
@@ -189,7 +189,7 @@ export default function ExpandedYearSection({ year, outfitMap, tournaments, year
         <div key={`${tournament}_not-held`} className="mb-8">
           <div className="flex items-center gap-2 mb-3">
             <span className="w-0.5 h-3.5 bg-dark3 flex-shrink-0 rounded-full" />
-            <span className="text-[10px] uppercase tracking-widest text-muted/40 font-medium">
+            <span className="text-xs uppercase tracking-widest text-muted/40 font-medium">
               {tournament} {year}
             </span>
           </div>
@@ -217,7 +217,7 @@ export default function ExpandedYearSection({ year, outfitMap, tournaments, year
   return (
     <section id={`year-${year}`} className="mb-14">
       <div className="mb-7">
-        <h2 className="font-playfair text-4xl text-ink leading-none">{year}</h2>
+        <h2 className="font-playfair text-5xl text-ink leading-none">{year}</h2>
         <p className="text-sm text-muted mt-1.5">{subtitle}</p>
       </div>
       {blocks}

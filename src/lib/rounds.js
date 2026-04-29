@@ -13,6 +13,7 @@ import {
   MIXED_NOT_HELD,
   NON_SLAM_ROUNDS_SINGLES,
   NON_SLAM_ROUNDS_DOUBLES,
+  NON_SLAM_EXPLICIT_ROUNDS_SINGLES,
 } from './constants'
 
 // ── Round label ↔ number conversions ─────────────────────────────────────
@@ -52,6 +53,11 @@ export function getSlotStatus(tournament, year, discipline) {
 export function getRoundsForSlot(tournament, year, discipline) {
   if (getSlotStatus(tournament, year, discipline) !== 'played') return 0
 
+  if (discipline === 'Singles') {
+    const explicit = NON_SLAM_EXPLICIT_ROUNDS_SINGLES[tournament]?.[Number(year)]
+    if (explicit) return explicit.length
+  }
+
   const y = Number(year)
   if (discipline === 'Singles') {
     return ROUNDS_SINGLES[tournament]?.[y] ?? NON_SLAM_ROUNDS_SINGLES[tournament]?.[y] ?? 0
@@ -62,11 +68,21 @@ export function getRoundsForSlot(tournament, year, discipline) {
   return ROUNDS_MIXED[tournament]?.[y] ?? 0
 }
 
+// Returns the 1-based ROUND_SEQUENCE indices for each round to display.
+// Handles non-contiguous draws (e.g. 96-draw with no R4, or seeded bye in R1).
+export function getRoundNumbers(tournament, year, discipline) {
+  if (discipline === 'Singles') {
+    const explicit = NON_SLAM_EXPLICIT_ROUNDS_SINGLES[tournament]?.[Number(year)]
+    if (explicit) return explicit
+  }
+  const n = getRoundsForSlot(tournament, year, discipline)
+  return Array.from({ length: n }, (_, i) => i + 1)
+}
+
 // Returns round labels for the rounds she actually played, e.g. ['R1','R2','R3','R4','QF']
 // Used to populate the admin form round picker for a specific slot
 export function getValidRounds(tournament, year, discipline) {
-  const n = getRoundsForSlot(tournament, year, discipline)
-  return ROUND_SEQUENCE.slice(0, n)
+  return getRoundNumbers(tournament, year, discipline).map(n => ROUND_SEQUENCE[n - 1])
 }
 
 // ── Combined (all-discipline) slot status ─────────────────────────────────

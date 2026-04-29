@@ -1,11 +1,18 @@
-import { GRAND_SLAMS } from '../../lib/constants'
+import { GRAND_SLAMS, NON_SLAM_ROUNDS_SINGLES, NON_SLAM_ROUNDS_DOUBLES } from '../../lib/constants'
 import { getCombinedSlotStatus } from '../../lib/rounds'
 import OutfitCard from './OutfitCard'
 import EmptySlot from './EmptySlot'
 import DimSlot from './DimSlot'
 
 const CARD_WIDTHS = { small: 88, standard: 128, large: 172 }
-const KNOWN_TOURNAMENTS = new Set([...GRAND_SLAMS, 'Olympics'])
+const SLAM_TOURNAMENTS = new Set([...GRAND_SLAMS, 'Olympics'])
+
+function isKnownForYear(tournament, year) {
+  if (SLAM_TOURNAMENTS.has(tournament)) return true
+  const y = Number(year)
+  return (NON_SLAM_ROUNDS_SINGLES[tournament]?.[y] != null) ||
+         (NON_SLAM_ROUNDS_DOUBLES[tournament]?.[y] != null)
+}
 
 export default function CondensedYearSection({ year, tournaments, yearOutfits, settings, onOpenLightbox }) {
   const cardWidth = CARD_WIDTHS[settings.gridDensity] ?? 128
@@ -16,22 +23,25 @@ export default function CondensedYearSection({ year, tournaments, yearOutfits, s
     outfitsByTournament[o.tournament].push(o)
   }
 
-  // Build a flat list of slots in tournament order (known grand slams first, then others alphabetically)
   const slots = []
   for (const tournament of tournaments) {
     const tOutfits = outfitsByTournament[tournament] ?? []
-    const isKnown = KNOWN_TOURNAMENTS.has(tournament)
+    const known = isKnownForYear(tournament, year)
 
     if (tOutfits.length > 0) {
       for (const outfit of tOutfits) {
         slots.push({ type: 'outfit', outfit })
       }
-    } else if (isKnown) {
+    } else if (known) {
       const status = getCombinedSlotStatus(tournament, year)
       if (status === 'played' && settings.showEmptySlots) {
         slots.push({ type: 'empty', tournament, id: `slot-${year}-${tournament}` })
       } else if (status !== 'played' && status !== 'no-event' && settings.showDimSlots) {
-        slots.push({ type: 'dim', label: status === 'not-held' ? 'Not held' : 'Did not play' })
+        slots.push({
+          type: 'dim',
+          tournament,
+          label: status === 'not-held' ? 'Not held' : 'Did not play',
+        })
       }
     }
   }
@@ -49,7 +59,7 @@ export default function CondensedYearSection({ year, tournaments, yearOutfits, s
   return (
     <section id={`year-${year}`} className="mb-14">
       <div className="mb-7">
-        <h2 className="font-playfair text-4xl text-ink leading-none">{year}</h2>
+        <h2 className="font-playfair text-5xl text-ink leading-none">{year}</h2>
         <p className="text-sm text-muted mt-1.5">{subtitle}</p>
       </div>
       <div className="flex gap-2 overflow-x-auto pb-1.5 snap-x snap-mandatory">
@@ -67,7 +77,7 @@ export default function CondensedYearSection({ year, tournaments, yearOutfits, s
               <EmptySlot label={slot.tournament} />
             )}
             {slot.type === 'dim' && (
-              <DimSlot label={slot.label} />
+              <DimSlot tournament={slot.tournament} label={slot.label} />
             )}
           </div>
         ))}

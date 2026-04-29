@@ -1,8 +1,7 @@
 import { COLOR_MAP, ROUND_LABELS } from '../../lib/constants'
 
 export default function OutfitCard({ outfit, settings, onClick }) {
-  const primaryColor = outfit.colors?.[0]
-  const colorValue = primaryColor ? (COLOR_MAP[primaryColor] ?? primaryColor) : null
+  const colors = outfit.colors ?? []
 
   const label =
     settings.cardLabel === 'notes' && outfit.notes
@@ -23,13 +22,18 @@ export default function OutfitCard({ outfit, settings, onClick }) {
         loading="lazy"
       />
       <div className="absolute inset-0 bg-dark/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-2">
-        <p className="text-[10px] text-ink leading-tight line-clamp-3">{label}</p>
+        <p className="text-xs text-ink leading-tight line-clamp-3">{label}</p>
       </div>
-      {settings.colorDot && colorValue && (
-        <div
-          className="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full ring-1 ring-dark/60 pointer-events-none"
-          style={{ background: colorValue }}
-        />
+      {settings.colorDot && colors.length > 0 && (
+        <div className="absolute bottom-1.5 left-1.5 flex gap-0.5 pointer-events-none">
+          {colors.map((color, i) => (
+            <div
+              key={i}
+              className="w-3 h-3 ring-1 ring-dark/50"
+              style={{ background: COLOR_MAP[color] ?? color }}
+            />
+          ))}
+        </div>
       )}
     </div>
   )

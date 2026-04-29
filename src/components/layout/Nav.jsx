@@ -4,8 +4,8 @@ export default function Nav() {
   return (
     <nav className="sticky top-0 z-40 bg-dark border-b border-dark3 px-6 h-12 flex items-center justify-between">
       <Link to="/" className="flex items-baseline gap-2 hover:opacity-80 transition-opacity">
-        <span className="font-playfair text-base text-gold tracking-wide">Serena Williams Fit-dex</span>
-        <span className="text-[10px] text-muted italic hidden sm:inline">gotta find 'em all</span>
+        <span className="font-playfair text-xl text-gold tracking-wide">Serena Williams Fit-dex</span>
+        <span className="text-xs text-muted italic hidden sm:inline">gotta find 'em all</span>
       </Link>
       <div className="flex items-center gap-4">
         <Link to="/about" className="text-xs text-muted hover:text-ink transition-colors">About</Link>

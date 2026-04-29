@@ -91,6 +91,14 @@ export const MIXED_NOT_HELD = {
 // ── Non-Grand-Slam participation data ─────────────────────────────────────
 // Maps tournament → {year: roundCount} using same ROUND_SEQUENCE encoding.
 // Round count = matches played (e.g. QF in a 3-round event = 3; won a 7-round event = 7).
+// For non-slams where the rounds played are non-contiguous or don't start at R1.
+// Values are arrays of 1-based ROUND_SEQUENCE indices.
+// When present, these override the count-based approach in NON_SLAM_ROUNDS_SINGLES.
+export const NON_SLAM_EXPLICIT_ROUNDS_SINGLES = {
+  'Indian Wells Open': { 1999: [1, 2, 3, 5, 6, 7] }, // 96-draw: R1,R2,R3,QF,SF,F — no R4
+  'Miami Open':        { 1999: [2, 3, 4, 5, 6, 7] }, // top seeds received bye through R1
+}
+
 export const NON_SLAM_ROUNDS_SINGLES = {
   'Indian Wells Open':    { 1999: 7 },
   'Miami Open':           { 1999: 7 },

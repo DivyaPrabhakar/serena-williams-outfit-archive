@@ -183,33 +183,19 @@ export default function ViewerPage() {
       <div className="sticky top-12 z-30 bg-dark border-b border-dark3 px-6 py-3">
         <div className="flex items-center justify-between gap-4">
 
-          {/* Filter trigger */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => { setFilterPanelOpen(o => !o); setShowSettings(false) }}
-              className={`flex items-center gap-1.5 px-3 py-1 rounded text-xs font-medium transition-colors ${
-                filterPanelOpen || activeTournament || activeYear
-                  ? 'bg-gold text-dark'
-                  : 'bg-dark3 text-muted hover:text-ink'
-              }`}
-            >
-              <span>Filter</span>
-              {(activeTournament || activeYear) && (
-                <span className="text-dark/60">
-                  {[activeTournament, activeYear].filter(Boolean).join(' · ')}
-                </span>
-              )}
-            </button>
-            {(activeTournament || activeYear) && (
+          {/* Left: view mode switcher */}
+          <div className="flex rounded overflow-hidden border border-dark3 flex-shrink-0">
+            {['condensed', 'expanded'].map(m => (
               <button
-                onClick={() => { setActiveTournament(null); setActiveYear(null) }}
-                className="text-muted hover:text-ink text-base leading-none transition-colors"
-                aria-label="Clear filters"
-                title="Clear filters"
+                key={m}
+                onClick={() => switchMode(m)}
+                className={`px-4 py-2 text-sm font-medium transition-colors capitalize ${
+                  mode === m ? 'bg-gold text-dark' : 'text-muted hover:text-ink'
+                }`}
               >
-                ×
+                {m}
               </button>
-            )}
+            ))}
           </div>
 
           {/* Right controls */}
@@ -217,7 +203,7 @@ export default function ViewerPage() {
             {!loading && missingCount > 0 && (
               <button
                 onClick={togglePanel}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded text-xs font-medium transition-colors ${
+                className={`flex items-center gap-1.5 px-4 py-2 rounded text-sm font-medium transition-colors ${
                   panelOpen ? 'bg-gold text-dark' : 'bg-dark3 text-muted hover:text-ink'
                 }`}
               >
@@ -225,18 +211,32 @@ export default function ViewerPage() {
                 <span className={panelOpen ? 'text-dark/70' : 'text-gold'}>({missingCount})</span>
               </button>
             )}
-            <div className="flex rounded overflow-hidden border border-dark3">
-              {['condensed', 'expanded'].map(m => (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => { setFilterPanelOpen(o => !o); setShowSettings(false) }}
+                className={`flex items-center gap-1.5 px-4 py-2 rounded text-sm font-medium transition-colors ${
+                  filterPanelOpen || activeTournament || activeYear
+                    ? 'bg-gold text-dark'
+                    : 'bg-dark3 text-muted hover:text-ink'
+                }`}
+              >
+                <span>Filter</span>
+                {(activeTournament || activeYear) && (
+                  <span className="text-dark/60">
+                    {[activeTournament, activeYear].filter(Boolean).join(' · ')}
+                  </span>
+                )}
+              </button>
+              {(activeTournament || activeYear) && (
                 <button
-                  key={m}
-                  onClick={() => switchMode(m)}
-                  className={`px-3 py-1 text-xs font-medium transition-colors capitalize ${
-                    mode === m ? 'bg-gold text-dark' : 'text-muted hover:text-ink'
-                  }`}
+                  onClick={() => { setActiveTournament(null); setActiveYear(null) }}
+                  className="text-muted hover:text-ink text-base leading-none transition-colors"
+                  aria-label="Clear filters"
+                  title="Clear filters"
                 >
-                  {m}
+                  ×
                 </button>
-              ))}
+              )}
             </div>
             <button
               onClick={() => { setShowSettings(s => !s); setFilterPanelOpen(false) }}
@@ -256,6 +256,11 @@ export default function ViewerPage() {
         className="px-6 pt-10 max-w-7xl mx-auto"
         style={{ paddingBottom: panelOpen ? 'calc(42vh + 40px)' : '6rem' }}
       >
+        <p className="text-xs text-muted/60 italic mb-8">
+          {mode === 'condensed'
+            ? 'Condensed — one card per tournament, showing the best outfit found so far.'
+            : 'Expanded — every round laid out as a slot, with gaps where outfits haven\'t been found yet.'}
+        </p>
         {loading && (
           <div className="flex items-center justify-center py-32 text-muted text-sm">Loading…</div>
         )}
