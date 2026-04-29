@@ -3,8 +3,7 @@ import { fetchOutfits } from '../lib/api'
 import { ACTIVE_YEARS, DISCIPLINES } from '../lib/constants'
 import { getRoundsForSlot, getRoundLabel, getCombinedSlotStatus, slotsForYear } from '../lib/rounds'
 import { useSettings } from '../hooks/useSettings'
-import TournamentFilter from '../components/filters/TournamentFilter'
-import YearFilter from '../components/filters/YearFilter'
+import FilterPanel from '../components/filters/FilterPanel'
 import GalleryGrid from '../components/gallery/GalleryGrid'
 import Lightbox from '../components/gallery/Lightbox'
 import SettingsPanel from '../components/SettingsPanel'
@@ -38,6 +37,7 @@ export default function ViewerPage() {
   const [activeYear, setActiveYear]     = useState(null)
   const [lightboxIndex, setLightboxIndex] = useState(null)
   const [showSettings, setShowSettings] = useState(false)
+  const [filterPanelOpen, setFilterPanelOpen] = useState(false)
 
   const [mode, setMode] = useState(() => readStorage('serena_viewer_mode', 'condensed'))
   const [panelOpen, setPanelOpen] = useState(() =>
@@ -180,17 +180,51 @@ export default function ViewerPage() {
   return (
     <div className="min-h-screen bg-dark">
       {/* Sticky filter bar */}
-      <div className="sticky top-12 z-30 bg-dark border-b border-dark3 px-6 py-3 space-y-2">
+      <div className="sticky top-12 z-30 bg-dark border-b border-dark3 px-6 py-3">
+        <div className="flex items-center justify-between gap-4">
 
-        {/* Row 1: Tournament filter + mode toggle + settings */}
-        <div className="flex items-start justify-between gap-4">
-          <TournamentFilter
-            tournaments={uniqueTournaments}
-            active={activeTournament}
-            onChange={setActiveTournament}
-          />
+          {/* Filter trigger */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => { setFilterPanelOpen(o => !o); setShowSettings(false) }}
+              className={`flex items-center gap-1.5 px-3 py-1 rounded text-xs font-medium transition-colors ${
+                filterPanelOpen || activeTournament || activeYear
+                  ? 'bg-gold text-dark'
+                  : 'bg-dark3 text-muted hover:text-ink'
+              }`}
+            >
+              <span>Filter</span>
+              {(activeTournament || activeYear) && (
+                <span className="text-dark/60">
+                  {[activeTournament, activeYear].filter(Boolean).join(' · ')}
+                </span>
+              )}
+            </button>
+            {(activeTournament || activeYear) && (
+              <button
+                onClick={() => { setActiveTournament(null); setActiveYear(null) }}
+                className="text-muted hover:text-ink text-base leading-none transition-colors"
+                aria-label="Clear filters"
+                title="Clear filters"
+              >
+                ×
+              </button>
+            )}
+          </div>
+
+          {/* Right controls */}
           <div className="flex items-center gap-2 flex-shrink-0">
-            {/* Mode toggle */}
+            {!loading && missingCount > 0 && (
+              <button
+                onClick={togglePanel}
+                className={`flex items-center gap-1.5 px-3 py-1 rounded text-xs font-medium transition-colors ${
+                  panelOpen ? 'bg-gold text-dark' : 'bg-dark3 text-muted hover:text-ink'
+                }`}
+              >
+                Still hunting
+                <span className={panelOpen ? 'text-dark/70' : 'text-gold'}>({missingCount})</span>
+              </button>
+            )}
             <div className="flex rounded overflow-hidden border border-dark3">
               {['condensed', 'expanded'].map(m => (
                 <button
@@ -204,9 +238,8 @@ export default function ViewerPage() {
                 </button>
               ))}
             </div>
-            {/* Settings gear */}
             <button
-              onClick={() => setShowSettings(s => !s)}
+              onClick={() => { setShowSettings(s => !s); setFilterPanelOpen(false) }}
               className="text-muted hover:text-ink transition-colors text-lg leading-none"
               aria-label="Display settings"
               title="Display settings"
@@ -214,22 +247,7 @@ export default function ViewerPage() {
               ⚙
             </button>
           </div>
-        </div>
 
-        {/* Row 2: Year filter + Still hunting toggle */}
-        <div className="flex items-center justify-between gap-4">
-          <YearFilter years={uniqueYears} active={activeYear} onChange={setActiveYear} />
-          {!loading && missingCount > 0 && (
-            <button
-              onClick={togglePanel}
-              className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1 rounded text-xs font-medium transition-colors ${
-                panelOpen ? 'bg-gold text-dark' : 'bg-dark3 text-muted hover:text-ink'
-              }`}
-            >
-              Still hunting
-              <span className={panelOpen ? 'text-dark/70' : 'text-gold'}>({missingCount})</span>
-            </button>
-          )}
         </div>
       </div>
 
@@ -274,6 +292,19 @@ export default function ViewerPage() {
           settings={settings}
           updateSetting={updateSetting}
           onClose={() => setShowSettings(false)}
+        />
+      )}
+
+      {/* Filter panel */}
+      {filterPanelOpen && (
+        <FilterPanel
+          tournaments={uniqueTournaments}
+          activeTournament={activeTournament}
+          onTournamentChange={setActiveTournament}
+          years={uniqueYears}
+          activeYear={activeYear}
+          onYearChange={setActiveYear}
+          onClose={() => setFilterPanelOpen(false)}
         />
       )}
 
