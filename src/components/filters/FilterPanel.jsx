@@ -38,12 +38,7 @@ export default function FilterPanel({
   const hasActive = activeTournament !== null || activeYear !== null
 
   return (
-    <>
-      {/* Backdrop — above sticky filter bar (z-30) but below nav (z-40) */}
-      <div className="fixed inset-0 z-[35]" onClick={onClose} />
-
-      {/* Drawer — above nav */}
-      <div className="fixed right-0 top-12 bottom-0 z-[45] w-72 bg-dark2 border-l border-dark3 shadow-2xl flex flex-col">
+    <div className="fixed right-0 top-16 bottom-0 z-[45] w-72 bg-dark2 border-l border-dark3 shadow-2xl flex flex-col">
         <div className="flex items-center justify-between px-5 py-4 border-b border-dark3 flex-shrink-0">
           <h3 className="font-playfair text-gold text-base">Filters</h3>
           <button
@@ -103,7 +98,6 @@ export default function FilterPanel({
             </button>
           </div>
         )}
-      </div>
-    </>
+    </div>
   )
 }

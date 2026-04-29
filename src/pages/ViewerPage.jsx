@@ -57,6 +57,7 @@ export default function ViewerPage() {
   function togglePanel() {
     setPanelOpen(prev => {
       const next = !prev
+      if (next) setFilterPanelOpen(false)
       writeStorage(`serena_hunt_panel_${mode}`, next)
       return next
     })
@@ -177,13 +178,21 @@ export default function ViewerPage() {
 
   // ── Render ─────────────────────────────────────────────────────────────────
 
-  return (
-    <div className="min-h-screen bg-dark">
-      {/* Sticky filter bar */}
-      <div className="sticky top-12 z-30 bg-dark border-b border-dark3 px-6 py-3">
-        <div className="flex items-center justify-between gap-4">
+  const anyPanelOpen = panelOpen || filterPanelOpen
 
-          {/* Left: view mode switcher */}
+  return (
+    <div
+      className="min-h-screen bg-dark"
+      style={{
+        paddingRight: anyPanelOpen ? '18rem' : undefined,
+        transition: 'padding-right 300ms ease',
+      }}
+    >
+      {/* Sticky filter bar */}
+      <div className="sticky top-16 z-30 bg-dark border-b border-dark3 px-6 py-3">
+        <div className="flex items-center gap-4">
+
+          {/* View mode switcher */}
           <div className="flex rounded overflow-hidden border border-dark3 flex-shrink-0">
             {['condensed', 'expanded'].map(m => (
               <button
@@ -198,13 +207,20 @@ export default function ViewerPage() {
             ))}
           </div>
 
+          {/* Mode explanation */}
+          <p className="text-sm text-muted italic flex-1 min-w-0 truncate hidden sm:block">
+            {mode === 'condensed'
+              ? 'One card per tournament — best outfit found so far'
+              : 'Every round as a slot — gaps where outfits haven\'t been found yet'}
+          </p>
+
           {/* Right controls */}
           <div className="flex items-center gap-2 flex-shrink-0">
             {!loading && missingCount > 0 && (
               <button
                 onClick={togglePanel}
                 className={`flex items-center gap-1.5 px-4 py-2 rounded text-sm font-medium transition-colors ${
-                  panelOpen ? 'bg-gold text-dark' : 'bg-dark3 text-muted hover:text-ink'
+                  panelOpen ? 'bg-gold text-dark' : 'bg-dark3 text-ink hover:text-white'
                 }`}
               >
                 Outfits yet to discover
@@ -213,11 +229,11 @@ export default function ViewerPage() {
             )}
             <div className="flex items-center gap-2">
               <button
-                onClick={() => { setFilterPanelOpen(o => !o); setShowSettings(false) }}
+                onClick={() => { const next = !filterPanelOpen; setFilterPanelOpen(next); if (next) setPanelOpen(false); setShowSettings(false) }}
                 className={`flex items-center gap-1.5 px-4 py-2 rounded text-sm font-medium transition-colors ${
                   filterPanelOpen || activeTournament || activeYear
                     ? 'bg-gold text-dark'
-                    : 'bg-dark3 text-muted hover:text-ink'
+                    : 'bg-dark3 text-ink hover:text-white'
                 }`}
               >
                 <span>Filter</span>
@@ -240,11 +256,13 @@ export default function ViewerPage() {
             </div>
             <button
               onClick={() => { setShowSettings(s => !s); setFilterPanelOpen(false) }}
-              className="text-muted hover:text-ink transition-colors text-lg leading-none"
+              className={`flex items-center gap-1.5 text-sm underline transition-colors ${
+                showSettings ? 'text-ink' : 'text-muted hover:text-ink'
+              }`}
               aria-label="Display settings"
-              title="Display settings"
             >
-              ⚙
+              <span>⚙</span>
+              <span>Display settings</span>
             </button>
           </div>
 
@@ -252,15 +270,7 @@ export default function ViewerPage() {
       </div>
 
       {/* Main gallery */}
-      <main
-        className="px-6 pt-10 max-w-7xl mx-auto"
-        style={{ paddingBottom: panelOpen ? 'calc(42vh + 40px)' : '6rem' }}
-      >
-        <p className="text-xs text-muted/60 italic mb-8">
-          {mode === 'condensed'
-            ? 'Condensed — one card per tournament, showing the best outfit found so far.'
-            : 'Expanded — every round laid out as a slot, with gaps where outfits haven\'t been found yet.'}
-        </p>
+      <main className="px-6 pt-10 pb-24 max-w-7xl mx-auto">
         {loading && (
           <div className="flex items-center justify-center py-32 text-muted text-sm">Loading…</div>
         )}

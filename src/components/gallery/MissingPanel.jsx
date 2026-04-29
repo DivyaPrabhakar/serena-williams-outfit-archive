@@ -64,7 +64,6 @@ function CondensedContent({ items, onHighlight }) {
 }
 
 function ExpandedContent({ items, onHighlight }) {
-  // Group: tournament → discipline → items
   const byTournament = {}
   for (const item of items) {
     if (!byTournament[item.tournament]) byTournament[item.tournament] = {}
@@ -112,22 +111,18 @@ function ExpandedContent({ items, onHighlight }) {
 
 export default function MissingPanel({ mode, condensedItems, expandedItems, onHighlight, onClose }) {
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 bg-dark2 border-t border-dark3 flex flex-col"
-      style={{ height: '42vh', minHeight: 240 }}
-    >
-      {/* Panel header */}
-      <div className="flex items-center justify-between px-5 py-3 border-b border-dark3 flex-shrink-0">
+    <div className="fixed right-0 top-16 bottom-0 z-[45] w-72 bg-dark2 border-l border-dark3 shadow-2xl flex flex-col">
+      <div className="flex items-center justify-between px-5 py-4 border-b border-dark3 flex-shrink-0">
         <h3 className="font-playfair text-base text-gold">Outfits yet to discover</h3>
         <button
           onClick={onClose}
           className="text-muted hover:text-ink text-xl leading-none transition-colors"
-          aria-label="Close missing panel"
+          aria-label="Close panel"
         >
           ×
         </button>
       </div>
 
-      {/* Scrollable list */}
       <div className="flex-1 overflow-y-auto px-5 py-4">
         {mode === 'condensed' ? (
           condensedItems.length === 0 ? (

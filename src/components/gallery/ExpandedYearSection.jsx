@@ -1,4 +1,4 @@
-import { GRAND_SLAMS, DISCIPLINES, NON_SLAM_ROUNDS_SINGLES, NON_SLAM_ROUNDS_DOUBLES } from '../../lib/constants'
+import { GRAND_SLAMS, DISCIPLINES, NON_SLAM_ROUNDS_SINGLES, NON_SLAM_ROUNDS_DOUBLES, COLOR_MAP } from '../../lib/constants'
 import { getRoundsForSlot, getSlotStatus, getRoundLabel, getCombinedSlotStatus, getRoundNumbers } from '../../lib/rounds'
 import OutfitCard from './OutfitCard'
 import EmptySlot from './EmptySlot'
@@ -166,6 +166,11 @@ export default function ExpandedYearSection({ year, outfitMap, tournaments, year
     showMajorsStat ? `${majorsWithOutfits} of 4 majors` : null,
   ].filter(Boolean).join(' · ')
 
+  const colorOrder = Object.keys(COLOR_MAP)
+  const yearColors = [...new Set(yearOutfits.flatMap(o => o.colors ?? []))]
+    .filter(c => c in COLOR_MAP)
+    .sort((a, b) => colorOrder.indexOf(a) - colorOrder.indexOf(b))
+
   const blocks = tournaments.flatMap(tournament => {
     if (!isKnownForYear(tournament, year)) {
       const tOutfits = yearOutfits.filter(o => o.tournament === tournament)
@@ -217,7 +222,21 @@ export default function ExpandedYearSection({ year, outfitMap, tournaments, year
   return (
     <section id={`year-${year}`} className="mb-14">
       <div className="mb-7">
-        <h2 className="font-playfair text-5xl text-ink leading-none">{year}</h2>
+        <div className="flex items-center gap-3">
+          <h2 className="font-playfair text-5xl text-ink leading-none">{year}</h2>
+          {yearColors.length > 0 && (
+            <div className="flex gap-1">
+              {yearColors.map(color => (
+                <div
+                  key={color}
+                  className="w-4 h-4 rounded-sm ring-1 ring-dark3/60 flex-shrink-0"
+                  style={{ background: COLOR_MAP[color] }}
+                  title={color}
+                />
+              ))}
+            </div>
+          )}
+        </div>
         <p className="text-sm text-muted mt-1.5">{subtitle}</p>
       </div>
       {blocks}
