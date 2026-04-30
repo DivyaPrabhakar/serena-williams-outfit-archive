@@ -81,12 +81,11 @@ export default function CondensedYearSection({ year, tournaments, yearOutfits, s
         </div>
         <p className="text-sm text-muted mt-1.5">{subtitle}</p>
       </div>
-      <div className="flex gap-2 overflow-x-auto pb-1.5 snap-x snap-mandatory">
+      <div className="flex flex-wrap gap-2">
         {slots.map((slot, i) => (
           <div
             key={i}
             id={slot.type === 'empty' ? slot.id : undefined}
-            className="flex-none snap-start"
             style={{ width: cardWidth }}
           >
             {slot.type === 'outfit' && (

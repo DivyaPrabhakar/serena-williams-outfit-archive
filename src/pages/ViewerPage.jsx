@@ -189,7 +189,7 @@ export default function ViewerPage() {
       }}
     >
       {/* Sticky filter bar */}
-      <div className="sticky top-16 z-30 bg-dark border-b border-dark3 px-6 py-3">
+      <div className="sticky top-16 z-30 bg-dark border-b border-dark3 px-3 py-3">
         <div className="flex items-center gap-4">
 
           {/* View mode switcher */}
@@ -270,7 +270,7 @@ export default function ViewerPage() {
       </div>
 
       {/* Main gallery */}
-      <main className="px-6 pt-10 pb-24 max-w-7xl mx-auto">
+      <main className="px-3 pt-10 pb-24 max-w-7xl mx-auto">
         {loading && (
           <div className="flex items-center justify-center py-32 text-muted text-sm">Loading…</div>
         )}

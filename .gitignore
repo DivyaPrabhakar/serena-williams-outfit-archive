@@ -21,9 +21,10 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# IDE
+# IDE / tooling
 .vscode/
 .idea/
+.claude/
 *.suo
 *.ntvs*
 *.njsproj

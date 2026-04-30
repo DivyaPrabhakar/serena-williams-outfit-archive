@@ -69,6 +69,7 @@ export default function EditOutfitModal({ outfit, onSave, onClose }) {
   const [round,           setRound]           = useState(outfit.round       ?? '')
   const [colors,          setColors]          = useState(outfit.colors      ?? [])
   const [notes,           setNotes]           = useState(outfit.notes       ?? '')
+  const [focalPoint,      setFocalPoint]      = useState(outfit.focal_point ?? 'center')
   const [uploading,       setUploading]       = useState(false)
   const [saving,          setSaving]          = useState(false)
   const [errors,          setErrors]          = useState({})
@@ -160,6 +161,7 @@ export default function EditOutfitModal({ outfit, onSave, onClose }) {
         roundNumber: ROUND_SEQUENCE.indexOf(round) + 1,
         colors,
         notes,
+        focal_point: focalPoint,
       })
     } catch (err) {
       setErrors({ submit: err.message })
@@ -234,6 +236,29 @@ export default function EditOutfitModal({ outfit, onSave, onClose }) {
               className="w-full bg-[#0D0D0D] border border-[#333] text-[#F0EDE6] px-3 py-2 text-sm outline-none focus:border-[#C9A84C] placeholder-[#3a3a3a]"
             />
             <InlineError msg={errors.image} />
+
+            {/* Focal point */}
+            <div className="flex flex-col gap-1.5">
+              <FieldLabel>Focal Point</FieldLabel>
+              <div className="flex gap-0">
+                {['left', 'center', 'right'].map((fp, i) => (
+                  <button
+                    key={fp}
+                    type="button"
+                    onClick={() => setFocalPoint(fp)}
+                    className={`px-4 py-1.5 text-xs border transition-colors capitalize ${
+                      i === 0 ? '' : '-ml-px'
+                    } ${
+                      focalPoint === fp
+                        ? 'border-[#C9A84C] bg-[#C9A84C]/10 text-[#C9A84C] z-10 relative'
+                        : 'border-[#2a2a2a] text-[#8A877F] hover:border-[#C9A84C] hover:text-[#C9A84C] cursor-pointer'
+                    }`}
+                  >
+                    {fp}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
 
           {/* Year */}

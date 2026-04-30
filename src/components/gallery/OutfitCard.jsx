@@ -20,6 +20,7 @@ export default function OutfitCard({ outfit, settings, onClick }) {
           src={outfit.imageUrl}
           alt={label}
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.04]"
+          style={{ objectPosition: outfit.focal_point === 'left' ? 'left center' : outfit.focal_point === 'right' ? 'right center' : 'center center' }}
           loading="lazy"
         />
         <div className="absolute inset-0 bg-dark/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-2">
@@ -31,7 +32,7 @@ export default function OutfitCard({ outfit, settings, onClick }) {
           {colors.map((color, i) => (
             <div
               key={i}
-              className="w-4 h-4 ring-1 ring-white/25"
+              className="w-4 h-4 rounded-sm ring-1 ring-white/25"
               style={{ background: COLOR_MAP[color] ?? color }}
             />
           ))}
