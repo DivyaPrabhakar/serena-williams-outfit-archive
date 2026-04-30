@@ -38,36 +38,38 @@ function ExpandedTournamentBlock({ tournament, year, outfitMap, settings, onOpen
 
   if (disciplineBlocks.length === 0) return null
 
-  const hasVisibleContent = disciplineBlocks.some(({ slots, status }) =>
-    status === 'played'
-      ? slots.some(s => s.outfit !== null) || settings.showEmptySlots
-      : settings.showDimSlots
-  )
+  const playedBlocks = disciplineBlocks.filter(d => d.status === 'played')
+  const dimBlocks = disciplineBlocks.filter(d => d.status !== 'played')
+
+  const hasVisibleContent =
+    playedBlocks.some(({ slots }) => slots.some(s => s.outfit !== null) || settings.showEmptySlots) ||
+    (settings.showDimSlots && dimBlocks.length > 0)
   if (!hasVisibleContent) return null
 
-  const totalSlots = disciplineBlocks.reduce((sum, d) => sum + d.slots.length, 0)
-  const found = disciplineBlocks.reduce(
+  const totalSlots = playedBlocks.reduce((sum, d) => sum + d.slots.length, 0)
+  const found = playedBlocks.reduce(
     (sum, d) => sum + d.slots.filter(s => s.outfit !== null).length, 0
   )
-  const header = `${tournament} ${year} · ${totalSlots} outfit${totalSlots !== 1 ? 's' : ''} · ${found} found`
+  const stats = `${totalSlots} outfit${totalSlots !== 1 ? 's' : ''} · ${found} found`
 
   const colorOrder = Object.keys(COLOR_MAP)
   const tournamentColors = [...new Set(
-    disciplineBlocks.flatMap(d => d.slots.flatMap(s => s.outfit?.colors ?? []))
+    playedBlocks.flatMap(d => d.slots.flatMap(s => s.outfit?.colors ?? []))
   )].filter(c => c in COLOR_MAP)
     .sort((a, b) => colorOrder.indexOf(a) - colorOrder.indexOf(b))
 
   return (
     <div className="mb-8">
-      <div className="flex items-center gap-2 mb-4">
-        <span className="w-0.5 h-3.5 bg-gold flex-shrink-0 rounded-full" />
-        <span className="text-xs uppercase tracking-widest text-gold font-medium">{header}</span>
+      <div className="flex items-center gap-2 mb-4 flex-wrap">
+        <span className="w-0.5 h-4 bg-gold flex-shrink-0 rounded-full" />
+        <span className="text-base uppercase tracking-widest text-gold font-medium">{tournament}</span>
+        <span className="text-xs uppercase tracking-widest text-gold/60">{year} · {stats}</span>
         {tournamentColors.length > 0 && (
           <div className="flex gap-1 ml-1">
             {tournamentColors.map(color => (
               <div
                 key={color}
-                className="w-3 h-3 rounded-sm ring-1 ring-white/20 flex-shrink-0"
+                className="w-5 h-5 rounded-sm ring-1 ring-white/20 flex-shrink-0"
                 style={{ background: COLOR_MAP[color] }}
                 title={color}
               />
@@ -76,55 +78,51 @@ function ExpandedTournamentBlock({ tournament, year, outfitMap, settings, onOpen
         )}
       </div>
 
-      {disciplineBlocks.map(({ discipline, slots, status }) => {
-        const visible =
-          status === 'played'
-            ? slots.some(s => s.outfit !== null) || settings.showEmptySlots
-            : settings.showDimSlots
+      {/* Played disciplines — each gets its own row */}
+      {playedBlocks.map(({ discipline, slots }) => {
+        const visible = slots.some(s => s.outfit !== null) || settings.showEmptySlots
         if (!visible) return null
-
         return (
           <div key={discipline} className="mb-4 pl-3">
             <div className="flex items-center gap-3 mb-2.5">
               <span className="text-xs uppercase tracking-widest text-muted">{discipline}</span>
               <div className="flex-1 h-px bg-dark3" />
             </div>
-
-            {status !== 'played' ? (
-              <div style={{ width: cardWidth }}>
-                <DimSlot
-                  tournament={tournament}
-                  label={status === 'not-held' ? 'Not held' : `Did not play · ${discipline}`}
-                />
-              </div>
-            ) : (
-              <div className="flex gap-2 overflow-x-auto pb-1.5 snap-x snap-mandatory">
-                {slots.map(({ roundNumber, outfit }) => {
-                  if (!outfit && !settings.showEmptySlots) return null
-                  return (
-                    <div
-                      key={roundNumber}
-                      id={`slot-${year}-${tournament}-${discipline}-${roundNumber}`}
-                      className="flex-none snap-start"
-                      style={{ width: cardWidth }}
-                    >
-                      {outfit ? (
-                        <OutfitCard
-                          outfit={outfit}
-                          settings={settings}
-                          onClick={() => onOpenLightbox(outfit)}
-                        />
-                      ) : (
-                        <EmptySlot label={`${discipline} ${getRoundLabel(roundNumber)}`} />
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-            )}
+            <div className="flex gap-2 overflow-x-auto pb-1.5 snap-x snap-mandatory">
+              {slots.map(({ roundNumber, outfit }) => {
+                if (!outfit && !settings.showEmptySlots) return null
+                return (
+                  <div
+                    key={roundNumber}
+                    id={`slot-${year}-${tournament}-${discipline}-${roundNumber}`}
+                    className="flex-none snap-start"
+                    style={{ width: cardWidth }}
+                  >
+                    {outfit ? (
+                      <OutfitCard
+                        outfit={outfit}
+                        settings={settings}
+                        onClick={() => onOpenLightbox(outfit)}
+                      />
+                    ) : (
+                      <EmptySlot label={`${discipline} ${getRoundLabel(roundNumber)}`} />
+                    )}
+                  </div>
+                )
+              })}
+            </div>
           </div>
         )
       })}
+
+      {/* Non-played disciplines — consolidated into one line */}
+      {settings.showDimSlots && dimBlocks.length > 0 && (
+        <div className="pl-3 mb-2">
+          <span className="text-xs text-muted/50 uppercase tracking-widest">
+            Did not play · {dimBlocks.map(d => d.discipline).join(' · ')}
+          </span>
+        </div>
+      )}
     </div>
   )
 }
@@ -143,7 +141,7 @@ function UnknownTournamentBlock({ tournament, year, outfits, settings, onOpenLig
   }
 
   const found = outfits.length
-  const header = `${tournament} ${year} · ${found} outfit${found !== 1 ? 's' : ''} · ${found} found`
+  const stats = `${found} outfit${found !== 1 ? 's' : ''} · ${found} found`
 
   const colorOrder = Object.keys(COLOR_MAP)
   const tournamentColors = [...new Set(outfits.flatMap(o => o.colors ?? []))]
@@ -152,15 +150,16 @@ function UnknownTournamentBlock({ tournament, year, outfits, settings, onOpenLig
 
   return (
     <div className="mb-8">
-      <div className="flex items-center gap-2 mb-4">
-        <span className="w-0.5 h-3.5 bg-gold flex-shrink-0 rounded-full" />
-        <span className="text-xs uppercase tracking-widest text-gold font-medium">{header}</span>
+      <div className="flex items-center gap-2 mb-4 flex-wrap">
+        <span className="w-0.5 h-4 bg-gold flex-shrink-0 rounded-full" />
+        <span className="text-base uppercase tracking-widest text-gold font-medium">{tournament}</span>
+        <span className="text-xs uppercase tracking-widest text-gold/60">{year} · {stats}</span>
         {tournamentColors.length > 0 && (
           <div className="flex gap-1 ml-1">
             {tournamentColors.map(color => (
               <div
                 key={color}
-                className="w-3 h-3 rounded-sm ring-1 ring-white/20 flex-shrink-0"
+                className="w-5 h-5 rounded-sm ring-1 ring-white/20 flex-shrink-0"
                 style={{ background: COLOR_MAP[color] }}
                 title={color}
               />
@@ -201,11 +200,6 @@ export default function ExpandedYearSection({ year, outfitMap, tournaments, year
     showMajorsStat ? `${majorsWithOutfits} of 4 majors` : null,
   ].filter(Boolean).join(' · ')
 
-  const colorOrder = Object.keys(COLOR_MAP)
-  const yearColors = [...new Set(yearOutfits.flatMap(o => o.colors ?? []))]
-    .filter(c => c in COLOR_MAP)
-    .sort((a, b) => colorOrder.indexOf(a) - colorOrder.indexOf(b))
-
   const blocks = tournaments.flatMap(tournament => {
     if (!isKnownForYear(tournament, year)) {
       const tOutfits = yearOutfits.filter(o => o.tournament === tournament)
@@ -228,13 +222,11 @@ export default function ExpandedYearSection({ year, outfitMap, tournaments, year
       return [(
         <div key={`${tournament}_not-held`} className="mb-8">
           <div className="flex items-center gap-2 mb-3">
-            <span className="w-0.5 h-3.5 bg-dark3 flex-shrink-0 rounded-full" />
-            <span className="text-xs uppercase tracking-widest text-muted/40 font-medium">
-              {tournament} {year}
+            <span className="w-0.5 h-4 bg-dark3 flex-shrink-0 rounded-full" />
+            <span className="text-base uppercase tracking-widest text-muted/40 font-medium">
+              {tournament}
             </span>
-          </div>
-          <div className="pl-3" style={{ width: cardWidth }}>
-            <DimSlot label="Not held" />
+            <span className="text-xs uppercase tracking-widest text-muted/30">{year} · Not held</span>
           </div>
         </div>
       )]
@@ -257,21 +249,7 @@ export default function ExpandedYearSection({ year, outfitMap, tournaments, year
   return (
     <section id={`year-${year}`} className="mb-14">
       <div className="mb-7">
-        <div className="flex items-center gap-3">
-          <h2 className="font-playfair text-5xl text-ink leading-none">{year}</h2>
-          {yearColors.length > 0 && (
-            <div className="flex gap-1">
-              {yearColors.map(color => (
-                <div
-                  key={color}
-                  className="w-5 h-5 rounded-sm ring-1 ring-white/25 flex-shrink-0"
-                  style={{ background: COLOR_MAP[color] }}
-                  title={color}
-                />
-              ))}
-            </div>
-          )}
-        </div>
+        <h2 className="font-playfair text-5xl text-ink leading-none">{year}</h2>
         <p className="text-sm text-muted mt-1.5">{subtitle}</p>
       </div>
       {flatGrid ? (
