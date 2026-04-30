@@ -3,6 +3,8 @@
 @theme {
   --font-sans: 'DM Sans', sans-serif;
   --font-playfair: 'Playfair Display', serif;
+  --font-bebas: 'Bebas Neue', sans-serif;
+  --font-cormorant: 'Cormorant Garamond', serif;
   --color-dark:       #0D0D0D;
   --color-dark2:      #1A1A1A;
   --color-dark3:      #252525;
