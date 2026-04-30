@@ -2,7 +2,6 @@ import { GRAND_SLAMS, NON_SLAM_ROUNDS_SINGLES, NON_SLAM_ROUNDS_DOUBLES, COLOR_MA
 import { getCombinedSlotStatus } from '../../lib/rounds'
 import OutfitCard from './OutfitCard'
 import EmptySlot from './EmptySlot'
-import DimSlot from './DimSlot'
 
 const CARD_WIDTHS = { small: 88, standard: 128, large: 172 }
 const SLAM_TOURNAMENTS = new Set([...GRAND_SLAMS, 'Olympics'])
@@ -32,17 +31,8 @@ export default function CondensedYearSection({ year, tournaments, yearOutfits, s
       for (const outfit of tOutfits) {
         slots.push({ type: 'outfit', outfit })
       }
-    } else if (known) {
-      const status = getCombinedSlotStatus(tournament, year)
-      if (status === 'played' && settings.showEmptySlots) {
-        slots.push({ type: 'empty', tournament, id: `slot-${year}-${tournament}` })
-      } else if (status !== 'played' && status !== 'no-event' && settings.showDimSlots) {
-        slots.push({
-          type: 'dim',
-          tournament,
-          label: status === 'not-held' ? 'Not held' : 'Did not play',
-        })
-      }
+    } else if (known && getCombinedSlotStatus(tournament, year) === 'played' && settings.showEmptySlots) {
+      slots.push({ type: 'empty', tournament, id: `slot-${year}-${tournament}` })
     }
   }
 
@@ -93,9 +83,6 @@ export default function CondensedYearSection({ year, tournaments, yearOutfits, s
             )}
             {slot.type === 'empty' && (
               <EmptySlot label={slot.tournament} />
-            )}
-            {slot.type === 'dim' && (
-              <DimSlot tournament={slot.tournament} label={slot.label} />
             )}
           </div>
         ))}

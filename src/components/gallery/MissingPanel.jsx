@@ -1,11 +1,17 @@
-const TOURNAMENT_ORDER = ['Australian Open', 'Roland Garros', 'Wimbledon', 'US Open', 'Olympics']
+const TOURNAMENT_ORDER = [
+  "Australian Open",
+  "Roland Garros",
+  "Wimbledon",
+  "US Open",
+  "Olympics",
+];
 
 function sortedTournamentKeys(obj) {
   return Object.keys(obj).sort((a, b) => {
-    const ai = TOURNAMENT_ORDER.indexOf(a)
-    const bi = TOURNAMENT_ORDER.indexOf(b)
-    return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi)
-  })
+    const ai = TOURNAMENT_ORDER.indexOf(a);
+    const bi = TOURNAMENT_ORDER.indexOf(b);
+    return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+  });
 }
 
 function TournamentGroup({ name, count, children }) {
@@ -17,7 +23,7 @@ function TournamentGroup({ name, count, children }) {
       </p>
       {children}
     </div>
-  )
+  );
 }
 
 function MissingButton({ label, onClick }) {
@@ -28,28 +34,29 @@ function MissingButton({ label, onClick }) {
     >
       {label}
     </button>
-  )
+  );
 }
 
 function CondensedContent({ items, onHighlight }) {
-  const byTournament = {}
+  const byTournament = {};
   for (const item of items) {
-    if (!byTournament[item.tournament]) byTournament[item.tournament] = []
-    byTournament[item.tournament].push(item)
+    if (!byTournament[item.tournament]) byTournament[item.tournament] = [];
+    byTournament[item.tournament].push(item);
   }
-  const tournaments = sortedTournamentKeys(byTournament)
-  const total = items.length
+  const tournaments = sortedTournamentKeys(byTournament);
+  const total = items.length;
 
   return (
     <>
       <p className="text-[10px] text-muted mb-4 flex-shrink-0">
-        {total} missing across {tournaments.length} tournament{tournaments.length !== 1 ? 's' : ''}
+        {total} missing across {tournaments.length} tournament
+        {tournaments.length !== 1 ? "s" : ""}
       </p>
-      {tournaments.map(t => {
-        const tItems = byTournament[t].slice().sort((a, b) => a.year - b.year)
+      {tournaments.map((t) => {
+        const tItems = byTournament[t].slice().sort((a, b) => a.year - b.year);
         return (
           <TournamentGroup key={t} name={t} count={tItems.length}>
-            {tItems.map(item => (
+            {tItems.map((item) => (
               <MissingButton
                 key={`${item.year}_${item.tournament}`}
                 label={`${item.year} · ${item.tournament}`}
@@ -57,42 +64,50 @@ function CondensedContent({ items, onHighlight }) {
               />
             ))}
           </TournamentGroup>
-        )
+        );
       })}
     </>
-  )
+  );
 }
 
 function ExpandedContent({ items, onHighlight }) {
-  const byTournament = {}
+  const byTournament = {};
   for (const item of items) {
-    if (!byTournament[item.tournament]) byTournament[item.tournament] = {}
+    if (!byTournament[item.tournament]) byTournament[item.tournament] = {};
     if (!byTournament[item.tournament][item.discipline]) {
-      byTournament[item.tournament][item.discipline] = []
+      byTournament[item.tournament][item.discipline] = [];
     }
-    byTournament[item.tournament][item.discipline].push(item)
+    byTournament[item.tournament][item.discipline].push(item);
   }
-  const tournaments = sortedTournamentKeys(byTournament)
-  const total = items.length
+  const tournaments = sortedTournamentKeys(byTournament);
+  const total = items.length;
 
   return (
     <>
       <p className="text-[10px] text-muted mb-4 flex-shrink-0">
-        {total} missing round{total !== 1 ? 's' : ''} across {tournaments.length} tournament{tournaments.length !== 1 ? 's' : ''}
+        {total} missing round{total !== 1 ? "s" : ""} across{" "}
+        {tournaments.length} tournament{tournaments.length !== 1 ? "s" : ""}
       </p>
-      {tournaments.map(t => {
-        const disciplineMap = byTournament[t]
-        const tTotal = Object.values(disciplineMap).reduce((s, arr) => s + arr.length, 0)
+      {tournaments.map((t) => {
+        const disciplineMap = byTournament[t];
+        const tTotal = Object.values(disciplineMap).reduce(
+          (s, arr) => s + arr.length,
+          0,
+        );
         return (
           <TournamentGroup key={t} name={t} count={tTotal}>
-            {Object.keys(disciplineMap).map(d => {
+            {Object.keys(disciplineMap).map((d) => {
               const dItems = disciplineMap[d]
                 .slice()
-                .sort((a, b) => a.year - b.year || a.roundNumber - b.roundNumber)
+                .sort(
+                  (a, b) => a.year - b.year || a.roundNumber - b.roundNumber,
+                );
               return (
                 <div key={d} className="ml-3 mb-2">
-                  <p className="text-[10px] uppercase tracking-widest text-muted/50 mb-1">{d}</p>
-                  {dItems.map(item => (
+                  <p className="text-[10px] uppercase tracking-widest text-muted/50 mb-1">
+                    {d}
+                  </p>
+                  {dItems.map((item) => (
                     <MissingButton
                       key={`${item.year}_${item.tournament}_${item.discipline}_${item.roundNumber}`}
                       label={`${item.year} · ${item.round}`}
@@ -100,20 +115,28 @@ function ExpandedContent({ items, onHighlight }) {
                     />
                   ))}
                 </div>
-              )
+              );
             })}
           </TournamentGroup>
-        )
+        );
       })}
     </>
-  )
+  );
 }
 
-export default function MissingPanel({ mode, condensedItems, expandedItems, onHighlight, onClose }) {
+export default function MissingPanel({
+  mode,
+  condensedItems,
+  expandedItems,
+  onHighlight,
+  onClose,
+}) {
   return (
-    <div className="fixed right-0 top-16 bottom-0 z-[45] w-72 bg-dark2 border-l border-dark3 shadow-2xl flex flex-col">
+    <div className="fixed right-0 top-20 bottom-0 z-[45] w-72 bg-dark2 border-l border-dark3 shadow-2xl flex flex-col">
       <div className="flex items-center justify-between px-5 py-4 border-b border-dark3 flex-shrink-0">
-        <h3 className="font-playfair text-base text-gold">Outfits yet to discover</h3>
+        <h3 className="font-playfair text-base text-gold">
+          Outfits yet to find
+        </h3>
         <button
           onClick={onClose}
           className="text-muted hover:text-ink text-xl leading-none transition-colors"
@@ -124,20 +147,21 @@ export default function MissingPanel({ mode, condensedItems, expandedItems, onHi
       </div>
 
       <div className="flex-1 overflow-y-auto px-5 py-4">
-        {mode === 'condensed' ? (
+        {mode === "condensed" ? (
           condensedItems.length === 0 ? (
             <p className="text-sm text-gold">All tournaments documented!</p>
           ) : (
-            <CondensedContent items={condensedItems} onHighlight={onHighlight} />
+            <CondensedContent
+              items={condensedItems}
+              onHighlight={onHighlight}
+            />
           )
+        ) : expandedItems.length === 0 ? (
+          <p className="text-sm text-gold">All rounds documented!</p>
         ) : (
-          expandedItems.length === 0 ? (
-            <p className="text-sm text-gold">All rounds documented!</p>
-          ) : (
-            <ExpandedContent items={expandedItems} onHighlight={onHighlight} />
-          )
+          <ExpandedContent items={expandedItems} onHighlight={onHighlight} />
         )}
       </div>
     </div>
-  )
+  );
 }

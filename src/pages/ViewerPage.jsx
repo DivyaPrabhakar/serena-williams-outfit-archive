@@ -1,205 +1,244 @@
-import { useEffect, useState, useMemo, useRef } from 'react'
-import { fetchOutfits } from '../lib/api'
-import { ACTIVE_YEARS, DISCIPLINES } from '../lib/constants'
-import { getRoundsForSlot, getRoundLabel, getCombinedSlotStatus, slotsForYear } from '../lib/rounds'
-import { useSettings } from '../hooks/useSettings'
-import FilterPanel from '../components/filters/FilterPanel'
-import GalleryGrid from '../components/gallery/GalleryGrid'
-import Lightbox from '../components/gallery/Lightbox'
-import SettingsPanel from '../components/SettingsPanel'
-import MissingPanel from '../components/gallery/MissingPanel'
+import { useEffect, useState, useMemo, useRef } from "react";
+import { fetchOutfits } from "../lib/api";
+import { ACTIVE_YEARS, DISCIPLINES } from "../lib/constants";
+import {
+  getRoundsForSlot,
+  getRoundLabel,
+  getCombinedSlotStatus,
+  slotsForYear,
+} from "../lib/rounds";
+import { useSettings } from "../hooks/useSettings";
+import FilterPanel from "../components/filters/FilterPanel";
+import GalleryGrid from "../components/gallery/GalleryGrid";
+import Lightbox from "../components/gallery/Lightbox";
+import SettingsPanel from "../components/SettingsPanel";
+import MissingPanel from "../components/gallery/MissingPanel";
 
-const TOURNAMENT_ORDER = ['Australian Open', 'Roland Garros', 'Wimbledon', 'US Open', 'Olympics']
+const TOURNAMENT_ORDER = [
+  "Australian Open",
+  "Roland Garros",
+  "Wimbledon",
+  "US Open",
+  "Olympics",
+];
 
 function sortTournaments(tournaments) {
   return [...tournaments].sort((a, b) => {
-    const ai = TOURNAMENT_ORDER.indexOf(a)
-    const bi = TOURNAMENT_ORDER.indexOf(b)
-    if (ai !== -1 && bi !== -1) return ai - bi
-    if (ai !== -1) return -1
-    if (bi !== -1) return 1
-    return a.localeCompare(b)
-  })
+    const ai = TOURNAMENT_ORDER.indexOf(a);
+    const bi = TOURNAMENT_ORDER.indexOf(b);
+    if (ai !== -1 && bi !== -1) return ai - bi;
+    if (ai !== -1) return -1;
+    if (bi !== -1) return 1;
+    return a.localeCompare(b);
+  });
 }
 
 function readStorage(key, fallback) {
-  try { const v = localStorage.getItem(key); return v !== null ? v : fallback } catch { return fallback }
+  try {
+    const v = localStorage.getItem(key);
+    return v !== null ? v : fallback;
+  } catch {
+    return fallback;
+  }
 }
 function writeStorage(key, value) {
-  try { localStorage.setItem(key, String(value)) } catch {}
+  try {
+    localStorage.setItem(key, String(value));
+  } catch {}
 }
 
 export default function ViewerPage() {
-  const [outfits, setOutfits]           = useState([])
-  const [loading, setLoading]           = useState(true)
-  const [error, setError]               = useState(null)
-  const [activeTournament, setActiveTournament] = useState(null)
-  const [activeYear, setActiveYear]     = useState(null)
-  const [lightboxIndex, setLightboxIndex] = useState(null)
-  const [showSettings, setShowSettings] = useState(false)
-  const [filterPanelOpen, setFilterPanelOpen] = useState(false)
+  const [outfits, setOutfits] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [activeTournament, setActiveTournament] = useState(null);
+  const [activeYear, setActiveYear] = useState(null);
+  const [lightboxIndex, setLightboxIndex] = useState(null);
+  const [showSettings, setShowSettings] = useState(false);
+  const [filterPanelOpen, setFilterPanelOpen] = useState(false);
 
-  const [mode, setMode] = useState(() => readStorage('serena_viewer_mode', 'condensed'))
-  const [panelOpen, setPanelOpen] = useState(() =>
-    readStorage(`serena_hunt_panel_condensed`, 'false') === 'true'
-  )
+  const [mode, setMode] = useState(() =>
+    readStorage("serena_viewer_mode", "condensed"),
+  );
+  const [panelOpen, setPanelOpen] = useState(
+    () => readStorage(`serena_hunt_panel_condensed`, "false") === "true",
+  );
 
-  const { settings, updateSetting } = useSettings()
-  const highlightTimerRef = useRef(null)
+  const { settings, updateSetting } = useSettings();
+  const highlightTimerRef = useRef(null);
 
   // Persist mode; restore per-mode panel state when mode changes
   function switchMode(m) {
-    setMode(m)
-    writeStorage('serena_viewer_mode', m)
-    setPanelOpen(readStorage(`serena_hunt_panel_${m}`, 'false') === 'true')
+    setMode(m);
+    writeStorage("serena_viewer_mode", m);
+    setPanelOpen(readStorage(`serena_hunt_panel_${m}`, "false") === "true");
   }
 
   function togglePanel() {
-    setPanelOpen(prev => {
-      const next = !prev
-      if (next) setFilterPanelOpen(false)
-      writeStorage(`serena_hunt_panel_${mode}`, next)
-      return next
-    })
+    setPanelOpen((prev) => {
+      const next = !prev;
+      if (next) setFilterPanelOpen(false);
+      writeStorage(`serena_hunt_panel_${mode}`, next);
+      return next;
+    });
   }
 
   function closePanel() {
-    setPanelOpen(false)
-    writeStorage(`serena_hunt_panel_${mode}`, false)
+    setPanelOpen(false);
+    writeStorage(`serena_hunt_panel_${mode}`, false);
   }
 
   useEffect(() => {
     fetchOutfits()
-      .then(data => {
+      .then((data) => {
         data.sort((a, b) => {
-          if (a.year !== b.year) return a.year - b.year
-          const ta = TOURNAMENT_ORDER.indexOf(a.tournament)
-          const tb = TOURNAMENT_ORDER.indexOf(b.tournament)
-          const tCmp = (ta === -1 ? 99 : ta) - (tb === -1 ? 99 : tb)
-          if (tCmp !== 0) return tCmp
-          const da = DISCIPLINES.indexOf(a.discipline)
-          const db = DISCIPLINES.indexOf(b.discipline)
-          if (da !== db) return da - db
-          return (a.roundNumber ?? 0) - (b.roundNumber ?? 0)
-        })
-        setOutfits(data)
+          if (a.year !== b.year) return a.year - b.year;
+          const ta = TOURNAMENT_ORDER.indexOf(a.tournament);
+          const tb = TOURNAMENT_ORDER.indexOf(b.tournament);
+          const tCmp = (ta === -1 ? 99 : ta) - (tb === -1 ? 99 : tb);
+          if (tCmp !== 0) return tCmp;
+          const da = DISCIPLINES.indexOf(a.discipline);
+          const db = DISCIPLINES.indexOf(b.discipline);
+          if (da !== db) return da - db;
+          return (a.roundNumber ?? 0) - (b.roundNumber ?? 0);
+        });
+        setOutfits(data);
       })
-      .catch(err => setError(err.message))
-      .finally(() => setLoading(false))
-  }, [])
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, []);
 
   // ── Missing item computation ───────────────────────────────────────────────
 
   const condensedMissing = useMemo(() => {
-    if (!outfits.length) return []
-    const outfitKeys = new Set(outfits.map(o => `${o.year}_${o.tournament}`))
-    const items = []
+    if (!outfits.length) return [];
+    const outfitKeys = new Set(outfits.map((o) => `${o.year}_${o.tournament}`));
+    const items = [];
     for (const year of ACTIVE_YEARS) {
       for (const tournament of slotsForYear(year)) {
-        if (!outfitKeys.has(`${year}_${tournament}`) &&
-            getCombinedSlotStatus(tournament, year) === 'played') {
-          items.push({ year, tournament })
+        if (
+          !outfitKeys.has(`${year}_${tournament}`) &&
+          getCombinedSlotStatus(tournament, year) === "played"
+        ) {
+          items.push({ year, tournament });
         }
       }
     }
-    return items
-  }, [outfits])
+    return items;
+  }, [outfits]);
 
   const expandedMissing = useMemo(() => {
-    if (!outfits.length) return []
+    if (!outfits.length) return [];
     const outfitKeys = new Set(
-      outfits.map(o => `${o.year}_${o.tournament}_${o.discipline}_${o.roundNumber}`)
-    )
-    const items = []
+      outfits.map(
+        (o) => `${o.year}_${o.tournament}_${o.discipline}_${o.roundNumber}`,
+      ),
+    );
+    const items = [];
     for (const year of ACTIVE_YEARS) {
       for (const tournament of slotsForYear(year)) {
         for (const discipline of DISCIPLINES) {
-          const rounds = getRoundsForSlot(tournament, year, discipline)
+          const rounds = getRoundsForSlot(tournament, year, discipline);
           for (let r = 1; r <= rounds; r++) {
             if (!outfitKeys.has(`${year}_${tournament}_${discipline}_${r}`)) {
-              items.push({ year, tournament, discipline, roundNumber: r, round: getRoundLabel(r) })
+              items.push({
+                year,
+                tournament,
+                discipline,
+                roundNumber: r,
+                round: getRoundLabel(r),
+              });
             }
           }
         }
       }
     }
-    return items
-  }, [outfits])
+    return items;
+  }, [outfits]);
 
-  const missingCount = mode === 'condensed' ? condensedMissing.length : expandedMissing.length
+  const missingCount =
+    mode === "condensed" ? condensedMissing.length : expandedMissing.length;
 
   // ── Scroll + highlight ─────────────────────────────────────────────────────
 
   function handleHighlight(item) {
-    if (highlightTimerRef.current) clearTimeout(highlightTimerRef.current)
+    if (highlightTimerRef.current) clearTimeout(highlightTimerRef.current);
 
     // Clear any lingering highlight classes
-    document.querySelectorAll('.slot-highlight').forEach(el => el.classList.remove('slot-highlight'))
+    document
+      .querySelectorAll(".slot-highlight")
+      .forEach((el) => el.classList.remove("slot-highlight"));
 
     const id = item.roundNumber
       ? `slot-${item.year}-${item.tournament}-${item.discipline}-${item.roundNumber}`
-      : `slot-${item.year}-${item.tournament}`
+      : `slot-${item.year}-${item.tournament}`;
 
-    const el = document.getElementById(id)
-    const yearEl = document.getElementById(`year-${item.year}`)
+    const el = document.getElementById(id);
+    const yearEl = document.getElementById(`year-${item.year}`);
 
     if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' })
-      el.classList.add('slot-highlight')
-      highlightTimerRef.current = setTimeout(() => el.classList.remove('slot-highlight'), 2700)
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      el.classList.add("slot-highlight");
+      highlightTimerRef.current = setTimeout(
+        () => el.classList.remove("slot-highlight"),
+        2700,
+      );
     } else if (yearEl) {
-      yearEl.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      yearEl.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   }
 
   // ── Lightbox ───────────────────────────────────────────────────────────────
 
-  const realOutfits = useMemo(() => outfits.filter(o => {
-    if (activeTournament && o.tournament !== activeTournament) return false
-    if (activeYear && o.year !== activeYear) return false
-    return true
-  }), [outfits, activeTournament, activeYear])
+  const realOutfits = useMemo(
+    () =>
+      outfits.filter((o) => {
+        if (activeTournament && o.tournament !== activeTournament) return false;
+        if (activeYear && o.year !== activeYear) return false;
+        return true;
+      }),
+    [outfits, activeTournament, activeYear],
+  );
 
   function openLightbox(outfit) {
-    const idx = realOutfits.findIndex(o => o.id === outfit.id)
-    if (idx !== -1) setLightboxIndex(idx)
+    const idx = realOutfits.findIndex((o) => o.id === outfit.id);
+    if (idx !== -1) setLightboxIndex(idx);
   }
 
   // ── Derived filter data ────────────────────────────────────────────────────
 
   const uniqueTournaments = useMemo(
-    () => sortTournaments([...new Set(outfits.map(o => o.tournament))]),
-    [outfits]
-  )
+    () => sortTournaments([...new Set(outfits.map((o) => o.tournament))]),
+    [outfits],
+  );
   const uniqueYears = useMemo(
-    () => [...new Set(outfits.map(o => o.year))],
-    [outfits]
-  )
+    () => [...new Set(outfits.map((o) => o.year))],
+    [outfits],
+  );
 
   // ── Render ─────────────────────────────────────────────────────────────────
 
-  const anyPanelOpen = panelOpen || filterPanelOpen
+  const anyPanelOpen = panelOpen || filterPanelOpen;
 
   return (
     <div
       className="min-h-screen bg-dark"
       style={{
-        paddingRight: anyPanelOpen ? '18rem' : undefined,
-        transition: 'padding-right 300ms ease',
+        paddingRight: anyPanelOpen ? "18rem" : undefined,
+        transition: "padding-right 300ms ease",
       }}
     >
       {/* Sticky filter bar */}
-      <div className="sticky top-16 z-30 bg-dark border-b border-dark3 px-3 py-3">
+      <div className="sticky top-20 z-30 bg-dark border-b border-dark3 px-3 py-3">
         <div className="flex items-center gap-4">
-
           {/* View mode switcher */}
           <div className="flex rounded overflow-hidden border border-dark3 flex-shrink-0">
-            {['condensed', 'expanded'].map(m => (
+            {["condensed", "expanded"].map((m) => (
               <button
                 key={m}
                 onClick={() => switchMode(m)}
                 className={`px-4 py-2 text-sm font-medium transition-colors capitalize ${
-                  mode === m ? 'bg-gold text-dark' : 'text-muted hover:text-ink'
+                  mode === m ? "bg-gold text-dark" : "text-muted hover:text-ink"
                 }`}
               >
                 {m}
@@ -207,45 +246,50 @@ export default function ViewerPage() {
             ))}
           </div>
 
-          {/* Mode explanation */}
-          <p className="text-sm text-muted italic flex-1 min-w-0 truncate hidden sm:block">
-            {mode === 'condensed'
-              ? 'One card per tournament — best outfit found so far'
-              : 'Every round as a slot — gaps where outfits haven\'t been found yet'}
-          </p>
-
           {/* Right controls */}
           <div className="flex items-center gap-2 flex-shrink-0">
             {!loading && missingCount > 0 && (
               <button
                 onClick={togglePanel}
                 className={`flex items-center gap-1.5 px-4 py-2 rounded text-sm font-medium transition-colors ${
-                  panelOpen ? 'bg-gold text-dark' : 'bg-dark3 text-ink hover:text-white'
+                  panelOpen
+                    ? "bg-gold text-dark"
+                    : "bg-dark3 text-ink hover:text-white"
                 }`}
               >
-                Outfits yet to discover
-                <span className={panelOpen ? 'text-dark/70' : 'text-gold'}>({missingCount})</span>
+                Outfits yet to find
+                <span className={panelOpen ? "text-dark/70" : "text-gold"}>
+                  ({missingCount})
+                </span>
               </button>
             )}
             <div className="flex items-center gap-2">
               <button
-                onClick={() => { const next = !filterPanelOpen; setFilterPanelOpen(next); if (next) setPanelOpen(false); setShowSettings(false) }}
+                onClick={() => {
+                  const next = !filterPanelOpen;
+                  setFilterPanelOpen(next);
+                  if (next) setPanelOpen(false);
+                  setShowSettings(false);
+                }}
                 className={`flex items-center gap-1.5 px-4 py-2 rounded text-sm font-medium transition-colors ${
                   filterPanelOpen || activeTournament || activeYear
-                    ? 'bg-gold text-dark'
-                    : 'bg-dark3 text-ink hover:text-white'
+                    ? "bg-gold text-dark"
+                    : "bg-dark3 text-ink hover:text-white"
                 }`}
               >
                 <span>Filter</span>
                 {(activeTournament || activeYear) && (
                   <span className="text-dark/60">
-                    {[activeTournament, activeYear].filter(Boolean).join(' · ')}
+                    {[activeTournament, activeYear].filter(Boolean).join(" · ")}
                   </span>
                 )}
               </button>
               {(activeTournament || activeYear) && (
                 <button
-                  onClick={() => { setActiveTournament(null); setActiveYear(null) }}
+                  onClick={() => {
+                    setActiveTournament(null);
+                    setActiveYear(null);
+                  }}
                   className="text-muted hover:text-ink text-base leading-none transition-colors"
                   aria-label="Clear filters"
                   title="Clear filters"
@@ -255,9 +299,12 @@ export default function ViewerPage() {
               )}
             </div>
             <button
-              onClick={() => { setShowSettings(s => !s); setFilterPanelOpen(false) }}
+              onClick={() => {
+                setShowSettings((s) => !s);
+                setFilterPanelOpen(false);
+              }}
               className={`flex items-center gap-1.5 text-sm underline transition-colors ${
-                showSettings ? 'text-ink' : 'text-muted hover:text-ink'
+                showSettings ? "text-ink" : "text-muted hover:text-ink"
               }`}
               aria-label="Display settings"
             >
@@ -265,14 +312,15 @@ export default function ViewerPage() {
               <span>Display settings</span>
             </button>
           </div>
-
         </div>
       </div>
 
       {/* Main gallery */}
       <main className="px-3 pt-10 pb-24 max-w-7xl mx-auto">
         {loading && (
-          <div className="flex items-center justify-center py-32 text-muted text-sm">Loading…</div>
+          <div className="flex items-center justify-center py-32 text-muted text-sm">
+            Loading…
+          </div>
         )}
         {error && (
           <div className="flex items-center justify-center py-32 text-red-400 text-sm">
@@ -323,7 +371,7 @@ export default function ViewerPage() {
         />
       )}
 
-      {/* Outfits yet to discover panel */}
+      {/* Outfits yet to find panel */}
       {panelOpen && (
         <MissingPanel
           mode={mode}
@@ -334,5 +382,5 @@ export default function ViewerPage() {
         />
       )}
     </div>
-  )
+  );
 }
