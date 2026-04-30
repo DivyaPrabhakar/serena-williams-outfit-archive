@@ -70,21 +70,23 @@ exports.handler = async (event) => {
     } else if (method === 'POST') {
       const body = JSON.parse(event.body || '[]');
       const isBulk = Array.isArray(body);
+      const payload = isBulk ? body : { focal_point: 'center', ...body };
       result = await sbFetch('outfits', {
         method: 'POST',
         prefer: isBulk ? 'resolution=ignore-duplicates' : 'return=representation',
         adminWrite: true,
-        body: JSON.stringify(body),
+        body: JSON.stringify(payload),
       });
 
     } else if (method === 'PATCH') {
       const id = params.id;
       if (!id) return { statusCode: 400, headers: CORS, body: JSON.stringify({ error: 'Missing id' }) };
+      const patchBody = JSON.parse(event.body || '{}');
       result = await sbFetch(`outfits?id=eq.${encodeURIComponent(id)}`, {
         method: 'PATCH',
         prefer: 'return=representation',
         adminWrite: true,
-        body: event.body,
+        body: JSON.stringify({ focal_point: 'center', ...patchBody }),
       });
 
     } else if (method === 'DELETE') {

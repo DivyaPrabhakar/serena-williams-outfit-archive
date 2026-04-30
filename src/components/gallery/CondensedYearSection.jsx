@@ -71,7 +71,7 @@ export default function CondensedYearSection({ year, tournaments, yearOutfits, s
               {yearColors.map(color => (
                 <div
                   key={color}
-                  className="w-4 h-4 rounded-sm ring-1 ring-dark3/60 flex-shrink-0"
+                  className="w-5 h-5 rounded-sm ring-1 ring-white/25 flex-shrink-0"
                   style={{ background: COLOR_MAP[color] }}
                   title={color}
                 />

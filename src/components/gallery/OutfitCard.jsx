@@ -27,11 +27,11 @@ export default function OutfitCard({ outfit, settings, onClick }) {
         </div>
       </div>
       {settings.colorDot && colors.length > 0 && (
-        <div className="flex gap-0.5 mt-1.5">
+        <div className="flex gap-1 mt-1.5">
           {colors.map((color, i) => (
             <div
               key={i}
-              className="w-3 h-3 ring-1 ring-dark3/60"
+              className="w-4 h-4 ring-1 ring-white/25"
               style={{ background: COLOR_MAP[color] ?? color }}
             />
           ))}
