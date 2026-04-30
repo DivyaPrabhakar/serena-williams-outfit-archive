@@ -8,6 +8,23 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@1,400;1,600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Playfair+Display:wght@400;700;900&display=swap" rel="stylesheet" />
+    <!-- Google Analytics 4 — only fires on the deployed site, not localhost -->
+    <script>
+      (function () {
+        var id = '%VITE_GA_MEASUREMENT_ID%';
+        var host = location.hostname;
+        if (!id || host === 'localhost' || host === '127.0.0.1' || host === '') return;
+        var s = document.createElement('script');
+        s.async = true;
+        s.src = 'https://www.googletagmanager.com/gtag/js?id=' + id;
+        document.head.appendChild(s);
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        window.gtag = gtag;
+        gtag('js', new Date());
+        gtag('config', id);
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
