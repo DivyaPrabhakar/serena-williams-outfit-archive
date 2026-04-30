@@ -51,11 +51,29 @@ function ExpandedTournamentBlock({ tournament, year, outfitMap, settings, onOpen
   )
   const header = `${tournament} ${year} · ${totalSlots} outfit${totalSlots !== 1 ? 's' : ''} · ${found} found`
 
+  const colorOrder = Object.keys(COLOR_MAP)
+  const tournamentColors = [...new Set(
+    disciplineBlocks.flatMap(d => d.slots.flatMap(s => s.outfit?.colors ?? []))
+  )].filter(c => c in COLOR_MAP)
+    .sort((a, b) => colorOrder.indexOf(a) - colorOrder.indexOf(b))
+
   return (
     <div className="mb-8">
       <div className="flex items-center gap-2 mb-4">
         <span className="w-0.5 h-3.5 bg-gold flex-shrink-0 rounded-full" />
         <span className="text-xs uppercase tracking-widest text-gold font-medium">{header}</span>
+        {tournamentColors.length > 0 && (
+          <div className="flex gap-1 ml-1">
+            {tournamentColors.map(color => (
+              <div
+                key={color}
+                className="w-3 h-3 rounded-sm ring-1 ring-white/20 flex-shrink-0"
+                style={{ background: COLOR_MAP[color] }}
+                title={color}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
       {disciplineBlocks.map(({ discipline, slots, status }) => {
@@ -127,11 +145,28 @@ function UnknownTournamentBlock({ tournament, year, outfits, settings, onOpenLig
   const found = outfits.length
   const header = `${tournament} ${year} · ${found} outfit${found !== 1 ? 's' : ''} · ${found} found`
 
+  const colorOrder = Object.keys(COLOR_MAP)
+  const tournamentColors = [...new Set(outfits.flatMap(o => o.colors ?? []))]
+    .filter(c => c in COLOR_MAP)
+    .sort((a, b) => colorOrder.indexOf(a) - colorOrder.indexOf(b))
+
   return (
     <div className="mb-8">
       <div className="flex items-center gap-2 mb-4">
         <span className="w-0.5 h-3.5 bg-gold flex-shrink-0 rounded-full" />
         <span className="text-xs uppercase tracking-widest text-gold font-medium">{header}</span>
+        {tournamentColors.length > 0 && (
+          <div className="flex gap-1 ml-1">
+            {tournamentColors.map(color => (
+              <div
+                key={color}
+                className="w-3 h-3 rounded-sm ring-1 ring-white/20 flex-shrink-0"
+                style={{ background: COLOR_MAP[color] }}
+                title={color}
+              />
+            ))}
+          </div>
+        )}
       </div>
       {Object.entries(byDiscipline).map(([discipline, dOutfits]) => {
         const sorted = [...dOutfits].sort((a, b) => (a.roundNumber ?? 0) - (b.roundNumber ?? 0))

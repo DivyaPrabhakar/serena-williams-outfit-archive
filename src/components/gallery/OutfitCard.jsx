@@ -10,6 +10,17 @@ export default function OutfitCard({ outfit, settings, onClick }) {
 
   return (
     <div>
+      {settings.colorDot && colors.length > 0 && (
+        <div className="flex gap-1 mb-1.5">
+          {colors.map((color, i) => (
+            <div
+              key={i}
+              className="w-4 h-4 rounded-sm ring-1 ring-white/25"
+              style={{ background: COLOR_MAP[color] ?? color }}
+            />
+          ))}
+        </div>
+      )}
       <div
         className={`relative aspect-[3/4] rounded overflow-hidden bg-dark3 group ${
           settings.lightbox ? 'cursor-pointer' : ''
@@ -27,17 +38,6 @@ export default function OutfitCard({ outfit, settings, onClick }) {
           <p className="text-xs text-ink leading-tight line-clamp-3">{label}</p>
         </div>
       </div>
-      {settings.colorDot && colors.length > 0 && (
-        <div className="flex gap-1 mt-1.5">
-          {colors.map((color, i) => (
-            <div
-              key={i}
-              className="w-4 h-4 rounded-sm ring-1 ring-white/25"
-              style={{ background: COLOR_MAP[color] ?? color }}
-            />
-          ))}
-        </div>
-      )}
     </div>
   )
 }
