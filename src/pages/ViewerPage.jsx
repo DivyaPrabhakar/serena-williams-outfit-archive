@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
 import { fetchOutfits } from "../lib/api";
 import { ACTIVE_YEARS, DISCIPLINES } from "../lib/constants";
 import {
@@ -48,12 +49,32 @@ function writeStorage(key, value) {
 }
 
 export default function ViewerPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [outfits, setOutfits] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeTournament, setActiveTournament] = useState(null);
-  const [activeYear, setActiveYear] = useState(null);
   const [lightboxIndex, setLightboxIndex] = useState(null);
+
+  const activeTournament = searchParams.get("tournament");
+  const activeYear = searchParams.get("year") ? Number(searchParams.get("year")) : null;
+
+  function setActiveTournament(value) {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (value) next.set("tournament", value);
+      else next.delete("tournament");
+      return next;
+    }, { replace: true });
+  }
+
+  function setActiveYear(value) {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (value) next.set("year", String(value));
+      else next.delete("year");
+      return next;
+    }, { replace: true });
+  }
   const [showSettings, setShowSettings] = useState(false);
   const [filterPanelOpen, setFilterPanelOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
