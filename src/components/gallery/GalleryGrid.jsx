@@ -5,7 +5,7 @@ import ExpandedYearSection from './ExpandedYearSection'
 
 const KNOWN_TOURNAMENTS = new Set([...GRAND_SLAMS, 'Olympics'])
 
-export default function GalleryGrid({ outfits, activeTournament, activeYear, settings, mode, onOpenLightbox }) {
+export default function GalleryGrid({ outfits, activeTournament, activeYear, settings, mode, flatGrid, onOpenLightbox }) {
   const outfitMap = new Map(
     outfits.map(o => [`${o.year}_${o.tournament}_${o.discipline}_${o.roundNumber}`, o])
   )
@@ -64,7 +64,7 @@ export default function GalleryGrid({ outfits, activeTournament, activeYear, set
           onOpenLightbox,
         }
         return mode === 'expanded'
-          ? <ExpandedYearSection {...props} />
+          ? <ExpandedYearSection {...props} flatGrid={flatGrid} />
           : <CondensedYearSection {...props} />
       })}
     </div>

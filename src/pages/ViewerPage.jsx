@@ -64,6 +64,8 @@ export default function ViewerPage() {
     () => readStorage(`serena_hunt_panel_condensed`, "false") === "true",
   );
 
+  const [flatGrid, setFlatGrid] = useState(false);
+
   const { settings, updateSetting } = useSettings();
   const highlightTimerRef = useRef(null);
 
@@ -229,7 +231,7 @@ export default function ViewerPage() {
       }}
     >
       {/* Sticky filter bar */}
-      <div className="sticky top-20 z-30 bg-dark border-b border-dark3 px-3 py-3">
+      <div className="sticky top-28 z-30 bg-dark border-b border-dark3 px-3 py-3">
         <div className="flex items-center gap-4">
           {/* View mode switcher */}
           <div className="flex rounded overflow-hidden border border-dark3 flex-shrink-0">
@@ -245,6 +247,23 @@ export default function ViewerPage() {
               </button>
             ))}
           </div>
+
+          {/* Expanded layout toggle */}
+          {mode === "expanded" && (
+            <div className="flex rounded overflow-hidden border border-dark3 flex-shrink-0">
+              {[["tournament", "By tournament"], ["grid", "Grid"]].map(([val, label]) => (
+                <button
+                  key={val}
+                  onClick={() => setFlatGrid(val === "grid")}
+                  className={`px-4 py-2 text-sm font-medium transition-colors ${
+                    (val === "grid") === flatGrid ? "bg-gold text-dark" : "text-muted hover:text-ink"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Right controls */}
           <div className="flex items-center gap-2 flex-shrink-0">
@@ -334,6 +353,7 @@ export default function ViewerPage() {
             activeYear={activeYear}
             settings={settings}
             mode={mode}
+            flatGrid={flatGrid}
             onOpenLightbox={openLightbox}
           />
         )}

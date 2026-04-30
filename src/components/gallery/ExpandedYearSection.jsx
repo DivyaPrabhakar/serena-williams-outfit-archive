@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { GRAND_SLAMS, DISCIPLINES, NON_SLAM_ROUNDS_SINGLES, NON_SLAM_ROUNDS_DOUBLES, COLOR_MAP } from '../../lib/constants'
 import { getRoundsForSlot, getSlotStatus, getRoundLabel, getCombinedSlotStatus, getRoundNumbers } from '../../lib/rounds'
 import OutfitCard from './OutfitCard'
@@ -156,9 +155,8 @@ function UnknownTournamentBlock({ tournament, year, outfits, settings, onOpenLig
   )
 }
 
-export default function ExpandedYearSection({ year, outfitMap, tournaments, yearOutfits, settings, onOpenLightbox }) {
+export default function ExpandedYearSection({ year, outfitMap, tournaments, yearOutfits, settings, flatGrid, onOpenLightbox }) {
   const cardWidth = CARD_WIDTHS[settings.gridDensity] ?? 128
-  const [flatGrid, setFlatGrid] = useState(false)
 
   const outfitCount = yearOutfits.length
   const majorsWithOutfits = GRAND_SLAMS.filter(t => yearOutfits.some(o => o.tournament === t)).length
@@ -239,23 +237,7 @@ export default function ExpandedYearSection({ year, outfitMap, tournaments, year
             </div>
           )}
         </div>
-        <div className="flex items-center justify-between mt-1.5">
-          <p className="text-sm text-muted">{subtitle}</p>
-          <div className="flex border border-dark3 rounded overflow-hidden">
-            {[['tournament', 'By tournament'], ['grid', 'Grid']].map(([val, label]) => (
-              <button
-                key={val}
-                type="button"
-                onClick={() => setFlatGrid(val === 'grid')}
-                className={`px-3 py-1 text-xs font-medium transition-colors ${
-                  (val === 'grid') === flatGrid ? 'bg-gold text-dark' : 'text-muted hover:text-ink'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
+        <p className="text-sm text-muted mt-1.5">{subtitle}</p>
       </div>
       {flatGrid ? (
         <div className="flex flex-wrap gap-2">
