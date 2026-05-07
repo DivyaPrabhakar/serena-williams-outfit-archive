@@ -36,6 +36,7 @@ function InlineError({ msg }) {
 
 const CL_CLOUD  = 'djkgbl2kx'
 const CL_PRESET = 'serena_williams-fitdex'
+const CL_PREFIX = `https://res.cloudinary.com/${CL_CLOUD}/`
 
 async function uploadToCloudinary(file, publicId) {
   const cloudName = CL_CLOUD
@@ -62,6 +63,7 @@ export default function EditOutfitModal({ outfit, onSave, onClose }) {
   // Initialise all state from the outfit prop (component is keyed by outfit.id)
   const isOther  = isOtherTournament(outfit.tournament)
   const [imageFile,       setImageFile]       = useState(null)
+  const [cloudinaryUrl,   setCloudinaryUrl]   = useState(outfit.imageUrl?.startsWith(CL_PREFIX) ? outfit.imageUrl : '')
   const [previewSrc,      setPreviewSrc]      = useState(outfit.imageUrl    ?? '')
   const [dragging,        setDragging]        = useState(false)
   const [year,            setYear]            = useState(String(outfit.year ?? ''))
@@ -116,12 +118,23 @@ export default function EditOutfitModal({ outfit, onSave, onClose }) {
     if (!file?.type.startsWith('image/')) return
     setImageFile(file)
     setPreviewSrc(URL.createObjectURL(file))
-    setErrors(prev => ({ ...prev, image: undefined }))
+    setCloudinaryUrl('')
+    setErrors(prev => ({ ...prev, image: undefined, cloudinaryUrl: undefined }))
   }, [])
+
+  const handleCloudinaryUrl = (url) => {
+    const trimmed = url.trim()
+    setCloudinaryUrl(url)
+    setPreviewSrc(trimmed ? trimmed : previewSrc)
+    if (trimmed) setImageFile(null)
+    setErrors(prev => ({ ...prev, image: undefined, cloudinaryUrl: undefined }))
+  }
 
   const validate = () => {
     const e = {}
-    if (!previewSrc)                                       e.image      = 'Image is required'
+    if (!previewSrc && !cloudinaryUrl.trim())              e.image        = 'Image is required'
+    if (cloudinaryUrl.trim() && !cloudinaryUrl.trim().startsWith(CL_PREFIX))
+                                                           e.cloudinaryUrl = `URL must start with ${CL_PREFIX}`
     if (!year || !yearNum)                                 e.year       = 'Year is required'
     if (!tournament)                                       e.tournament = 'Tournament is required'
     if (tournament === 'Other' && !otherTournament.trim()) e.tournament = 'Tournament name is required'
@@ -139,7 +152,9 @@ export default function EditOutfitModal({ outfit, onSave, onClose }) {
 
     try {
       let finalUrl = outfit.imageUrl
-      if (imageFile) {
+      if (cloudinaryUrl.trim()) {
+        finalUrl = cloudinaryUrl.trim()
+      } else if (imageFile) {
         setUploading(true)
         const publicId = [yearNum, effectiveTournament, discipline, round]
           .join('_')
@@ -225,6 +240,19 @@ export default function EditOutfitModal({ outfit, onSave, onClose }) {
                 </p>
               )}
             </div>
+            {/* Cloudinary URL input */}
+            <div className="flex flex-col gap-1.5">
+              <FieldLabel>Or paste a Cloudinary URL</FieldLabel>
+              <input
+                type="url"
+                value={cloudinaryUrl}
+                onChange={e => handleCloudinaryUrl(e.target.value)}
+                placeholder={`${CL_PREFIX}…`}
+                className="w-full bg-[#0D0D0D] border border-[#333] text-[#F0EDE6] px-3 py-2 text-sm outline-none focus:border-[#C9A84C] placeholder-[#3a3a3a]"
+              />
+              <InlineError msg={errors.cloudinaryUrl} />
+            </div>
+
             <InlineError msg={errors.image} />
 
             {/* Focal point */}
