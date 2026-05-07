@@ -12,6 +12,7 @@ const TABS = [
   { id: 'broken',        label: 'Broken Links' },
   { id: 'no-colors',     label: 'Needs Colors' },
   { id: 'no-cloudinary', label: 'No Cloudinary URL' },
+  { id: 'no-round',      label: 'No Round' },
   { id: 'search',        label: 'All Entries' },
 ]
 
@@ -137,6 +138,24 @@ function NeedsColorsPanel({ outfits, onEdit, onDelete }) {
   )
 }
 
+function NoRoundPanel({ outfits, onEdit, onDelete }) {
+  const list = outfits.filter(o => !o.round)
+  return (
+    <div className="flex flex-col gap-3">
+      <p className="text-xs text-[#8A877F] uppercase tracking-wide">
+        {list.length} outfit{list.length !== 1 ? 's' : ''} without round information
+      </p>
+      {list.length === 0 ? (
+        <p className="text-[#555] text-sm">All outfits have a round assigned.</p>
+      ) : (
+        <div className="flex flex-col gap-px">
+          {list.map(o => <OutfitRow key={o.id} o={o} onEdit={onEdit} onDelete={onDelete} />)}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function NoCloudinaryPanel({ outfits, onEdit, onDelete }) {
   const list = outfits.filter(o => !o.imageUrl?.includes('cloudinary.com'))
   return (
@@ -197,6 +216,8 @@ export default function AdminPage() {
         return <NeedsColorsPanel outfits={outfits} onEdit={setEditingOutfit} onDelete={remove} />
       case 'no-cloudinary':
         return <NoCloudinaryPanel outfits={outfits} onEdit={setEditingOutfit} onDelete={remove} />
+      case 'no-round':
+        return <NoRoundPanel outfits={outfits} onEdit={setEditingOutfit} onDelete={remove} />
       case 'search':
         return (
           <EntriesList
