@@ -35,7 +35,7 @@ function InlineError({ msg }) {
   return msg ? <p className="text-red-400 text-xs mt-1">{msg}</p> : null
 }
 
-async function uploadToCloudinary(file) {
+async function uploadToCloudinary(file, publicId) {
   const cloudName = localStorage.getItem('cl_cloud')
   const preset    = localStorage.getItem('cl_preset')
   if (!cloudName || !preset) {
@@ -44,6 +44,7 @@ async function uploadToCloudinary(file) {
   const fd = new FormData()
   fd.append('file', file)
   fd.append('upload_preset', preset)
+  if (publicId) fd.append('public_id', publicId)
   const res  = await fetch(
     `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
     { method: 'POST', body: fd },
@@ -55,7 +56,6 @@ async function uploadToCloudinary(file) {
 
 const EMPTY = {
   imageFile: null,
-  imageUrl:  '',
   previewSrc: '',
   focal_point: 'center',
   year:       '',
@@ -119,20 +119,14 @@ export default function AddOutfitForm({ onAdd }) {
       ...prev,
       imageFile:  file,
       previewSrc: URL.createObjectURL(file),
-      imageUrl:   '',
     }))
     setErrors(prev => ({ ...prev, image: undefined }))
   }, [])
 
-  const handleUrlChange = (url) => {
-    setF(prev => ({ ...prev, imageUrl: url, previewSrc: url, imageFile: null }))
-    if (url) setErrors(prev => ({ ...prev, image: undefined }))
-  }
-
   // ── Validation ───────────────────────────────────────────────────────────
   const validate = () => {
     const e = {}
-    if (!f.previewSrc && !f.imageUrl)                     e.image      = 'Image is required'
+    if (!f.previewSrc)                                     e.image      = 'Image is required'
     if (!f.year || !yearNum)                              e.year       = 'Year is required'
     if (!f.tournament)                                    e.tournament = 'Tournament is required'
     if (f.tournament === 'Other' && !f.otherTournament.trim())
@@ -152,12 +146,13 @@ export default function AddOutfitForm({ onAdd }) {
     setErrors({})
 
     try {
-      let finalUrl = f.imageUrl
-      if (f.imageFile) {
-        setUploading(true)
-        finalUrl = await uploadToCloudinary(f.imageFile)
-        setUploading(false)
-      }
+      if (!f.imageFile) throw new Error('No image selected')
+      setUploading(true)
+      const publicId = [yearNum, effectiveTournament, f.discipline, f.round]
+        .join('_')
+        .replace(/\s+/g, '_')
+      const finalUrl = await uploadToCloudinary(f.imageFile, publicId)
+      setUploading(false)
 
       await onAdd({
         imageUrl:    finalUrl,
@@ -230,14 +225,6 @@ export default function AddOutfitForm({ onAdd }) {
           )}
         </div>
 
-        {/* URL paste */}
-        <input
-          type="url"
-          value={f.imageUrl}
-          onChange={e => handleUrlChange(e.target.value)}
-          placeholder="Or paste an image URL…"
-          className="w-full bg-[#0D0D0D] border border-[#333] text-[#F0EDE6] px-3 py-2 text-sm outline-none focus:border-[#C9A84C] placeholder-[#3a3a3a]"
-        />
         <InlineError msg={errors.image} />
 
         {/* Focal point */}
