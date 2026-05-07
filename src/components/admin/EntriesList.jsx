@@ -1,8 +1,4 @@
-import { useState } from 'react'
-
-export default function EntriesList({ outfits, onEdit, onDelete }) {
-  const [search, setSearch] = useState('')
-
+export default function EntriesList({ outfits, onEdit, onDelete, search = '', onSearchChange }) {
   const q = search.toLowerCase().trim()
 
   const filtered = outfits
@@ -30,7 +26,7 @@ export default function EntriesList({ outfits, onEdit, onDelete }) {
       <input
         type="text"
         value={search}
-        onChange={e => setSearch(e.target.value)}
+        onChange={e => onSearchChange?.(e.target.value)}
         placeholder="Search by tournament, year, discipline, round…"
         className="w-full bg-[#0D0D0D] border border-[#333] text-[#F0EDE6] px-3 py-2 text-sm outline-none focus:border-[#C9A84C] placeholder-[#3a3a3a]"
       />
