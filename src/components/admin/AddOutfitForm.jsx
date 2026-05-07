@@ -7,8 +7,7 @@ import { getValidRounds, getRoundsForSlot } from '../../lib/rounds'
 const MIXED_SLAMS = ['Australian Open', 'Roland Garros', 'Wimbledon', 'US Open']
 const COLORS      = Object.keys(COLOR_MAP)
 
-// Read once on module load; refresh the page if cl_cloud is changed
-const CL_CLOUD  = localStorage.getItem('cl_cloud') || 'djkgbl2kx'
+const CL_CLOUD  = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
 const CL_PREFIX = `https://res.cloudinary.com/${CL_CLOUD}/`
 
 function PickerBtn({ active, disabled, onClick, children }) {
@@ -39,10 +38,10 @@ function InlineError({ msg }) {
 }
 
 async function uploadToCloudinary(file, publicId) {
-  const cloudName = localStorage.getItem('cl_cloud')
-  const preset    = localStorage.getItem('cl_preset')
+  const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
+  const preset    = import.meta.env.VITE_CLOUDINARY_PRESET
   if (!cloudName || !preset) {
-    throw new Error('Cloudinary not configured — set cl_cloud and cl_preset in localStorage')
+    throw new Error('Cloudinary not configured — set VITE_CLOUDINARY_CLOUD_NAME and VITE_CLOUDINARY_PRESET in Netlify environment variables')
   }
   const fd = new FormData()
   fd.append('file', file)

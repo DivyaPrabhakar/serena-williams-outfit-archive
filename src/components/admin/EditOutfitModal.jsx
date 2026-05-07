@@ -35,9 +35,9 @@ function InlineError({ msg }) {
 }
 
 async function uploadToCloudinary(file, publicId) {
-  const cloudName = localStorage.getItem('cl_cloud')
-  const preset    = localStorage.getItem('cl_preset')
-  if (!cloudName || !preset) throw new Error('Cloudinary not configured')
+  const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
+  const preset    = import.meta.env.VITE_CLOUDINARY_PRESET
+  if (!cloudName || !preset) throw new Error('Cloudinary not configured — set VITE_CLOUDINARY_CLOUD_NAME and VITE_CLOUDINARY_PRESET in Netlify environment variables')
   const fd = new FormData()
   fd.append('file', file)
   fd.append('upload_preset', preset)
