@@ -7,7 +7,8 @@ import { getValidRounds, getRoundsForSlot } from '../../lib/rounds'
 const MIXED_SLAMS = ['Australian Open', 'Roland Garros', 'Wimbledon', 'US Open']
 const COLORS      = Object.keys(COLOR_MAP)
 
-const CL_CLOUD  = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
+const CL_CLOUD  = 'djkgbl2kx'
+const CL_PRESET = 'serena_williams-fitdex'
 const CL_PREFIX = `https://res.cloudinary.com/${CL_CLOUD}/`
 
 function PickerBtn({ active, disabled, onClick, children }) {
@@ -38,11 +39,8 @@ function InlineError({ msg }) {
 }
 
 async function uploadToCloudinary(file, publicId) {
-  const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
-  const preset    = import.meta.env.VITE_CLOUDINARY_PRESET
-  if (!cloudName || !preset) {
-    throw new Error('Cloudinary not configured — set VITE_CLOUDINARY_CLOUD_NAME and VITE_CLOUDINARY_PRESET in Netlify environment variables')
-  }
+  const cloudName = CL_CLOUD
+  const preset    = CL_PRESET
   const fd = new FormData()
   fd.append('file', file)
   fd.append('upload_preset', preset)
