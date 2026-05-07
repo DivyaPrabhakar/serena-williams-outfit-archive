@@ -209,7 +209,7 @@ export default function AdminPage() {
     if (loading) return <p className="text-[#555] text-sm">Loading…</p>
     switch (tab) {
       case 'upload':
-        return <AddOutfitForm onAdd={insert} />
+        return <AddOutfitForm onAdd={insert} outfits={outfits} />
       case 'broken':
         return <BrokenLinksPanel outfits={outfits} onEdit={setEditingOutfit} onDelete={remove} />
       case 'no-colors':

@@ -4,9 +4,12 @@ import {
 } from '../../lib/constants'
 import { getValidRounds, getRoundsForSlot } from '../../lib/rounds'
 
-// Tournaments where she played mixed doubles
 const MIXED_SLAMS = ['Australian Open', 'Roland Garros', 'Wimbledon', 'US Open']
 const COLORS      = Object.keys(COLOR_MAP)
+
+// Read once on module load; refresh the page if cl_cloud is changed
+const CL_CLOUD  = localStorage.getItem('cl_cloud') || 'djkgbl2kx'
+const CL_PREFIX = `https://res.cloudinary.com/${CL_CLOUD}/`
 
 function PickerBtn({ active, disabled, onClick, children }) {
   return (
@@ -55,19 +58,20 @@ async function uploadToCloudinary(file, publicId) {
 }
 
 const EMPTY = {
-  imageFile: null,
-  previewSrc: '',
-  focal_point: 'center',
-  year:       '',
-  tournament: '',
+  imageFile:     null,
+  cloudinaryUrl: '',
+  previewSrc:    '',
+  focal_point:   'center',
+  year:          '',
+  tournament:    '',
   otherTournament: '',
-  discipline: '',
-  round:      '',
-  colors:     [],
-  notes:      '',
+  discipline:    '',
+  round:         '',
+  colors:        [],
+  notes:         '',
 }
 
-export default function AddOutfitForm({ onAdd }) {
+export default function AddOutfitForm({ onAdd, outfits = [] }) {
   const [f,          setF]          = useState(EMPTY)
   const [dragging,   setDragging]   = useState(false)
   const [uploading,  setUploading]  = useState(false)
@@ -77,7 +81,7 @@ export default function AddOutfitForm({ onAdd }) {
 
   const set = (key, val) => setF(prev => ({ ...prev, [key]: val }))
 
-  const yearNum = parseInt(f.year) || 0
+  const yearNum             = parseInt(f.year) || 0
   const effectiveTournament = f.tournament === 'Other' ? f.otherTournament.trim() : f.tournament
 
   const availableDisciplines = useMemo(() => {
@@ -102,12 +106,21 @@ export default function AddOutfitForm({ onAdd }) {
     return max > 0 ? ROUND_SEQUENCE.slice(0, max) : ROUND_SEQUENCE
   }, [f.discipline, effectiveTournament, yearNum])
 
-  // Only clear discipline if it becomes unavailable (Mixed → Olympics)
+  // How many entries already exist for this exact slot (used to number new uploads)
+  const slotCount = useMemo(() => {
+    if (!yearNum || !effectiveTournament || !f.discipline || !f.round) return 0
+    return outfits.filter(o =>
+      o.year       === yearNum             &&
+      o.tournament === effectiveTournament &&
+      o.discipline === f.discipline        &&
+      o.round      === f.round
+    ).length
+  }, [outfits, yearNum, effectiveTournament, f.discipline, f.round])
+
   useEffect(() => {
     if (f.discipline === 'Mixed' && f.tournament === 'Olympics') set('discipline', '')
   }, [f.tournament])
 
-  // Only clear round if it falls outside the newly computed valid range
   useEffect(() => {
     if (f.round && validRounds.length > 0 && !validRounds.includes(f.round)) set('round', '')
   }, [validRounds])
@@ -117,22 +130,42 @@ export default function AddOutfitForm({ onAdd }) {
     if (!file?.type.startsWith('image/')) return
     setF(prev => ({
       ...prev,
-      imageFile:  file,
-      previewSrc: URL.createObjectURL(file),
+      imageFile:     file,
+      previewSrc:    URL.createObjectURL(file),
+      cloudinaryUrl: '',
     }))
-    setErrors(prev => ({ ...prev, image: undefined }))
+    setErrors(prev => ({ ...prev, image: undefined, cloudinaryUrl: undefined }))
   }, [])
+
+  const handleCloudinaryUrl = (url) => {
+    const trimmed = url.trim()
+    setF(prev => ({
+      ...prev,
+      cloudinaryUrl: url,
+      previewSrc:    trimmed ? trimmed : prev.previewSrc,
+      imageFile:     trimmed ? null    : prev.imageFile,
+    }))
+    setErrors(prev => ({ ...prev, image: undefined, cloudinaryUrl: undefined }))
+  }
 
   // ── Validation ───────────────────────────────────────────────────────────
   const validate = () => {
     const e = {}
-    if (!f.previewSrc)                                     e.image      = 'Image is required'
-    if (!f.year || !yearNum)                              e.year       = 'Year is required'
-    if (!f.tournament)                                    e.tournament = 'Tournament is required'
+    const hasFile = !!f.imageFile
+    const hasCl   = !!f.cloudinaryUrl.trim()
+
+    if (!hasFile && !hasCl) {
+      e.image = 'Image is required — upload a file or paste a Cloudinary URL'
+    } else if (hasCl && !f.cloudinaryUrl.trim().startsWith(CL_PREFIX)) {
+      e.cloudinaryUrl = `URL must start with ${CL_PREFIX}`
+    }
+
+    if (!f.year || !yearNum)    e.year       = 'Year is required'
+    if (!f.tournament)          e.tournament = 'Tournament is required'
     if (f.tournament === 'Other' && !f.otherTournament.trim())
-                                                          e.tournament = 'Tournament name is required'
-    if (!f.discipline)                                    e.discipline = 'Discipline is required'
-    if (!f.round)                                         e.round      = 'Round is required'
+                                e.tournament = 'Tournament name is required'
+    if (!f.discipline)          e.discipline = 'Discipline is required'
+    if (!f.round)               e.round      = 'Round is required'
     return e
   }
 
@@ -146,13 +179,21 @@ export default function AddOutfitForm({ onAdd }) {
     setErrors({})
 
     try {
-      if (!f.imageFile) throw new Error('No image selected')
-      setUploading(true)
-      const publicId = [yearNum, effectiveTournament, f.discipline, f.round]
-        .join('_')
-        .replace(/\s+/g, '_')
-      const finalUrl = await uploadToCloudinary(f.imageFile, publicId)
-      setUploading(false)
+      let finalUrl
+
+      if (f.cloudinaryUrl.trim()) {
+        // Direct Cloudinary URL — skip upload, write straight to Supabase
+        finalUrl = f.cloudinaryUrl.trim()
+      } else {
+        // File upload path — name includes image number for uniqueness
+        setUploading(true)
+        const imageNumber = slotCount + 1
+        const publicId = [yearNum, effectiveTournament, f.discipline, f.round, imageNumber]
+          .join('_')
+          .replace(/\s+/g, '_')
+        finalUrl = await uploadToCloudinary(f.imageFile, publicId)
+        setUploading(false)
+      }
 
       await onAdd({
         imageUrl:    finalUrl,
@@ -185,7 +226,7 @@ export default function AddOutfitForm({ onAdd }) {
     <form onSubmit={handleSubmit} className="flex flex-col gap-6">
 
       {/* 1. Image */}
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-3">
         <FieldLabel>Image</FieldLabel>
 
         {/* Drag / drop zone */}
@@ -223,6 +264,19 @@ export default function AddOutfitForm({ onAdd }) {
               Drag &amp; drop an image here, or click to select
             </p>
           )}
+        </div>
+
+        {/* Cloudinary URL input */}
+        <div className="flex flex-col gap-1.5">
+          <FieldLabel>Or paste a Cloudinary URL</FieldLabel>
+          <input
+            type="url"
+            value={f.cloudinaryUrl}
+            onChange={e => handleCloudinaryUrl(e.target.value)}
+            placeholder={`${CL_PREFIX}…`}
+            className="w-full bg-[#0D0D0D] border border-[#333] text-[#F0EDE6] px-3 py-2 text-sm outline-none focus:border-[#C9A84C] placeholder-[#3a3a3a]"
+          />
+          <InlineError msg={errors.cloudinaryUrl} />
         </div>
 
         <InlineError msg={errors.image} />
@@ -299,7 +353,7 @@ export default function AddOutfitForm({ onAdd }) {
         <InlineError msg={errors.tournament} />
       </div>
 
-      {/* 4. Round — appears as soon as year + tournament are known */}
+      {/* 4. Round */}
       {yearNum > 0 && effectiveTournament && (
         <div className="flex flex-col gap-2">
           <FieldLabel>Round</FieldLabel>
@@ -369,7 +423,15 @@ export default function AddOutfitForm({ onAdd }) {
         />
       </div>
 
-      {/* 8. Submit */}
+      {/* 8. Slot info — shown when slot already has entries */}
+      {slotCount > 0 && f.discipline && f.round && (
+        <p className="text-xs text-[#8A877F] border border-[#2a2a2a] px-3 py-2">
+          {slotCount} existing {slotCount === 1 ? 'entry' : 'entries'} for this slot —
+          new file upload will be named image {slotCount + 1}
+        </p>
+      )}
+
+      {/* 9. Submit */}
       <InlineError msg={errors.submit} />
       <button
         type="submit"
