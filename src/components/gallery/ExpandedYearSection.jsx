@@ -88,14 +88,14 @@ function ExpandedTournamentBlock({ tournament, year, outfitMap, settings, onOpen
               <span className="text-xs uppercase tracking-widest text-muted">{discipline}</span>
               <div className="flex-1 h-px bg-dark3" />
             </div>
-            <div className="flex gap-2 overflow-x-auto pb-1.5 snap-x snap-mandatory">
+            <div className="flex flex-wrap gap-2 pb-1.5">
               {slots.map(({ roundNumber, outfit }) => {
                 if (!outfit && !settings.showEmptySlots) return null
                 return (
                   <div
                     key={roundNumber}
                     id={`slot-${year}-${tournament}-${discipline}-${roundNumber}`}
-                    className="flex-none snap-start"
+                    className="flex-none"
                     style={{ width: cardWidth }}
                   >
                     {outfit ? (
@@ -175,9 +175,9 @@ function UnknownTournamentBlock({ tournament, year, outfits, settings, onOpenLig
               <span className="text-xs uppercase tracking-widest text-muted">{discipline}</span>
               <div className="flex-1 h-px bg-dark3" />
             </div>
-            <div className="flex gap-2 overflow-x-auto pb-1.5 snap-x snap-mandatory">
+            <div className="flex flex-wrap gap-2 pb-1.5">
               {sorted.map(outfit => (
-                <div key={outfit.id} className="flex-none snap-start" style={{ width: cardWidth }}>
+                <div key={outfit.id} className="flex-none" style={{ width: cardWidth }}>
                   <OutfitCard outfit={outfit} settings={settings} onClick={() => onOpenLightbox(outfit)} />
                 </div>
               ))}
