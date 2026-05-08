@@ -1,3 +1,5 @@
+const ROUND_ORDER = ['R1', 'R2', 'R3', 'R4', 'QF', 'SF', 'F']
+
 export default function EntriesList({ outfits, onEdit, onDelete, search = '', onSearchChange }) {
   const q = search.toLowerCase().trim()
 
@@ -13,7 +15,15 @@ export default function EntriesList({ outfits, onEdit, onDelete, search = '', on
         (o.colors      ?? []).join(' ').toLowerCase().includes(q)
       )
     })
-    .sort((a, b) => (b.year ?? 0) - (a.year ?? 0))
+    .sort((a, b) => {
+      const tCmp = (a.tournament ?? '').localeCompare(b.tournament ?? '')
+      if (tCmp !== 0) return tCmp
+      const yCmp = (a.year ?? 0) - (b.year ?? 0)
+      if (yCmp !== 0) return yCmp
+      const aRound = ROUND_ORDER.indexOf(a.round ?? '')
+      const bRound = ROUND_ORDER.indexOf(b.round ?? '')
+      return (aRound === -1 ? 99 : aRound) - (bRound === -1 ? 99 : bRound)
+    })
 
   const handleDelete = (id) => {
     if (!window.confirm('Delete this outfit?')) return
