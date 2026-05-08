@@ -8,11 +8,12 @@ export function rowToOutfit(r) {
     imageUrl:    r.image_url,
     year:        r.year,
     tournament:  r.tournament,
-    discipline:  r.discipline ?? 'Singles',
+    discipline:  r.discipline  ?? 'Singles',
     round:       r.round       ?? null,
     roundNumber: r.round_number ?? null,
     colors:      r.colors      ?? [],
     notes:       r.notes       ?? null,
+    focal_point: r.focal_point ?? 'center',
   }
 }
 
@@ -23,10 +24,11 @@ export function outfitToRow(o) {
     year:         o.year,
     tournament:   o.tournament,
     discipline:   o.discipline,
-    round:        o.round       ?? null,
-    round_number: o.roundNumber ?? null,
-    colors:       o.colors      ?? [],
-    notes:        o.notes       ?? null,
+    round:        o.round        ?? null,
+    round_number: o.roundNumber  ?? null,
+    colors:       o.colors       ?? [],
+    notes:        o.notes        ?? null,
+    focal_point:  o.focal_point  ?? 'center',
   }
 }
 
