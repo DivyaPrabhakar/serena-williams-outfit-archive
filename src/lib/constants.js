@@ -95,32 +95,36 @@ export const MIXED_NOT_HELD = {
 // Values are arrays of 1-based ROUND_SEQUENCE indices.
 // When present, these override the count-based approach in NON_SLAM_ROUNDS_SINGLES/DOUBLES.
 export const NON_SLAM_EXPLICIT_ROUNDS_SINGLES = {
-  'Indian Wells / Evert Cup': { 1999: [1, 2, 3, 5, 6, 7] }, // 96-draw: R1,R2,R3,QF,SF,F — no R4
-  'Miami Open':                { 1999: [2, 3, 4, 5, 6, 7] }, // top seeds received bye through R1
-  'Sydney International':      { 1998: [1, 2, 5, 6] },        // R1,R2,QF,SF — no R3/R4 in draw
-  'Acura Classic':             { 1998: [1, 2, 5] },            // R1,R2,QF — no R3/R4 in draw
+  'Indian Wells / Evert Cup':          { 1999: [1, 2, 3, 5, 6, 7] }, // R1,R2,R3,QF,SF,F — no R4 in 96-draw
+  'Lipton Championships / Miami Open': { 1999: [2, 3, 4, 5, 6, 7] }, // top seeds received bye through R1
+  'Sydney International':              { 1998: [1, 2, 5, 6] },        // R1,R2,QF,SF — no R3/R4 in draw
+  'Acura Classic':                     { 1998: [1, 2, 5], 1999: [1, 2, 5, 6, 7] }, // 1998: R1,R2,QF; 1999: R1,R2,QF,SF,F
+  'Open Gaz de France':                { 1999: [1, 2, 5, 6, 7] },    // R1,R2,QF,SF,F — no R3/R4 in draw
+  'Italian Open':                      { 1999: [2, 3, 5] },           // R2,R3,QF — seeded bye R1, no R4
+  'Grand Slam Cup':                    { 1999: [5, 6, 7] },           // QF,SF,F — top-8 invitational starts at QF
+  'Porsche Tennis Grand Prix':         { 1999: [2] },                 // R2 only — seeded bye in R1
 }
 
+// Same as NON_SLAM_EXPLICIT_ROUNDS_SINGLES but for Doubles.
 export const NON_SLAM_EXPLICIT_ROUNDS_DOUBLES = {
   'Indian Wells / Evert Cup': { 1999: [1, 2, 5, 6] }, // R1,R2,QF,SF — no R3/R4 in draw
 }
 
 export const NON_SLAM_ROUNDS_SINGLES = {
-  'Indian Wells / Evert Cup': { 1999: 6 },
-  'Miami Open':                { 1999: 7 },
-  'Sydney International':      { 1998: 4 },
-  'Lipton Championships':      { 1998: 5 },
-  'Acura Classic':             { 1998: 3 },
-  'Italian Open':              { 1999: 3 },
-  'German Open':               { 1999: 3 },
-  'Grand Slam Cup':            { 1999: 3 },
-  'Billie Jean King Cup':      { 1999: 4 },
+  'Indian Wells / Evert Cup':          { 1999: 6 },
+  'Lipton Championships / Miami Open': { 1998: 5, 1999: 6 },
+  'Sydney International':              { 1998: 4, 1999: 2 },
+  'Acura Classic':                     { 1998: 3, 1999: 5 },
+  'Open Gaz de France':                { 1999: 5 },
+  'Italian Open':                      { 1999: 3 },
+  'Grand Slam Cup':                    { 1999: 3 },
+  'Porsche Tennis Grand Prix':         { 1999: 1 },
 }
 
 export const NON_SLAM_ROUNDS_DOUBLES = {
-  'Indian Wells / Evert Cup': { 1999: 4 },
-  'Miami Open':               { 1999: 3 },
-  'Billie Jean King Cup':     { 1999: 4 },
+  'Indian Wells / Evert Cup':          { 1999: 4 },
+  'Lipton Championships / Miami Open': { 1999: 3 },
+  'Billie Jean King Cup':              { 1999: 4 },
 }
 
 // ── Colour map ────────────────────────────────────────────────────────────
