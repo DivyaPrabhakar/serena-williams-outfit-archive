@@ -16,6 +16,31 @@ const TABS = [
   { id: 'search',        label: 'All Entries' },
 ]
 
+function filterByQuery(list, q) {
+  if (!q) return list
+  const lq = q.toLowerCase().trim()
+  return list.filter(o =>
+    (o.tournament ?? '').toLowerCase().includes(lq) ||
+    String(o.year ?? '').includes(lq) ||
+    (o.discipline ?? '').toLowerCase().includes(lq) ||
+    (o.round ?? '').toLowerCase().includes(lq) ||
+    (o.notes ?? '').toLowerCase().includes(lq) ||
+    (o.colors ?? []).join(' ').toLowerCase().includes(lq)
+  )
+}
+
+function TabSearch({ value, onChange }) {
+  return (
+    <input
+      type="text"
+      value={value}
+      onChange={e => onChange(e.target.value)}
+      placeholder="Search by tournament, year, discipline, round…"
+      className="w-full bg-[#0D0D0D] border border-[#333] text-[#F0EDE6] px-3 py-2 text-sm outline-none focus:border-[#C9A84C] placeholder-[#3a3a3a]"
+    />
+  )
+}
+
 function checkImageUrl(url) {
   if (!url) return Promise.resolve(false)
   return new Promise(resolve => {
@@ -66,10 +91,12 @@ function BrokenLinksPanel({ outfits, onEdit, onDelete }) {
   const [status,  setStatus]  = useState({})
   const [checked, setChecked] = useState(0)
   const [running, setRunning] = useState(false)
+  const [search,  setSearch]  = useState('')
 
   const run = () => {
     setStatus({})
     setChecked(0)
+    setSearch('')
     setRunning(true)
     outfits.forEach(o => {
       checkImageUrl(o.imageUrl).then(ok => {
@@ -83,8 +110,9 @@ function BrokenLinksPanel({ outfits, onEdit, onDelete }) {
     if (running && checked >= outfits.length) setRunning(false)
   }, [checked, outfits.length, running])
 
-  const done   = !running && checked > 0
-  const broken = outfits.filter(o => status[o.id] === 'broken')
+  const done    = !running && checked > 0
+  const broken  = outfits.filter(o => status[o.id] === 'broken')
+  const visible = filterByQuery(broken, search)
 
   return (
     <div className="flex flex-col gap-4">
@@ -103,14 +131,20 @@ function BrokenLinksPanel({ outfits, onEdit, onDelete }) {
         )}
       </div>
 
-      {broken.length > 0 && (
-        <div className="flex flex-col gap-px">
-          {broken.map(o => (
-            <OutfitRow key={o.id} o={o} onEdit={onEdit} onDelete={onDelete}>
-              <p className="text-xs text-red-400 truncate mt-0.5">{o.imageUrl || '(no URL)'}</p>
-            </OutfitRow>
-          ))}
-        </div>
+      {done && broken.length > 0 && (
+        <>
+          <TabSearch value={search} onChange={setSearch} />
+          <p className="text-xs text-[#8A877F] uppercase tracking-wide">
+            {visible.length} / {broken.length} entries
+          </p>
+          <div className="flex flex-col gap-px">
+            {visible.map(o => (
+              <OutfitRow key={o.id} o={o} onEdit={onEdit} onDelete={onDelete}>
+                <p className="text-xs text-red-400 truncate mt-0.5">{o.imageUrl || '(no URL)'}</p>
+              </OutfitRow>
+            ))}
+          </div>
+        </>
       )}
 
       {done && broken.length === 0 && (
@@ -121,17 +155,22 @@ function BrokenLinksPanel({ outfits, onEdit, onDelete }) {
 }
 
 function NeedsColorsPanel({ outfits, onEdit, onDelete }) {
-  const list = outfits.filter(o => !o.colors?.length)
+  const [search, setSearch] = useState('')
+  const list    = outfits.filter(o => !o.colors?.length)
+  const visible = filterByQuery(list, search)
   return (
     <div className="flex flex-col gap-3">
+      <TabSearch value={search} onChange={setSearch} />
       <p className="text-xs text-[#8A877F] uppercase tracking-wide">
-        {list.length} outfit{list.length !== 1 ? 's' : ''} without colors
+        {visible.length} / {list.length} without colors
       </p>
       {list.length === 0 ? (
         <p className="text-[#555] text-sm">All outfits have colors assigned.</p>
+      ) : visible.length === 0 ? (
+        <p className="text-[#555] text-sm">No results.</p>
       ) : (
         <div className="flex flex-col gap-px">
-          {list.map(o => <OutfitRow key={o.id} o={o} onEdit={onEdit} onDelete={onDelete} />)}
+          {visible.map(o => <OutfitRow key={o.id} o={o} onEdit={onEdit} onDelete={onDelete} />)}
         </div>
       )}
     </div>
@@ -139,17 +178,22 @@ function NeedsColorsPanel({ outfits, onEdit, onDelete }) {
 }
 
 function NoRoundPanel({ outfits, onEdit, onDelete }) {
-  const list = outfits.filter(o => !o.round)
+  const [search, setSearch] = useState('')
+  const list    = outfits.filter(o => !o.round)
+  const visible = filterByQuery(list, search)
   return (
     <div className="flex flex-col gap-3">
+      <TabSearch value={search} onChange={setSearch} />
       <p className="text-xs text-[#8A877F] uppercase tracking-wide">
-        {list.length} outfit{list.length !== 1 ? 's' : ''} without round information
+        {visible.length} / {list.length} without round
       </p>
       {list.length === 0 ? (
         <p className="text-[#555] text-sm">All outfits have a round assigned.</p>
+      ) : visible.length === 0 ? (
+        <p className="text-[#555] text-sm">No results.</p>
       ) : (
         <div className="flex flex-col gap-px">
-          {list.map(o => <OutfitRow key={o.id} o={o} onEdit={onEdit} onDelete={onDelete} />)}
+          {visible.map(o => <OutfitRow key={o.id} o={o} onEdit={onEdit} onDelete={onDelete} />)}
         </div>
       )}
     </div>
@@ -157,17 +201,22 @@ function NoRoundPanel({ outfits, onEdit, onDelete }) {
 }
 
 function NoCloudinaryPanel({ outfits, onEdit, onDelete }) {
-  const list = outfits.filter(o => !o.imageUrl?.includes('cloudinary.com'))
+  const [search, setSearch] = useState('')
+  const list    = outfits.filter(o => !o.imageUrl?.includes('cloudinary.com'))
+  const visible = filterByQuery(list, search)
   return (
     <div className="flex flex-col gap-3">
+      <TabSearch value={search} onChange={setSearch} />
       <p className="text-xs text-[#8A877F] uppercase tracking-wide">
-        {list.length} outfit{list.length !== 1 ? 's' : ''} without a Cloudinary URL
+        {visible.length} / {list.length} without Cloudinary URL
       </p>
       {list.length === 0 ? (
         <p className="text-[#555] text-sm">All outfits use Cloudinary URLs.</p>
+      ) : visible.length === 0 ? (
+        <p className="text-[#555] text-sm">No results.</p>
       ) : (
         <div className="flex flex-col gap-px">
-          {list.map(o => (
+          {visible.map(o => (
             <OutfitRow key={o.id} o={o} onEdit={onEdit} onDelete={onDelete}>
               <p className="text-xs text-[#555] truncate mt-0.5">{o.imageUrl || '(no URL)'}</p>
             </OutfitRow>
