@@ -98,6 +98,7 @@ export const NON_SLAM_EXPLICIT_ROUNDS_SINGLES = {
   'Indian Wells Open':   { 1999: [1, 2, 3, 5, 6, 7] }, // 96-draw: R1,R2,R3,QF,SF,F — no R4
   'Miami Open':          { 1999: [2, 3, 4, 5, 6, 7] }, // top seeds received bye through R1
   'Sydney International': { 1998: [1, 2, 5, 6] },       // R1,R2,QF,SF — no R3/R4 in draw
+  'Acura Classic':        { 1998: [1, 2, 5] },           // R1,R2,QF — no R3/R4 in draw
 }
 
 export const NON_SLAM_ROUNDS_SINGLES = {
@@ -105,6 +106,7 @@ export const NON_SLAM_ROUNDS_SINGLES = {
   'Miami Open':           { 1999: 7 },
   'Sydney International': { 1998: 4 },
   'Lipton Championships': { 1998: 5 },
+  'Acura Classic':        { 1998: 3 },
   'Italian Open':         { 1999: 3 },
   'German Open':          { 1999: 3 },
   'Grand Slam Cup':       { 1999: 3 },
