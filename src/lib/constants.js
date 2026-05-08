@@ -124,7 +124,7 @@ export const NON_SLAM_ROUNDS_SINGLES = {
 export const NON_SLAM_ROUNDS_DOUBLES = {
   'Indian Wells / Evert Cup':          { 1999: 4 },
   'Lipton Championships / Miami Open': { 1999: 3 },
-  'Billie Jean King Cup':              { 1999: 4 },
+  'Fed Cup / Billie Jean King Cup':    { 1999: 4 },
 }
 
 // ── Colour map ────────────────────────────────────────────────────────────
