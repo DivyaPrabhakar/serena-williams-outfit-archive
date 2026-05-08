@@ -14,6 +14,7 @@ import {
   NON_SLAM_ROUNDS_SINGLES,
   NON_SLAM_ROUNDS_DOUBLES,
   NON_SLAM_EXPLICIT_ROUNDS_SINGLES,
+  NON_SLAM_EXPLICIT_ROUNDS_DOUBLES,
 } from './constants'
 
 // ── Round label ↔ number conversions ─────────────────────────────────────
@@ -57,6 +58,10 @@ export function getRoundsForSlot(tournament, year, discipline) {
     const explicit = NON_SLAM_EXPLICIT_ROUNDS_SINGLES[tournament]?.[Number(year)]
     if (explicit) return explicit.length
   }
+  if (discipline === 'Doubles') {
+    const explicit = NON_SLAM_EXPLICIT_ROUNDS_DOUBLES[tournament]?.[Number(year)]
+    if (explicit) return explicit.length
+  }
 
   const y = Number(year)
   if (discipline === 'Singles') {
@@ -73,6 +78,10 @@ export function getRoundsForSlot(tournament, year, discipline) {
 export function getRoundNumbers(tournament, year, discipline) {
   if (discipline === 'Singles') {
     const explicit = NON_SLAM_EXPLICIT_ROUNDS_SINGLES[tournament]?.[Number(year)]
+    if (explicit) return explicit
+  }
+  if (discipline === 'Doubles') {
+    const explicit = NON_SLAM_EXPLICIT_ROUNDS_DOUBLES[tournament]?.[Number(year)]
     if (explicit) return explicit
   }
   const n = getRoundsForSlot(tournament, year, discipline)

@@ -93,30 +93,34 @@ export const MIXED_NOT_HELD = {
 // Round count = matches played (e.g. QF in a 3-round event = 3; won a 7-round event = 7).
 // For non-slams where the rounds played are non-contiguous or don't start at R1.
 // Values are arrays of 1-based ROUND_SEQUENCE indices.
-// When present, these override the count-based approach in NON_SLAM_ROUNDS_SINGLES.
+// When present, these override the count-based approach in NON_SLAM_ROUNDS_SINGLES/DOUBLES.
 export const NON_SLAM_EXPLICIT_ROUNDS_SINGLES = {
-  'Indian Wells Open':   { 1999: [1, 2, 3, 5, 6, 7] }, // 96-draw: R1,R2,R3,QF,SF,F — no R4
-  'Miami Open':          { 1999: [2, 3, 4, 5, 6, 7] }, // top seeds received bye through R1
-  'Sydney International': { 1998: [1, 2, 5, 6] },       // R1,R2,QF,SF — no R3/R4 in draw
-  'Acura Classic':        { 1998: [1, 2, 5] },           // R1,R2,QF — no R3/R4 in draw
+  'Indian Wells / Evert Cup': { 1999: [1, 2, 3, 5, 6, 7] }, // 96-draw: R1,R2,R3,QF,SF,F — no R4
+  'Miami Open':                { 1999: [2, 3, 4, 5, 6, 7] }, // top seeds received bye through R1
+  'Sydney International':      { 1998: [1, 2, 5, 6] },        // R1,R2,QF,SF — no R3/R4 in draw
+  'Acura Classic':             { 1998: [1, 2, 5] },            // R1,R2,QF — no R3/R4 in draw
+}
+
+export const NON_SLAM_EXPLICIT_ROUNDS_DOUBLES = {
+  'Indian Wells / Evert Cup': { 1999: [1, 2, 5, 6] }, // R1,R2,QF,SF — no R3/R4 in draw
 }
 
 export const NON_SLAM_ROUNDS_SINGLES = {
-  'Indian Wells Open':    { 1999: 7 },
-  'Miami Open':           { 1999: 7 },
-  'Sydney International': { 1998: 4 },
-  'Lipton Championships': { 1998: 5 },
-  'Acura Classic':        { 1998: 3 },
-  'Italian Open':         { 1999: 3 },
-  'German Open':          { 1999: 3 },
-  'Grand Slam Cup':       { 1999: 3 },
-  'Billie Jean King Cup': { 1999: 4 },
+  'Indian Wells / Evert Cup': { 1999: 6 },
+  'Miami Open':                { 1999: 7 },
+  'Sydney International':      { 1998: 4 },
+  'Lipton Championships':      { 1998: 5 },
+  'Acura Classic':             { 1998: 3 },
+  'Italian Open':              { 1999: 3 },
+  'German Open':               { 1999: 3 },
+  'Grand Slam Cup':            { 1999: 3 },
+  'Billie Jean King Cup':      { 1999: 4 },
 }
 
 export const NON_SLAM_ROUNDS_DOUBLES = {
-  'Indian Wells Open':    { 1999: 6 },
-  'Miami Open':           { 1999: 3 },
-  'Billie Jean King Cup': { 1999: 4 },
+  'Indian Wells / Evert Cup': { 1999: 4 },
+  'Miami Open':               { 1999: 3 },
+  'Billie Jean King Cup':     { 1999: 4 },
 }
 
 // ── Colour map ────────────────────────────────────────────────────────────
