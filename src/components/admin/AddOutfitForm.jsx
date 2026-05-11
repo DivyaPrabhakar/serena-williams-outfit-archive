@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useMemo, useEffect } from 'react'
 import {
-  GRAND_SLAMS, OLYMPICS_YEARS, ROUND_SEQUENCE, COLOR_MAP,
+  GRAND_SLAMS, OLYMPICS_YEARS, ROUND_SEQUENCE, COLOR_MAP, OUTFIT_BRANDS,
 } from '../../lib/constants'
 import { getValidRounds, getRoundsForSlot } from '../../lib/rounds'
 
@@ -66,6 +66,7 @@ const EMPTY = {
   round:         '',
   colors:        [],
   notes:         '',
+  brand:         null,
 }
 
 export default function AddOutfitForm({ onAdd, outfits = [] }) {
@@ -202,6 +203,7 @@ export default function AddOutfitForm({ onAdd, outfits = [] }) {
         colors:      f.colors,
         notes:       f.notes,
         focal_point: f.focal_point,
+        brand:       f.brand,
       })
 
       setF(EMPTY)
@@ -408,7 +410,23 @@ export default function AddOutfitForm({ onAdd, outfits = [] }) {
         </div>
       </div>
 
-      {/* 7. Notes */}
+      {/* 7. Brand */}
+      <div className="flex flex-col gap-2">
+        <FieldLabel>Brand</FieldLabel>
+        <div className="flex flex-wrap gap-2">
+          {OUTFIT_BRANDS.map(b => (
+            <PickerBtn
+              key={b}
+              active={f.brand === b}
+              onClick={() => set('brand', f.brand === b ? null : b)}
+            >
+              {b}
+            </PickerBtn>
+          ))}
+        </div>
+      </div>
+
+      {/* 8. Notes */}
       <div className="flex flex-col gap-2">
         <FieldLabel>Notes</FieldLabel>
         <textarea
@@ -420,7 +438,7 @@ export default function AddOutfitForm({ onAdd, outfits = [] }) {
         />
       </div>
 
-      {/* 8. Slot info — shown when slot already has entries */}
+      {/* 9. Slot info — shown when slot already has entries */}
       {slotCount > 0 && f.discipline && f.round && (
         <p className="text-xs text-[#8A877F] border border-[#2a2a2a] px-3 py-2">
           {slotCount} existing {slotCount === 1 ? 'entry' : 'entries'} for this slot —
@@ -428,7 +446,7 @@ export default function AddOutfitForm({ onAdd, outfits = [] }) {
         </p>
       )}
 
-      {/* 9. Submit */}
+      {/* 10. Submit */}
       <InlineError msg={errors.submit} />
       <button
         type="submit"

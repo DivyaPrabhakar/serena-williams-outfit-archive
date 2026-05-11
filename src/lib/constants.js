@@ -127,6 +127,9 @@ export const NON_SLAM_ROUNDS_DOUBLES = {
   'Fed Cup / Billie Jean King Cup':    { 1999: 4 },
 }
 
+// ── Outfit brands ─────────────────────────────────────────────────────────
+export const OUTFIT_BRANDS = ['Nike', 'Puma']
+
 // ── Colour map ────────────────────────────────────────────────────────────
 export const COLOR_MAP = {
   White:  '#eee',

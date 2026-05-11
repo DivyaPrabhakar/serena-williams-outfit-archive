@@ -13,6 +13,7 @@ const TABS = [
   { id: 'no-colors',     label: 'Needs Colors' },
   { id: 'no-cloudinary', label: 'No Cloudinary URL' },
   { id: 'no-round',      label: 'No Round' },
+  { id: 'no-brand',      label: 'No Brand' },
   { id: 'search',        label: 'All Entries' },
 ]
 
@@ -25,7 +26,8 @@ function filterByQuery(list, q) {
     (o.discipline ?? '').toLowerCase().includes(lq) ||
     (o.round ?? '').toLowerCase().includes(lq) ||
     (o.notes ?? '').toLowerCase().includes(lq) ||
-    (o.colors ?? []).join(' ').toLowerCase().includes(lq)
+    (o.colors ?? []).join(' ').toLowerCase().includes(lq) ||
+    (o.brand ?? '').toLowerCase().includes(lq)
   )
 }
 
@@ -200,6 +202,33 @@ function NoRoundPanel({ outfits, onEdit, onDelete }) {
   )
 }
 
+function NoBrandPanel({ outfits, onEdit, onDelete }) {
+  const [search, setSearch] = useState('')
+  const list    = outfits.filter(o => !o.brand)
+  const visible = filterByQuery(list, search)
+  return (
+    <div className="flex flex-col gap-3">
+      <TabSearch value={search} onChange={setSearch} />
+      <p className="text-xs text-[#8A877F] uppercase tracking-wide">
+        {visible.length} / {list.length} without brand
+      </p>
+      {list.length === 0 ? (
+        <p className="text-[#555] text-sm">All outfits have a brand assigned.</p>
+      ) : visible.length === 0 ? (
+        <p className="text-[#555] text-sm">No results.</p>
+      ) : (
+        <div className="flex flex-col gap-px">
+          {visible.map(o => (
+            <OutfitRow key={o.id} o={o} onEdit={onEdit} onDelete={onDelete}>
+              <p className="text-xs text-[#555] mt-0.5">{o.year}</p>
+            </OutfitRow>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function NoCloudinaryPanel({ outfits, onEdit, onDelete }) {
   const [search, setSearch] = useState('')
   const list    = outfits.filter(o => !o.imageUrl?.includes('cloudinary.com'))
@@ -267,6 +296,8 @@ export default function AdminPage() {
         return <NoCloudinaryPanel outfits={outfits} onEdit={setEditingOutfit} onDelete={remove} />
       case 'no-round':
         return <NoRoundPanel outfits={outfits} onEdit={setEditingOutfit} onDelete={remove} />
+      case 'no-brand':
+        return <NoBrandPanel outfits={outfits} onEdit={setEditingOutfit} onDelete={remove} />
       case 'search':
         return (
           <EntriesList

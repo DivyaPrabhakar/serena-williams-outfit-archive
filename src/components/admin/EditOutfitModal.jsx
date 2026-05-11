@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react'
 import {
-  GRAND_SLAMS, OLYMPICS_YEARS, ROUND_SEQUENCE, COLOR_MAP,
+  GRAND_SLAMS, OLYMPICS_YEARS, ROUND_SEQUENCE, COLOR_MAP, OUTFIT_BRANDS,
 } from '../../lib/constants'
 import { getValidRounds, getRoundsForSlot } from '../../lib/rounds'
 
@@ -74,6 +74,7 @@ export default function EditOutfitModal({ outfit, onSave, onClose }) {
   const [colors,          setColors]          = useState(outfit.colors      ?? [])
   const [notes,           setNotes]           = useState(outfit.notes       ?? '')
   const [focalPoint,      setFocalPoint]      = useState(outfit.focal_point ?? 'center')
+  const [brand,           setBrand]           = useState(outfit.brand       ?? null)
   const [uploading,       setUploading]       = useState(false)
   const [saving,          setSaving]          = useState(false)
   const [errors,          setErrors]          = useState({})
@@ -174,6 +175,7 @@ export default function EditOutfitModal({ outfit, onSave, onClose }) {
         colors,
         notes,
         focal_point: focalPoint,
+        brand,
       })
     } catch (err) {
       setErrors({ submit: err.message })
@@ -378,6 +380,22 @@ export default function EditOutfitModal({ outfit, onSave, onClose }) {
                     style={{ background: COLOR_MAP[color] }}
                   />
                   {color}
+                </PickerBtn>
+              ))}
+            </div>
+          </div>
+
+          {/* Brand */}
+          <div className="flex flex-col gap-2">
+            <FieldLabel>Brand</FieldLabel>
+            <div className="flex flex-wrap gap-2">
+              {OUTFIT_BRANDS.map(b => (
+                <PickerBtn
+                  key={b}
+                  active={brand === b}
+                  onClick={() => setBrand(brand === b ? null : b)}
+                >
+                  {b}
                 </PickerBtn>
               ))}
             </div>

@@ -14,6 +14,7 @@ export function rowToOutfit(r) {
     colors:      r.colors      ?? [],
     notes:       r.notes       ?? null,
     focal_point: r.focal_point ?? 'center',
+    brand:       r.brand       ?? null,
   }
 }
 
@@ -29,6 +30,7 @@ export function outfitToRow(o) {
     colors:       o.colors       ?? [],
     notes:        o.notes        ?? null,
     focal_point:  o.focal_point  ?? 'center',
+    brand:        o.brand        ?? null,
   }
 }
 

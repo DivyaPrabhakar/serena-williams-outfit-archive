@@ -1,3 +1,5 @@
+import { COLOR_MAP } from '../../lib/constants'
+
 const TOURNAMENT_ORDER = ['Australian Open', 'Roland Garros', 'Wimbledon', 'US Open', 'Olympics']
 
 function sortTournaments(tournaments) {
@@ -31,11 +33,18 @@ export default function FilterPanel({
   years,
   activeYear,
   onYearChange,
+  brands,
+  activeBrand,
+  onBrandChange,
+  colors,
+  activeColor,
+  onColorChange,
   onClose,
 }) {
   const sortedTournaments = sortTournaments(tournaments)
   const sortedYears = [...years].sort((a, b) => a - b)
-  const hasActive = activeTournament !== null || activeYear !== null
+  const sortedBrands = [...brands].sort()
+  const hasActive = activeTournament !== null || activeYear !== null || activeBrand !== null || activeColor !== null
 
   return (
     <div className="fixed right-0 top-28 bottom-0 z-[45] w-72 bg-dark2 border-l border-dark3 shadow-2xl flex flex-col">
@@ -86,12 +95,56 @@ export default function FilterPanel({
               ))}
             </div>
           </div>
+
+          {sortedBrands.length > 0 && (
+            <div>
+              <p className="text-xs uppercase tracking-widest text-muted mb-3">Brand</p>
+              <div className="flex flex-wrap gap-1.5">
+                <FilterBtn active={activeBrand === null} onClick={() => onBrandChange(null)}>
+                  All
+                </FilterBtn>
+                {sortedBrands.map(b => (
+                  <FilterBtn
+                    key={b}
+                    active={activeBrand === b}
+                    onClick={() => onBrandChange(activeBrand === b ? null : b)}
+                  >
+                    {b}
+                  </FilterBtn>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {colors.length > 0 && (
+            <div>
+              <p className="text-xs uppercase tracking-widest text-muted mb-3">Color</p>
+              <div className="flex flex-wrap gap-1.5">
+                <FilterBtn active={activeColor === null} onClick={() => onColorChange(null)}>
+                  All
+                </FilterBtn>
+                {colors.map(c => (
+                  <FilterBtn
+                    key={c}
+                    active={activeColor === c}
+                    onClick={() => onColorChange(activeColor === c ? null : c)}
+                  >
+                    <span
+                      className="w-2.5 h-2.5 rounded-sm inline-block mr-1.5 flex-shrink-0 align-middle"
+                      style={{ background: COLOR_MAP[c] }}
+                    />
+                    {c}
+                  </FilterBtn>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {hasActive && (
           <div className="px-5 py-4 border-t border-dark3 flex-shrink-0">
             <button
-              onClick={() => { onTournamentChange(null); onYearChange(null) }}
+              onClick={() => { onTournamentChange(null); onYearChange(null); onBrandChange(null); onColorChange(null) }}
               className="w-full py-2 rounded text-xs font-medium bg-dark3 text-muted hover:text-ink transition-colors"
             >
               Clear all filters

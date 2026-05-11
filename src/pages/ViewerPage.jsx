@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { fetchOutfits } from "../lib/api";
-import { ACTIVE_YEARS, DISCIPLINES } from "../lib/constants";
+import { ACTIVE_YEARS, DISCIPLINES, COLOR_MAP } from "../lib/constants";
 import {
   getRoundsForSlot,
   getRoundLabel,
@@ -57,6 +57,8 @@ export default function ViewerPage() {
 
   const activeTournament = searchParams.get("tournament");
   const activeYear = searchParams.get("year") ? Number(searchParams.get("year")) : null;
+  const activeBrand = searchParams.get("brand");
+  const activeColor = searchParams.get("color");
 
   function setActiveTournament(value) {
     setSearchParams((prev) => {
@@ -75,6 +77,25 @@ export default function ViewerPage() {
       return next;
     }, { replace: true });
   }
+
+  function setActiveBrand(value) {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (value) next.set("brand", value);
+      else next.delete("brand");
+      return next;
+    }, { replace: true });
+  }
+
+  function setActiveColor(value) {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (value) next.set("color", value);
+      else next.delete("color");
+      return next;
+    }, { replace: true });
+  }
+
   const [showSettings, setShowSettings] = useState(false);
   const [filterPanelOpen, setFilterPanelOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -219,9 +240,11 @@ export default function ViewerPage() {
       outfits.filter((o) => {
         if (activeTournament && o.tournament !== activeTournament) return false;
         if (activeYear && o.year !== activeYear) return false;
+        if (activeBrand && o.brand !== activeBrand) return false;
+        if (activeColor && !(o.colors ?? []).includes(activeColor)) return false;
         return true;
       }),
-    [outfits, activeTournament, activeYear],
+    [outfits, activeTournament, activeYear, activeBrand, activeColor],
   );
 
   function openLightbox(outfit) {
@@ -239,6 +262,14 @@ export default function ViewerPage() {
     () => [...new Set(outfits.map((o) => o.year))],
     [outfits],
   );
+  const uniqueBrands = useMemo(
+    () => [...new Set(outfits.map((o) => o.brand).filter(Boolean))],
+    [outfits],
+  );
+  const uniqueColors = useMemo(() => {
+    const used = new Set(outfits.flatMap((o) => o.colors ?? []))
+    return Object.keys(COLOR_MAP).filter((c) => used.has(c))
+  }, [outfits]);
 
   // ── Render ─────────────────────────────────────────────────────────────────
 
@@ -309,21 +340,21 @@ export default function ViewerPage() {
                   setShowSettings(false);
                 }}
                 className={`flex items-center gap-1.5 px-4 py-2 rounded text-sm font-medium transition-colors ${
-                  filterPanelOpen || activeTournament || activeYear
+                  filterPanelOpen || activeTournament || activeYear || activeBrand || activeColor
                     ? "bg-gold text-dark"
                     : "bg-dark3 text-ink hover:text-white"
                 }`}
               >
                 <span>Filter</span>
-                {(activeTournament || activeYear) && (
+                {(activeTournament || activeYear || activeBrand || activeColor) && (
                   <span className="text-dark/60">
-                    {[activeTournament, activeYear].filter(Boolean).join(" · ")}
+                    {[activeTournament, activeYear, activeBrand, activeColor].filter(Boolean).join(" · ")}
                   </span>
                 )}
               </button>
-              {(activeTournament || activeYear) && (
+              {(activeTournament || activeYear || activeBrand || activeColor) && (
                 <button
-                  onClick={() => { setActiveTournament(null); setActiveYear(null); }}
+                  onClick={() => { setActiveTournament(null); setActiveYear(null); setActiveBrand(null); setActiveColor(null); }}
                   className="text-muted hover:text-ink text-base leading-none transition-colors"
                   aria-label="Clear filters"
                   title="Clear filters"
@@ -363,9 +394,9 @@ export default function ViewerPage() {
           </div>
 
           {/* Active filter pill */}
-          {(activeTournament || activeYear) && (
+          {(activeTournament || activeYear || activeBrand || activeColor) && (
             <span className="text-xs bg-gold text-dark rounded px-2 py-1 truncate max-w-[130px]">
-              {[activeTournament, activeYear].filter(Boolean).join(" · ")}
+              {[activeTournament, activeYear, activeBrand, activeColor].filter(Boolean).join(" · ")}
             </span>
           )}
 
@@ -413,23 +444,23 @@ export default function ViewerPage() {
                 setMobileMenuOpen(false);
               }}
               className={`w-full flex items-center justify-between px-4 py-2 rounded text-sm font-medium transition-colors ${
-                filterPanelOpen || activeTournament || activeYear
+                filterPanelOpen || activeTournament || activeYear || activeBrand || activeColor
                   ? "bg-gold text-dark"
                   : "bg-dark3 text-ink hover:text-white"
               }`}
             >
               <span>Filter</span>
-              {(activeTournament || activeYear) && (
+              {(activeTournament || activeYear || activeBrand || activeColor) && (
                 <span className="text-dark/60 text-xs">
-                  {[activeTournament, activeYear].filter(Boolean).join(" · ")}
+                  {[activeTournament, activeYear, activeBrand, activeColor].filter(Boolean).join(" · ")}
                 </span>
               )}
             </button>
 
             {/* Clear filters */}
-            {(activeTournament || activeYear) && (
+            {(activeTournament || activeYear || activeBrand || activeColor) && (
               <button
-                onClick={() => { setActiveTournament(null); setActiveYear(null); setMobileMenuOpen(false); }}
+                onClick={() => { setActiveTournament(null); setActiveYear(null); setActiveBrand(null); setActiveColor(null); setMobileMenuOpen(false); }}
                 className="w-full px-4 py-2 rounded text-sm bg-dark3 text-muted hover:text-ink transition-colors"
               >
                 Clear filters
@@ -516,6 +547,12 @@ export default function ViewerPage() {
           years={uniqueYears}
           activeYear={activeYear}
           onYearChange={setActiveYear}
+          brands={uniqueBrands}
+          activeBrand={activeBrand}
+          onBrandChange={setActiveBrand}
+          colors={uniqueColors}
+          activeColor={activeColor}
+          onColorChange={setActiveColor}
           onClose={() => setFilterPanelOpen(false)}
         />
       )}
