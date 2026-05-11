@@ -1,18 +1,10 @@
-import { GRAND_SLAMS, DISCIPLINES, NON_SLAM_ROUNDS_SINGLES, NON_SLAM_ROUNDS_DOUBLES, COLOR_MAP } from '../../lib/constants'
+import { GRAND_SLAMS, DISCIPLINES } from '../../lib/constants'
 import { getRoundsForSlot, getSlotStatus, getRoundLabel, getCombinedSlotStatus, getRoundNumbers } from '../../lib/rounds'
+import { CARD_WIDTHS, SLAM_TOURNAMENTS, isKnownForYear } from '../../lib/galleryUtils'
+import { getSortedColors } from '../../lib/colorUtils'
 import OutfitCard from './OutfitCard'
 import EmptySlot from './EmptySlot'
 import DimSlot from './DimSlot'
-
-const CARD_WIDTHS = { small: 88, standard: 128, large: 172 }
-const SLAM_TOURNAMENTS = new Set([...GRAND_SLAMS, 'Olympics'])
-
-function isKnownForYear(tournament, year) {
-  if (SLAM_TOURNAMENTS.has(tournament)) return true
-  const y = Number(year)
-  return (NON_SLAM_ROUNDS_SINGLES[tournament]?.[y] != null) ||
-         (NON_SLAM_ROUNDS_DOUBLES[tournament]?.[y] != null)
-}
 
 // For tournaments in the participation constants (grand slams + Olympics)
 function ExpandedTournamentBlock({ tournament, year, outfitMap, settings, onOpenLightbox }) {
@@ -52,11 +44,9 @@ function ExpandedTournamentBlock({ tournament, year, outfitMap, settings, onOpen
   )
   const stats = `${totalSlots} outfit${totalSlots !== 1 ? 's' : ''} · ${found} found`
 
-  const colorOrder = Object.keys(COLOR_MAP)
-  const tournamentColors = [...new Set(
+  const tournamentColors = getSortedColors(
     playedBlocks.flatMap(d => d.slots.flatMap(s => s.outfit?.colors ?? []))
-  )].filter(c => c in COLOR_MAP)
-    .sort((a, b) => colorOrder.indexOf(a) - colorOrder.indexOf(b))
+  )
 
   return (
     <div className="mb-8">
@@ -143,10 +133,7 @@ function UnknownTournamentBlock({ tournament, year, outfits, settings, onOpenLig
   const found = outfits.length
   const stats = `${found} outfit${found !== 1 ? 's' : ''} · ${found} found`
 
-  const colorOrder = Object.keys(COLOR_MAP)
-  const tournamentColors = [...new Set(outfits.flatMap(o => o.colors ?? []))]
-    .filter(c => c in COLOR_MAP)
-    .sort((a, b) => colorOrder.indexOf(a) - colorOrder.indexOf(b))
+  const tournamentColors = getSortedColors(outfits.flatMap(o => o.colors ?? []))
 
   return (
     <div className="mb-8">

@@ -1,18 +1,4 @@
-const TOURNAMENT_ORDER = [
-  "Australian Open",
-  "Roland Garros",
-  "Wimbledon",
-  "US Open",
-  "Olympics",
-];
-
-function sortedTournamentKeys(obj) {
-  return Object.keys(obj).sort((a, b) => {
-    const ai = TOURNAMENT_ORDER.indexOf(a);
-    const bi = TOURNAMENT_ORDER.indexOf(b);
-    return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
-  });
-}
+import { sortTournaments } from '../../lib/filterUtils'
 
 function TournamentGroup({ name, count, children }) {
   return (
@@ -43,7 +29,7 @@ function CondensedContent({ items, onHighlight }) {
     if (!byTournament[item.tournament]) byTournament[item.tournament] = [];
     byTournament[item.tournament].push(item);
   }
-  const tournaments = sortedTournamentKeys(byTournament);
+  const tournaments = sortTournaments(Object.keys(byTournament));
   const total = items.length;
 
   return (
@@ -79,7 +65,7 @@ function ExpandedContent({ items, onHighlight }) {
     }
     byTournament[item.tournament][item.discipline].push(item);
   }
-  const tournaments = sortedTournamentKeys(byTournament);
+  const tournaments = sortTournaments(Object.keys(byTournament));
   const total = items.length;
 
   return (

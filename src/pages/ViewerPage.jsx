@@ -1,5 +1,4 @@
 import { useEffect, useState, useMemo, useRef } from "react";
-import { useSearchParams } from "react-router-dom";
 import { fetchOutfits } from "../lib/api";
 import { ACTIVE_YEARS, DISCIPLINES, COLOR_MAP } from "../lib/constants";
 import {
@@ -8,6 +7,9 @@ import {
   getCombinedSlotStatus,
   slotsForYear,
 } from "../lib/rounds";
+import { sortTournaments, TOURNAMENT_ORDER } from "../lib/filterUtils";
+import { readStorage, writeStorage } from "../lib/storage";
+import { useFilterParams } from "../hooks/useFilterParams";
 import { useSettings } from "../hooks/useSettings";
 import FilterPanel from "../components/filters/FilterPanel";
 import GalleryGrid from "../components/gallery/GalleryGrid";
@@ -15,86 +17,12 @@ import Lightbox from "../components/gallery/Lightbox";
 import SettingsPanel from "../components/SettingsPanel";
 import MissingPanel from "../components/gallery/MissingPanel";
 
-const TOURNAMENT_ORDER = [
-  "Australian Open",
-  "Roland Garros",
-  "Wimbledon",
-  "US Open",
-  "Olympics",
-];
-
-function sortTournaments(tournaments) {
-  return [...tournaments].sort((a, b) => {
-    const ai = TOURNAMENT_ORDER.indexOf(a);
-    const bi = TOURNAMENT_ORDER.indexOf(b);
-    if (ai !== -1 && bi !== -1) return ai - bi;
-    if (ai !== -1) return -1;
-    if (bi !== -1) return 1;
-    return a.localeCompare(b);
-  });
-}
-
-function readStorage(key, fallback) {
-  try {
-    const v = localStorage.getItem(key);
-    return v !== null ? v : fallback;
-  } catch {
-    return fallback;
-  }
-}
-function writeStorage(key, value) {
-  try {
-    localStorage.setItem(key, String(value));
-  } catch {}
-}
-
 export default function ViewerPage() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const { activeTournament, activeYear, activeBrand, activeColor, setFilter, clearAllFilters } = useFilterParams();
   const [outfits, setOutfits] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [lightboxIndex, setLightboxIndex] = useState(null);
-
-  const activeTournament = searchParams.get("tournament");
-  const activeYear = searchParams.get("year") ? Number(searchParams.get("year")) : null;
-  const activeBrand = searchParams.get("brand");
-  const activeColor = searchParams.get("color");
-
-  function setActiveTournament(value) {
-    setSearchParams((prev) => {
-      const next = new URLSearchParams(prev);
-      if (value) next.set("tournament", value);
-      else next.delete("tournament");
-      return next;
-    }, { replace: true });
-  }
-
-  function setActiveYear(value) {
-    setSearchParams((prev) => {
-      const next = new URLSearchParams(prev);
-      if (value) next.set("year", String(value));
-      else next.delete("year");
-      return next;
-    }, { replace: true });
-  }
-
-  function setActiveBrand(value) {
-    setSearchParams((prev) => {
-      const next = new URLSearchParams(prev);
-      if (value) next.set("brand", value);
-      else next.delete("brand");
-      return next;
-    }, { replace: true });
-  }
-
-  function setActiveColor(value) {
-    setSearchParams((prev) => {
-      const next = new URLSearchParams(prev);
-      if (value) next.set("color", value);
-      else next.delete("color");
-      return next;
-    }, { replace: true });
-  }
 
   const [showSettings, setShowSettings] = useState(false);
   const [filterPanelOpen, setFilterPanelOpen] = useState(false);
@@ -354,7 +282,7 @@ export default function ViewerPage() {
               </button>
               {(activeTournament || activeYear || activeBrand || activeColor) && (
                 <button
-                  onClick={() => { setActiveTournament(null); setActiveYear(null); setActiveBrand(null); setActiveColor(null); }}
+                  onClick={clearAllFilters}
                   className="text-muted hover:text-ink text-base leading-none transition-colors"
                   aria-label="Clear filters"
                   title="Clear filters"
@@ -460,7 +388,7 @@ export default function ViewerPage() {
             {/* Clear filters */}
             {(activeTournament || activeYear || activeBrand || activeColor) && (
               <button
-                onClick={() => { setActiveTournament(null); setActiveYear(null); setActiveBrand(null); setActiveColor(null); setMobileMenuOpen(false); }}
+                onClick={() => { clearAllFilters(); setMobileMenuOpen(false); }}
                 className="w-full px-4 py-2 rounded text-sm bg-dark3 text-muted hover:text-ink transition-colors"
               >
                 Clear filters
@@ -543,16 +471,16 @@ export default function ViewerPage() {
         <FilterPanel
           tournaments={uniqueTournaments}
           activeTournament={activeTournament}
-          onTournamentChange={setActiveTournament}
+          onTournamentChange={v => setFilter('tournament', v)}
           years={uniqueYears}
           activeYear={activeYear}
-          onYearChange={setActiveYear}
+          onYearChange={v => setFilter('year', v)}
           brands={uniqueBrands}
           activeBrand={activeBrand}
-          onBrandChange={setActiveBrand}
+          onBrandChange={v => setFilter('brand', v)}
           colors={uniqueColors}
           activeColor={activeColor}
-          onColorChange={setActiveColor}
+          onColorChange={v => setFilter('color', v)}
           onClose={() => setFilterPanelOpen(false)}
         />
       )}

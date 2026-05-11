@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { readStorageJson, writeStorageJson } from '../lib/storage'
 
 const STORAGE_KEY = 'serena_gallery_settings'
 
@@ -12,19 +13,14 @@ const DEFAULTS = {
 }
 
 export function useSettings() {
-  const [settings, setSettings] = useState(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY)
-      return stored ? { ...DEFAULTS, ...JSON.parse(stored) } : DEFAULTS
-    } catch {
-      return DEFAULTS
-    }
-  })
+  const [settings, setSettings] = useState(() =>
+    ({ ...DEFAULTS, ...readStorageJson(STORAGE_KEY, {}) })
+  )
 
   function updateSetting(key, value) {
     setSettings(prev => {
       const next = { ...prev, [key]: value }
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)) } catch {}
+      writeStorageJson(STORAGE_KEY, next)
       return next
     })
   }

@@ -6,6 +6,7 @@ import EditOutfitModal from '../components/admin/EditOutfitModal'
 import EntriesList     from '../components/admin/EntriesList'
 import BackfillPanel   from '../components/admin/BackfillPanel'
 import { useOutfits }  from '../hooks/useOutfits'
+import { filterByQuery } from '../lib/adminUtils'
 
 const TABS = [
   { id: 'upload',        label: 'Upload' },
@@ -16,20 +17,6 @@ const TABS = [
   { id: 'no-brand',      label: 'No Brand' },
   { id: 'search',        label: 'All Entries' },
 ]
-
-function filterByQuery(list, q) {
-  if (!q) return list
-  const lq = q.toLowerCase().trim()
-  return list.filter(o =>
-    (o.tournament ?? '').toLowerCase().includes(lq) ||
-    String(o.year ?? '').includes(lq) ||
-    (o.discipline ?? '').toLowerCase().includes(lq) ||
-    (o.round ?? '').toLowerCase().includes(lq) ||
-    (o.notes ?? '').toLowerCase().includes(lq) ||
-    (o.colors ?? []).join(' ').toLowerCase().includes(lq) ||
-    (o.brand ?? '').toLowerCase().includes(lq)
-  )
-}
 
 function TabSearch({ value, onChange }) {
   return (
@@ -156,98 +143,25 @@ function BrokenLinksPanel({ outfits, onEdit, onDelete }) {
   )
 }
 
-function NeedsColorsPanel({ outfits, onEdit, onDelete }) {
+function OutfitAuditPanel({ outfits, onEdit, onDelete, filter, countSuffix, emptyMessage, renderExtra }) {
   const [search, setSearch] = useState('')
-  const list    = outfits.filter(o => !o.colors?.length)
+  const list    = outfits.filter(filter)
   const visible = filterByQuery(list, search)
   return (
     <div className="flex flex-col gap-3">
       <TabSearch value={search} onChange={setSearch} />
       <p className="text-xs text-[#8A877F] uppercase tracking-wide">
-        {visible.length} / {list.length} without colors
+        {visible.length} / {list.length} {countSuffix}
       </p>
       {list.length === 0 ? (
-        <p className="text-[#555] text-sm">All outfits have colors assigned.</p>
-      ) : visible.length === 0 ? (
-        <p className="text-[#555] text-sm">No results.</p>
-      ) : (
-        <div className="flex flex-col gap-px">
-          {visible.map(o => <OutfitRow key={o.id} o={o} onEdit={onEdit} onDelete={onDelete} />)}
-        </div>
-      )}
-    </div>
-  )
-}
-
-function NoRoundPanel({ outfits, onEdit, onDelete }) {
-  const [search, setSearch] = useState('')
-  const list    = outfits.filter(o => !o.round)
-  const visible = filterByQuery(list, search)
-  return (
-    <div className="flex flex-col gap-3">
-      <TabSearch value={search} onChange={setSearch} />
-      <p className="text-xs text-[#8A877F] uppercase tracking-wide">
-        {visible.length} / {list.length} without round
-      </p>
-      {list.length === 0 ? (
-        <p className="text-[#555] text-sm">All outfits have a round assigned.</p>
-      ) : visible.length === 0 ? (
-        <p className="text-[#555] text-sm">No results.</p>
-      ) : (
-        <div className="flex flex-col gap-px">
-          {visible.map(o => <OutfitRow key={o.id} o={o} onEdit={onEdit} onDelete={onDelete} />)}
-        </div>
-      )}
-    </div>
-  )
-}
-
-function NoBrandPanel({ outfits, onEdit, onDelete }) {
-  const [search, setSearch] = useState('')
-  const list    = outfits.filter(o => !o.brand)
-  const visible = filterByQuery(list, search)
-  return (
-    <div className="flex flex-col gap-3">
-      <TabSearch value={search} onChange={setSearch} />
-      <p className="text-xs text-[#8A877F] uppercase tracking-wide">
-        {visible.length} / {list.length} without brand
-      </p>
-      {list.length === 0 ? (
-        <p className="text-[#555] text-sm">All outfits have a brand assigned.</p>
+        <p className="text-[#555] text-sm">{emptyMessage}</p>
       ) : visible.length === 0 ? (
         <p className="text-[#555] text-sm">No results.</p>
       ) : (
         <div className="flex flex-col gap-px">
           {visible.map(o => (
             <OutfitRow key={o.id} o={o} onEdit={onEdit} onDelete={onDelete}>
-              <p className="text-xs text-[#555] mt-0.5">{o.year}</p>
-            </OutfitRow>
-          ))}
-        </div>
-      )}
-    </div>
-  )
-}
-
-function NoCloudinaryPanel({ outfits, onEdit, onDelete }) {
-  const [search, setSearch] = useState('')
-  const list    = outfits.filter(o => !o.imageUrl?.includes('cloudinary.com'))
-  const visible = filterByQuery(list, search)
-  return (
-    <div className="flex flex-col gap-3">
-      <TabSearch value={search} onChange={setSearch} />
-      <p className="text-xs text-[#8A877F] uppercase tracking-wide">
-        {visible.length} / {list.length} without Cloudinary URL
-      </p>
-      {list.length === 0 ? (
-        <p className="text-[#555] text-sm">All outfits use Cloudinary URLs.</p>
-      ) : visible.length === 0 ? (
-        <p className="text-[#555] text-sm">No results.</p>
-      ) : (
-        <div className="flex flex-col gap-px">
-          {visible.map(o => (
-            <OutfitRow key={o.id} o={o} onEdit={onEdit} onDelete={onDelete}>
-              <p className="text-xs text-[#555] truncate mt-0.5">{o.imageUrl || '(no URL)'}</p>
+              {renderExtra?.(o)}
             </OutfitRow>
           ))}
         </div>
@@ -291,13 +205,19 @@ export default function AdminPage() {
       case 'broken':
         return <BrokenLinksPanel outfits={outfits} onEdit={setEditingOutfit} onDelete={remove} />
       case 'no-colors':
-        return <NeedsColorsPanel outfits={outfits} onEdit={setEditingOutfit} onDelete={remove} />
+        return <OutfitAuditPanel outfits={outfits} onEdit={setEditingOutfit} onDelete={remove}
+          filter={o => !o.colors?.length} countSuffix="without colors" emptyMessage="All outfits have colors assigned." />
       case 'no-cloudinary':
-        return <NoCloudinaryPanel outfits={outfits} onEdit={setEditingOutfit} onDelete={remove} />
+        return <OutfitAuditPanel outfits={outfits} onEdit={setEditingOutfit} onDelete={remove}
+          filter={o => !o.imageUrl?.includes('cloudinary.com')} countSuffix="without Cloudinary URL" emptyMessage="All outfits use Cloudinary URLs."
+          renderExtra={o => <p className="text-xs text-[#555] truncate mt-0.5">{o.imageUrl || '(no URL)'}</p>} />
       case 'no-round':
-        return <NoRoundPanel outfits={outfits} onEdit={setEditingOutfit} onDelete={remove} />
+        return <OutfitAuditPanel outfits={outfits} onEdit={setEditingOutfit} onDelete={remove}
+          filter={o => !o.round} countSuffix="without round" emptyMessage="All outfits have a round assigned." />
       case 'no-brand':
-        return <NoBrandPanel outfits={outfits} onEdit={setEditingOutfit} onDelete={remove} />
+        return <OutfitAuditPanel outfits={outfits} onEdit={setEditingOutfit} onDelete={remove}
+          filter={o => !o.brand} countSuffix="without brand" emptyMessage="All outfits have a brand assigned."
+          renderExtra={o => <p className="text-xs text-[#555] mt-0.5">{o.year}</p>} />
       case 'search':
         return (
           <EntriesList

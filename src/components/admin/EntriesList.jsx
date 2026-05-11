@@ -1,20 +1,9 @@
+import { filterByQuery } from '../../lib/adminUtils'
+
 const ROUND_ORDER = ['R1', 'R2', 'R3', 'R4', 'QF', 'SF', 'F']
 
 export default function EntriesList({ outfits, onEdit, onDelete, search = '', onSearchChange }) {
-  const q = search.toLowerCase().trim()
-
-  const filtered = outfits
-    .filter(o => {
-      if (!q) return true
-      return (
-        (o.tournament  ?? '').toLowerCase().includes(q) ||
-        String(o.year  ?? '').includes(q)               ||
-        (o.discipline  ?? '').toLowerCase().includes(q) ||
-        (o.round       ?? '').toLowerCase().includes(q) ||
-        (o.notes       ?? '').toLowerCase().includes(q) ||
-        (o.colors      ?? []).join(' ').toLowerCase().includes(q)
-      )
-    })
+  const filtered = filterByQuery(outfits, search)
     .sort((a, b) => {
       const tCmp = (a.tournament ?? '').localeCompare(b.tournament ?? '')
       if (tCmp !== 0) return tCmp
@@ -49,7 +38,7 @@ export default function EntriesList({ outfits, onEdit, onDelete, search = '', on
       {/* List */}
       {filtered.length === 0 ? (
         <p className="text-[#555] text-sm py-4">
-          {q ? 'No results.' : 'No outfits added yet.'}
+          {search.trim() ? 'No results.' : 'No outfits added yet.'}
         </p>
       ) : (
         <div className="flex flex-col gap-px">

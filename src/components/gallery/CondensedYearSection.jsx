@@ -1,17 +1,9 @@
-import { GRAND_SLAMS, NON_SLAM_ROUNDS_SINGLES, NON_SLAM_ROUNDS_DOUBLES, COLOR_MAP } from '../../lib/constants'
+import { GRAND_SLAMS } from '../../lib/constants'
 import { getCombinedSlotStatus } from '../../lib/rounds'
+import { CARD_WIDTHS, SLAM_TOURNAMENTS, isKnownForYear } from '../../lib/galleryUtils'
+import { getSortedColors } from '../../lib/colorUtils'
 import OutfitCard from './OutfitCard'
 import EmptySlot from './EmptySlot'
-
-const CARD_WIDTHS = { small: 88, standard: 128, large: 172 }
-const SLAM_TOURNAMENTS = new Set([...GRAND_SLAMS, 'Olympics'])
-
-function isKnownForYear(tournament, year) {
-  if (SLAM_TOURNAMENTS.has(tournament)) return true
-  const y = Number(year)
-  return (NON_SLAM_ROUNDS_SINGLES[tournament]?.[y] != null) ||
-         (NON_SLAM_ROUNDS_DOUBLES[tournament]?.[y] != null)
-}
 
 export default function CondensedYearSection({ year, tournaments, yearOutfits, settings, onOpenLightbox }) {
   const cardWidth = CARD_WIDTHS[settings.gridDensity] ?? 128
@@ -46,10 +38,7 @@ export default function CondensedYearSection({ year, tournaments, yearOutfits, s
     showMajorsStat ? `${majorsWithOutfits} of 4 majors` : null,
   ].filter(Boolean).join(' · ')
 
-  const colorOrder = Object.keys(COLOR_MAP)
-  const yearColors = [...new Set(yearOutfits.flatMap(o => o.colors ?? []))]
-    .filter(c => c in COLOR_MAP)
-    .sort((a, b) => colorOrder.indexOf(a) - colorOrder.indexOf(b))
+  const yearColors = getSortedColors(yearOutfits.flatMap(o => o.colors ?? []))
 
   return (
     <section id={`year-${year}`} className="mb-14">
