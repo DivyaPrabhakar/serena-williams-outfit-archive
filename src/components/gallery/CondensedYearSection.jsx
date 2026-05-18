@@ -1,4 +1,4 @@
-import { GRAND_SLAMS } from '../../lib/constants'
+import { GRAND_SLAMS, COLOR_MAP } from '../../lib/constants'
 import { getCombinedSlotStatus } from '../../lib/rounds'
 import { CARD_WIDTHS, SLAM_TOURNAMENTS, isKnownForYear } from '../../lib/galleryUtils'
 import { getSortedColors } from '../../lib/colorUtils'
