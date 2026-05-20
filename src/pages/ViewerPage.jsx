@@ -180,6 +180,17 @@ export default function ViewerPage() {
     if (idx !== -1) setLightboxIndex(idx);
   }
 
+  // ── Brand/color pre-filtered outfits for the gallery grid ─────────────────
+
+  const galleryOutfits = useMemo(() => {
+    if (!activeBrand && !activeColor) return outfits;
+    return outfits.filter(o => {
+      if (activeBrand && o.brand !== activeBrand) return false;
+      if (activeColor && !(o.colors ?? []).includes(activeColor)) return false;
+      return true;
+    });
+  }, [outfits, activeBrand, activeColor]);
+
   // ── Derived filter data ────────────────────────────────────────────────────
 
   const uniqueTournaments = useMemo(
@@ -436,7 +447,7 @@ export default function ViewerPage() {
         )}
         {!loading && !error && (
           <GalleryGrid
-            outfits={outfits}
+            outfits={galleryOutfits}
             activeTournament={activeTournament}
             activeYear={activeYear}
             settings={settings}
