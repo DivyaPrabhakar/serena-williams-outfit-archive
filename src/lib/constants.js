@@ -108,7 +108,7 @@ export const NON_SLAM_EXPLICIT_ROUNDS_SINGLES = {
 // Same as NON_SLAM_EXPLICIT_ROUNDS_SINGLES but for Doubles.
 export const NON_SLAM_EXPLICIT_ROUNDS_DOUBLES = {
   'Indian Wells / Evert Cup': { 1999: [1, 2, 5, 6] }, // R1,R2,QF,SF — no R3/R4 in draw
-  'Eastbourne International': { 2022: [1, 5, 6] },    // R1,QF,SF — small draw, no R2/R3/R4
+  'Eastbourne Tournament': { 2022: [1, 5, 6] },        // R1,QF,SF — small draw, no R2/R3/R4
 }
 
 export const NON_SLAM_ROUNDS_SINGLES = {
@@ -128,7 +128,7 @@ export const NON_SLAM_ROUNDS_DOUBLES = {
   'Indian Wells / Evert Cup':          { 1999: 4 },
   'Lipton Championships / Miami Open': { 1999: 3 },
   'Fed Cup / Billie Jean King Cup':    { 1999: 4 },
-  'Eastbourne International':          { 2022: 3 },
+  'Eastbourne Tournament':             { 2022: 3 },
 }
 
 // ── Outfit brands ─────────────────────────────────────────────────────────
