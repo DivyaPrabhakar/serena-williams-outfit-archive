@@ -102,14 +102,16 @@ export const NON_SLAM_EXPLICIT_ROUNDS_SINGLES = {
   'Open Gaz de France':                { 1999: [1, 2, 5, 6, 7] },    // R1,R2,QF,SF,F — no R3/R4 in draw
   'Italian Open':                      { 1998: [1, 2, 3, 5], 1999: [2, 3, 5] }, // 1998: R1,R2,R3,QF — no R4; 1999: R2,R3,QF — seeded bye R1, no R4
   'Grand Slam Cup':                    { 1999: [5, 6, 7] },           // QF,SF,F — top-8 invitational starts at QF
-  'Porsche Tennis Grand Prix':         { 1999: [2] },                 // R2 only — seeded bye in R1
+  'Porsche Tennis Grand Prix':         { 1999: [2], 2007: [1, 2, 5], 2008: [2] }, // 1999/2008: R2 only — seeded bye; 2007: R1,R2,QF — no R3/R4
   'Yarra Valley Classic':              { 2021: [2, 3, 5] },           // R2,R3,QF — seeded bye R1, no R4; withdrew SF (shoulder)
 }
 
 // Same as NON_SLAM_EXPLICIT_ROUNDS_SINGLES but for Doubles.
 export const NON_SLAM_EXPLICIT_ROUNDS_DOUBLES = {
   'Indian Wells / Evert Cup': { 1999: [1, 2, 5, 6] }, // R1,R2,QF,SF — no R3/R4 in draw
-  'Eastbourne Tournament': { 2022: [1, 5, 6] },        // R1,QF,SF — small draw, no R2/R3/R4
+  'Eastbourne Tournament':           { 2022: [1, 5, 6] }, // R1,QF,SF — small draw, no R2/R3/R4
+  'Porsche Tennis Grand Prix':       { 2008: [1, 5] },   // R1,QF — no R2/R3/R4 in draw
+  'Fed Cup / Billie Jean King Cup':  { 1999: [1, 5, 6] }, // R1,QF,SF — no R2/R3/R4 in draw
 }
 
 export const NON_SLAM_ROUNDS_SINGLES = {
@@ -120,7 +122,7 @@ export const NON_SLAM_ROUNDS_SINGLES = {
   'Open Gaz de France':                { 1999: 5 },
   'Italian Open':                      { 1998: 4, 1999: 3 },
   'Grand Slam Cup':                    { 1999: 3 },
-  'Porsche Tennis Grand Prix':         { 1999: 1 },
+  'Porsche Tennis Grand Prix':         { 1999: 1, 2007: 3, 2008: 1 },
   'Western & Southern Open':           { 2022: 1 },
   'National Bank Open':                { 2022: 2 },
   'Yarra Valley Classic':              { 2021: 3 },
@@ -129,8 +131,9 @@ export const NON_SLAM_ROUNDS_SINGLES = {
 export const NON_SLAM_ROUNDS_DOUBLES = {
   'Indian Wells / Evert Cup':          { 1999: 4 },
   'Lipton Championships / Miami Open': { 1999: 3 },
-  'Fed Cup / Billie Jean King Cup':    { 1999: 4 },
+  'Fed Cup / Billie Jean King Cup':    { 1999: 3 },
   'Eastbourne Tournament':             { 2022: 3 },
+  'Porsche Tennis Grand Prix':         { 2008: 2 },
 }
 
 // ── Outfit brands ─────────────────────────────────────────────────────────
