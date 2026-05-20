@@ -97,10 +97,10 @@ export const MIXED_NOT_HELD = {
 export const NON_SLAM_EXPLICIT_ROUNDS_SINGLES = {
   'Indian Wells / Evert Cup':          { 1999: [1, 2, 3, 5, 6, 7] }, // R1,R2,R3,QF,SF,F — no R4 in 96-draw
   'Lipton Championships / Miami Open': { 1999: [2, 3, 4, 5, 6, 7] }, // top seeds received bye through R1
-  'Sydney International':              { 1998: [1, 2, 5, 6] },        // R1,R2,QF,SF — no R3/R4 in draw
+  'Adidas International Sydney':              { 1998: [1, 2, 5, 6] },        // R1,R2,QF,SF — no R3/R4 in draw
   'Acura Classic':                     { 1998: [1, 2, 5], 1999: [1, 2, 5, 6, 7] }, // 1998: R1,R2,QF; 1999: R1,R2,QF,SF,F
   'Open Gaz de France':                { 1999: [1, 2, 5, 6, 7] },    // R1,R2,QF,SF,F — no R3/R4 in draw
-  'Italian Open':                      { 1999: [2, 3, 5] },           // R2,R3,QF — seeded bye R1, no R4
+  'Italian Open':                      { 1998: [1, 2, 3, 5], 1999: [2, 3, 5] }, // 1998: R1,R2,R3,QF — no R4; 1999: R2,R3,QF — seeded bye R1, no R4
   'Grand Slam Cup':                    { 1999: [5, 6, 7] },           // QF,SF,F — top-8 invitational starts at QF
   'Porsche Tennis Grand Prix':         { 1999: [2] },                 // R2 only — seeded bye in R1
   'Yarra Valley Classic':              { 2021: [2, 3, 5] },           // R2,R3,QF — seeded bye R1, no R4; withdrew SF (shoulder)
@@ -115,10 +115,10 @@ export const NON_SLAM_EXPLICIT_ROUNDS_DOUBLES = {
 export const NON_SLAM_ROUNDS_SINGLES = {
   'Indian Wells / Evert Cup':          { 1999: 6 },
   'Lipton Championships / Miami Open': { 1998: 5, 1999: 6 },
-  'Sydney International':              { 1998: 4, 1999: 2 },
+  'Adidas International Sydney':              { 1998: 4, 1999: 2 },
   'Acura Classic':                     { 1998: 3, 1999: 5 },
   'Open Gaz de France':                { 1999: 5 },
-  'Italian Open':                      { 1999: 3 },
+  'Italian Open':                      { 1998: 4, 1999: 3 },
   'Grand Slam Cup':                    { 1999: 3 },
   'Porsche Tennis Grand Prix':         { 1999: 1 },
   'Western & Southern Open':           { 2022: 1 },
