@@ -28,9 +28,7 @@ export default function ViewerPage() {
   const [filterPanelOpen, setFilterPanelOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const [mode, setMode] = useState(() =>
-    readStorage("serena_viewer_mode", "condensed"),
-  );
+  const [mode, setMode] = useState("condensed");
   const [panelOpen, setPanelOpen] = useState(
     () => readStorage(`serena_hunt_panel_condensed`, "false") === "true",
   );
@@ -40,10 +38,8 @@ export default function ViewerPage() {
   const { settings, updateSetting } = useSettings();
   const highlightTimerRef = useRef(null);
 
-  // Persist mode; restore per-mode panel state when mode changes
   function switchMode(m) {
     setMode(m);
-    writeStorage("serena_viewer_mode", m);
     setPanelOpen(readStorage(`serena_hunt_panel_${m}`, "false") === "true");
   }
 
