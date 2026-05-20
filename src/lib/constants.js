@@ -103,7 +103,7 @@ export const NON_SLAM_EXPLICIT_ROUNDS_SINGLES = {
   'Italian Open':                      { 1999: [2, 3, 5] },           // R2,R3,QF — seeded bye R1, no R4
   'Grand Slam Cup':                    { 1999: [5, 6, 7] },           // QF,SF,F — top-8 invitational starts at QF
   'Porsche Tennis Grand Prix':         { 1999: [2] },                 // R2 only — seeded bye in R1
-  'Yarra Valley Classic':              { 2021: [2, 3, 5, 6] },        // R2,R3,QF,SF — seeded bye R1, no R4
+  'Yarra Valley Classic':              { 2021: [2, 3, 5] },           // R2,R3,QF — seeded bye R1, no R4; withdrew SF (shoulder)
 }
 
 // Same as NON_SLAM_EXPLICIT_ROUNDS_SINGLES but for Doubles.
@@ -123,7 +123,7 @@ export const NON_SLAM_ROUNDS_SINGLES = {
   'Porsche Tennis Grand Prix':         { 1999: 1 },
   'Western & Southern Open':           { 2022: 1 },
   'National Bank Open':                { 2022: 2 },
-  'Yarra Valley Classic':              { 2021: 4 },
+  'Yarra Valley Classic':              { 2021: 3 },
 }
 
 export const NON_SLAM_ROUNDS_DOUBLES = {
