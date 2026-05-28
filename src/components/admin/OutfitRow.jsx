@@ -1,12 +1,20 @@
+import { isGettyEmbed } from '../../lib/imageUtils'
+
 export default function OutfitRow({ o, onEdit, onDelete, children }) {
   return (
     <div className="flex items-center gap-3 px-3 py-2.5 bg-[#111]">
-      <img
-        src={o.imageUrl}
-        alt=""
-        className="w-10 h-14 object-cover flex-shrink-0 bg-[#222]"
-        onError={e => { e.target.style.opacity = '0.2' }}
-      />
+      {isGettyEmbed(o.imageUrl) ? (
+        <div className="w-10 h-14 flex-shrink-0 bg-[#1e1e1e] flex items-center justify-center">
+          <span className="text-[8px] text-[#555] uppercase tracking-wide">Getty</span>
+        </div>
+      ) : (
+        <img
+          src={o.imageUrl}
+          alt=""
+          className="w-10 h-14 object-cover flex-shrink-0 bg-[#222]"
+          onError={e => { e.target.style.opacity = '0.2' }}
+        />
+      )}
       <div className="flex-1 min-w-0">
         <p className="text-sm text-[#F0EDE6] truncate">
           {o.year} {o.tournament}

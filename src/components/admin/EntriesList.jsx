@@ -1,4 +1,5 @@
 import { filterByQuery } from '../../lib/adminUtils'
+import { isGettyEmbed } from '../../lib/imageUtils'
 
 const ROUND_ORDER = ['R1', 'R2', 'R3', 'R4', 'QF', 'SF', 'F']
 
@@ -48,12 +49,18 @@ export default function EntriesList({ outfits, onEdit, onDelete, search = '', on
               className="flex items-center gap-3 bg-[#1A1A1A] px-3 py-2.5"
             >
               {/* Thumbnail */}
-              <img
-                src={o.imageUrl}
-                alt=""
-                className="w-10 h-14 object-cover flex-shrink-0 bg-[#111]"
-                onError={e => { e.target.style.background = '#222' }}
-              />
+              {isGettyEmbed(o.imageUrl) ? (
+                <div className="w-10 h-14 flex-shrink-0 bg-[#1e1e1e] flex items-center justify-center">
+                  <span className="text-[8px] text-[#555] uppercase tracking-wide">Getty</span>
+                </div>
+              ) : (
+                <img
+                  src={o.imageUrl}
+                  alt=""
+                  className="w-10 h-14 object-cover flex-shrink-0 bg-[#111]"
+                  onError={e => { e.target.style.background = '#222' }}
+                />
+              )}
 
               {/* Info */}
               <div className="flex-1 min-w-0">
