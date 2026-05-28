@@ -28,11 +28,11 @@ export default function Lightbox({ outfits, index, onNavigate, onClose }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-dark/90 flex items-center justify-center p-4 md:p-8"
+      className="fixed inset-0 z-50 bg-dark/90 flex items-center justify-center p-2 md:p-4"
       onClick={onClose}
     >
       <div
-        className="flex flex-col md:flex-row w-full max-w-5xl max-h-[90vh] bg-dark2 rounded-xl overflow-hidden shadow-2xl"
+        className="flex flex-col md:flex-row w-full max-w-5xl max-h-[95vh] bg-dark2 rounded-xl overflow-hidden shadow-2xl"
         onClick={e => e.stopPropagation()}
       >
         {/* Image */}
@@ -40,7 +40,7 @@ export default function Lightbox({ outfits, index, onNavigate, onClose }) {
           {isGettyEmbed(outfit.imageUrl) ? (
             <iframe
               key={outfit.id}
-              srcDoc={`<!DOCTYPE html><html><head><style>body{margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:16px;box-sizing:border-box}</style></head><body>${outfit.imageUrl}</body></html>`}
+              srcDoc={`<!DOCTYPE html><html><head><style>html,body{margin:0;height:100%;overflow:hidden;background:#000}body{display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box}</style></head><body>${outfit.imageUrl}</body></html>`}
               title={`${outfit.tournament} ${outfit.year}`}
               className="w-full h-full border-0"
               sandbox="allow-scripts allow-same-origin"
