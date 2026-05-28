@@ -50,9 +50,12 @@ export default function EntriesList({ outfits, onEdit, onDelete, search = '', on
             >
               {/* Thumbnail */}
               {isGettyEmbed(o.imageUrl) ? (
-                <div className="w-10 h-14 flex-shrink-0 bg-[#1e1e1e] flex items-center justify-center">
-                  <span className="text-[8px] text-[#555] uppercase tracking-wide">Getty</span>
-                </div>
+                <iframe
+                  srcDoc={`<!DOCTYPE html><html><head><style>html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#111}body{display:flex;align-items:center;justify-content:center}</style></head><body>${o.imageUrl}</body></html>`}
+                  className="w-10 h-14 flex-shrink-0 border-0 pointer-events-none"
+                  sandbox="allow-scripts allow-same-origin"
+                  loading="lazy"
+                />
               ) : (
                 <img
                   src={o.imageUrl}
