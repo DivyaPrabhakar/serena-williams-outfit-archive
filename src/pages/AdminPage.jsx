@@ -49,7 +49,7 @@ export default function AdminPage() {
   if (!adminToken) return <AdminLogin onSuccess={setAdminToken} />
 
   const renderTab = () => {
-    if (loading) return <p className="text-[#555] text-sm">Loading…</p>
+    if (loading && outfits.length === 0) return <p className="text-[#555] text-sm">Loading…</p>
     switch (tab) {
       case 'upload':
         return <AddOutfitForm onAdd={insert} outfits={outfits} />
