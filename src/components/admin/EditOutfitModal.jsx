@@ -1,34 +1,25 @@
-import { useState, useCallback, useMemo, useEffect, useRef } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import {
   GRAND_SLAMS, OLYMPICS_YEARS, ROUND_SEQUENCE, COLOR_MAP, OUTFIT_BRANDS,
 } from '../../lib/constants'
 import { getValidRounds, getRoundsForSlot } from '../../lib/rounds'
 import { PickerBtn, FieldLabel, InlineError } from './adminFormPrimitives'
+import { isGettyEmbed } from './AddOutfitForm'
 
 const MIXED_SLAMS = ['Australian Open', 'Roland Garros', 'Wimbledon', 'US Open']
 const COLORS      = Object.keys(COLOR_MAP)
 
-const CL_CLOUD  = 'djkgbl2kx'
-const CL_PRESET = 'serena_williams-fitdex'
-const CL_PREFIX = `https://res.cloudinary.com/${CL_CLOUD}/`
+const BLOCKED_DOMAINS = ['facebook.com', 'fb.com', 'fbcdn.net', 'instagram.com', 'cdninstagram.com', 'instagr.am']
 
-async function uploadToCloudinary(file, publicId) {
-  const cloudName = CL_CLOUD
-  const preset    = CL_PRESET
-  const fd = new FormData()
-  fd.append('file', file)
-  fd.append('upload_preset', preset)
-  if (publicId) fd.append('public_id', publicId)
-  const res  = await fetch(
-    `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
-    { method: 'POST', body: fd },
-  )
-  const data = await res.json()
-  if (!data.secure_url) throw new Error('Upload failed')
-  return data.secure_url
+function isBlockedUrl(url) {
+  try {
+    const host = new URL(url).hostname
+    return BLOCKED_DOMAINS.some(d => host === d || host.endsWith('.' + d))
+  } catch {
+    return false
+  }
 }
 
-// Determine if a tournament value is "Other" (not a slam or Olympics)
 function isOtherTournament(t) {
   return t && !GRAND_SLAMS.includes(t) && t !== 'Olympics'
 }
@@ -36,10 +27,9 @@ function isOtherTournament(t) {
 export default function EditOutfitModal({ outfit, onSave, onClose }) {
   // Initialise all state from the outfit prop (component is keyed by outfit.id)
   const isOther  = isOtherTournament(outfit.tournament)
-  const [imageFile,       setImageFile]       = useState(null)
-  const [cloudinaryUrl,   setCloudinaryUrl]   = useState(outfit.imageUrl?.startsWith(CL_PREFIX) ? outfit.imageUrl : '')
-  const [previewSrc,      setPreviewSrc]      = useState(outfit.imageUrl    ?? '')
-  const [dragging,        setDragging]        = useState(false)
+  const existingIsGetty = isGettyEmbed(outfit.imageUrl)
+  const [gettyEmbed,      setGettyEmbedState] = useState(existingIsGetty ? (outfit.imageUrl ?? '') : '')
+  const [imageUrl,        setImageUrlState]   = useState(!existingIsGetty ? (outfit.imageUrl ?? '') : '')
   const [year,            setYear]            = useState(String(outfit.year ?? ''))
   const [tournament,      setTournament]      = useState(isOther ? 'Other' : (outfit.tournament ?? ''))
   const [otherTournament, setOtherTournament] = useState(isOther ? outfit.tournament : '')
@@ -49,10 +39,8 @@ export default function EditOutfitModal({ outfit, onSave, onClose }) {
   const [notes,           setNotes]           = useState(outfit.notes       ?? '')
   const [focalPoint,      setFocalPoint]      = useState(outfit.focal_point ?? 'center')
   const [brand,           setBrand]           = useState(outfit.brand       ?? null)
-  const [uploading,       setUploading]       = useState(false)
   const [saving,          setSaving]          = useState(false)
   const [errors,          setErrors]          = useState({})
-  const fileRef = useRef(null)
 
   const yearNum             = parseInt(year) || 0
   const effectiveTournament = tournament === 'Other' ? otherTournament.trim() : tournament
@@ -89,32 +77,29 @@ export default function EditOutfitModal({ outfit, onSave, onClose }) {
     if (round && validRounds.length > 0 && !validRounds.includes(round)) setRound('')
   }, [validRounds])
 
-  const handleFile = useCallback((file) => {
-    if (!file?.type.startsWith('image/')) return
-    setImageFile(file)
-    setPreviewSrc(URL.createObjectURL(file))
-    setCloudinaryUrl('')
-    setErrors(prev => ({ ...prev, image: undefined, cloudinaryUrl: undefined }))
-  }, [])
+  const handleGettyEmbed = (val) => {
+    setGettyEmbedState(val)
+    if (val.trim()) setImageUrlState('')
+    setErrors(prev => ({ ...prev, image: undefined, imageUrl: undefined }))
+  }
 
-  const handleCloudinaryUrl = (url) => {
-    const trimmed = url.trim()
-    setCloudinaryUrl(url)
-    setPreviewSrc(trimmed ? trimmed : previewSrc)
-    if (trimmed) setImageFile(null)
-    setErrors(prev => ({ ...prev, image: undefined, cloudinaryUrl: undefined }))
+  const handleImageUrl = (url) => {
+    setImageUrlState(url)
+    if (url.trim()) setGettyEmbedState('')
+    setErrors(prev => ({ ...prev, image: undefined, imageUrl: undefined }))
   }
 
   const validate = () => {
     const e = {}
-    if (!previewSrc && !cloudinaryUrl.trim())              e.image        = 'Image is required'
-    if (cloudinaryUrl.trim() && !cloudinaryUrl.trim().startsWith(CL_PREFIX))
-                                                           e.cloudinaryUrl = `URL must start with ${CL_PREFIX}`
-    if (!year || !yearNum)                                 e.year       = 'Year is required'
-    if (!tournament)                                       e.tournament = 'Tournament is required'
+    const hasGetty = !!gettyEmbed.trim()
+    const hasUrl   = !!imageUrl.trim()
+    if (!hasGetty && !hasUrl)                 e.image    = 'Image is required'
+    if (hasUrl && isBlockedUrl(imageUrl.trim())) e.imageUrl = 'Facebook and Instagram links are not supported'
+    if (!year || !yearNum)                    e.year       = 'Year is required'
+    if (!tournament)                          e.tournament = 'Tournament is required'
     if (tournament === 'Other' && !otherTournament.trim()) e.tournament = 'Tournament name is required'
-    if (!discipline)                                       e.discipline = 'Discipline is required'
-    if (!round)                                            e.round      = 'Round is required'
+    if (!discipline)                          e.discipline = 'Discipline is required'
+    if (!round)                               e.round      = 'Round is required'
     return e
   }
 
@@ -126,17 +111,7 @@ export default function EditOutfitModal({ outfit, onSave, onClose }) {
     setErrors({})
 
     try {
-      let finalUrl = outfit.imageUrl
-      if (cloudinaryUrl.trim()) {
-        finalUrl = cloudinaryUrl.trim()
-      } else if (imageFile) {
-        setUploading(true)
-        const publicId = [yearNum, effectiveTournament, discipline, round]
-          .join('_')
-          .replace(/\s+/g, '_')
-        finalUrl = await uploadToCloudinary(imageFile, publicId)
-        setUploading(false)
-      }
+      const finalUrl = gettyEmbed.trim() || imageUrl.trim() || outfit.imageUrl
 
       await onSave({
         ...outfit,
@@ -155,7 +130,6 @@ export default function EditOutfitModal({ outfit, onSave, onClose }) {
       setErrors({ submit: err.message })
     } finally {
       setSaving(false)
-      setUploading(false)
     }
   }
 
@@ -187,46 +161,54 @@ export default function EditOutfitModal({ outfit, onSave, onClose }) {
         <div className="flex flex-col gap-6 p-6">
 
           {/* Image */}
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-3">
             <FieldLabel>Image</FieldLabel>
-            <div
-              role="button"
-              tabIndex={0}
-              onKeyDown={e => e.key === 'Enter' && fileRef.current?.click()}
-              className={`border-2 border-dashed transition-colors cursor-pointer flex items-center justify-center min-h-28 ${
-                dragging ? 'border-[#C9A84C] bg-[#C9A84C]/5' : 'border-[#2a2a2a] hover:border-[#444]'
-              }`}
-              onDragOver={e  => { e.preventDefault(); setDragging(true)  }}
-              onDragLeave={() => setDragging(false)}
-              onDrop={e => { e.preventDefault(); setDragging(false); handleFile(e.dataTransfer.files[0]) }}
-              onClick={() => fileRef.current?.click()}
-            >
-              <input
-                ref={fileRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={e => handleFile(e.target.files[0])}
+
+            {/* Getty embed */}
+            <div className="flex flex-col gap-1.5">
+              <FieldLabel>Getty Embed Code</FieldLabel>
+              <textarea
+                value={gettyEmbed}
+                onChange={e => handleGettyEmbed(e.target.value)}
+                placeholder="Paste the embed code from Getty Images…"
+                rows={4}
+                className="w-full bg-[#0D0D0D] border border-[#333] text-[#F0EDE6] px-3 py-2 text-sm outline-none focus:border-[#C9A84C] placeholder-[#3a3a3a] resize-y font-mono"
               />
-              {previewSrc ? (
-                <img src={previewSrc} alt="Preview" className="max-h-40 max-w-full object-contain p-2" />
-              ) : (
-                <p className="text-[#555] text-sm px-4 text-center">
-                  Drag &amp; drop or click to replace image
+              {gettyEmbed.trim() && (
+                <p className="text-xs text-[#8A877F]">
+                  Getty embed detected
+                  {(() => { const m = gettyEmbed.match(/items:'(\d+)'/) ; return m ? ` — asset #${m[1]}` : '' })()}
                 </p>
               )}
             </div>
-            {/* Cloudinary URL input */}
+
+            {/* Divider */}
+            <div className="flex items-center gap-3">
+              <div className="flex-1 border-t border-[#2a2a2a]" />
+              <span className="text-[10px] text-[#3a3a3a] uppercase tracking-wider">or</span>
+              <div className="flex-1 border-t border-[#2a2a2a]" />
+            </div>
+
+            {/* Direct image URL */}
             <div className="flex flex-col gap-1.5">
-              <FieldLabel>Or paste a Cloudinary URL</FieldLabel>
+              <FieldLabel>Image URL</FieldLabel>
               <input
                 type="url"
-                value={cloudinaryUrl}
-                onChange={e => handleCloudinaryUrl(e.target.value)}
-                placeholder={`${CL_PREFIX}…`}
+                value={imageUrl}
+                onChange={e => handleImageUrl(e.target.value)}
+                placeholder="https://… (from a news or sports site)"
                 className="w-full bg-[#0D0D0D] border border-[#333] text-[#F0EDE6] px-3 py-2 text-sm outline-none focus:border-[#C9A84C] placeholder-[#3a3a3a]"
               />
-              <InlineError msg={errors.cloudinaryUrl} />
+              <p className="text-[10px] text-[#3a3a3a]">Facebook and Instagram links are not supported</p>
+              <InlineError msg={errors.imageUrl} />
+              {imageUrl.trim() && !isBlockedUrl(imageUrl.trim()) && (
+                <img
+                  src={imageUrl.trim()}
+                  alt="Preview"
+                  className="max-h-40 max-w-full object-contain border border-[#2a2a2a] bg-[#111]"
+                  onError={e => { e.target.style.display = 'none' }}
+                />
+              )}
             </div>
 
             <InlineError msg={errors.image} />
@@ -402,7 +384,7 @@ export default function EditOutfitModal({ outfit, onSave, onClose }) {
             disabled={saving}
             className="flex-1 bg-[#C9A84C] text-[#0D0D0D] font-medium text-sm py-2.5 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
           >
-            {uploading ? 'Uploading…' : saving ? 'Saving…' : 'Save Changes'}
+            {saving ? 'Saving…' : 'Save Changes'}
           </button>
         </div>
       </div>

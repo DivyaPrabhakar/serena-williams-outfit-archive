@@ -1,7 +1,9 @@
 import { COLOR_MAP, ROUND_LABELS } from '../../lib/constants'
+import { isGettyEmbed } from '../admin/AddOutfitForm'
 
 export default function OutfitCard({ outfit, settings, onClick }) {
   const colors = outfit.colors ?? []
+  const getty  = isGettyEmbed(outfit.imageUrl)
 
   const label =
     settings.cardLabel === 'notes' && outfit.notes
@@ -27,13 +29,19 @@ export default function OutfitCard({ outfit, settings, onClick }) {
         }`}
         onClick={settings.lightbox ? onClick : undefined}
       >
-        <img
-          src={outfit.imageUrl}
-          alt={label}
-          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.04]"
-          style={{ objectPosition: outfit.focal_point === 'left' ? 'left center' : outfit.focal_point === 'right' ? 'right center' : 'center center' }}
-          loading="lazy"
-        />
+        {getty ? (
+          <div className="w-full h-full flex flex-col items-center justify-center gap-1 bg-[#111]">
+            <span className="text-[10px] uppercase tracking-widest text-[#444]">Getty Image</span>
+          </div>
+        ) : (
+          <img
+            src={outfit.imageUrl}
+            alt={label}
+            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.04]"
+            style={{ objectPosition: outfit.focal_point === 'left' ? 'left center' : outfit.focal_point === 'right' ? 'right center' : 'center center' }}
+            loading="lazy"
+          />
+        )}
         <div className="absolute inset-0 bg-dark/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-2">
           <p className="text-xs text-ink leading-tight line-clamp-3">{label}</p>
         </div>

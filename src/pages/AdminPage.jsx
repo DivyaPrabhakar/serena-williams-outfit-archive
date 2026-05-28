@@ -7,15 +7,16 @@ import EntriesList     from '../components/admin/EntriesList'
 import BackfillPanel   from '../components/admin/BackfillPanel'
 import { useOutfits }  from '../hooks/useOutfits'
 import { filterByQuery } from '../lib/adminUtils'
+import { isGettyEmbed } from '../components/admin/AddOutfitForm'
 
 const TABS = [
-  { id: 'upload',        label: 'Upload' },
-  { id: 'broken',        label: 'Broken Links' },
-  { id: 'no-colors',     label: 'Needs Colors' },
-  { id: 'no-cloudinary', label: 'No Cloudinary URL' },
-  { id: 'no-round',      label: 'No Round' },
-  { id: 'no-brand',      label: 'No Brand' },
-  { id: 'search',        label: 'All Entries' },
+  { id: 'upload',    label: 'Upload' },
+  { id: 'broken',    label: 'Broken Links' },
+  { id: 'no-colors', label: 'Needs Colors' },
+  { id: 'no-image',  label: 'No Image' },
+  { id: 'no-round',  label: 'No Round' },
+  { id: 'no-brand',  label: 'No Brand' },
+  { id: 'search',    label: 'All Entries' },
 ]
 
 function TabSearch({ value, onChange }) {
@@ -32,6 +33,7 @@ function TabSearch({ value, onChange }) {
 
 function checkImageUrl(url) {
   if (!url) return Promise.resolve(false)
+  if (isGettyEmbed(url)) return Promise.resolve(true)
   return new Promise(resolve => {
     const img = new Image()
     img.onload  = () => resolve(true)
@@ -207,10 +209,10 @@ export default function AdminPage() {
       case 'no-colors':
         return <OutfitAuditPanel outfits={outfits} onEdit={setEditingOutfit} onDelete={remove}
           filter={o => !o.colors?.length} countSuffix="without colors" emptyMessage="All outfits have colors assigned." />
-      case 'no-cloudinary':
+      case 'no-image':
         return <OutfitAuditPanel outfits={outfits} onEdit={setEditingOutfit} onDelete={remove}
-          filter={o => !o.imageUrl?.includes('cloudinary.com')} countSuffix="without Cloudinary URL" emptyMessage="All outfits use Cloudinary URLs."
-          renderExtra={o => <p className="text-xs text-[#555] truncate mt-0.5">{o.imageUrl || '(no URL)'}</p>} />
+          filter={o => !o.imageUrl} countSuffix="without any image" emptyMessage="All outfits have images."
+          renderExtra={o => <p className="text-xs text-[#555] truncate mt-0.5">{o.imageUrl || '(no image)'}</p>} />
       case 'no-round':
         return <OutfitAuditPanel outfits={outfits} onEdit={setEditingOutfit} onDelete={remove}
           filter={o => !o.round} countSuffix="without round" emptyMessage="All outfits have a round assigned." />

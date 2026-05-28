@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import {
   GRAND_SLAMS, OLYMPICS_YEARS, ROUND_SEQUENCE, COLOR_MAP, OUTFIT_BRANDS,
 } from '../../lib/constants'
@@ -8,48 +8,39 @@ import { PickerBtn, FieldLabel, InlineError } from './adminFormPrimitives'
 const MIXED_SLAMS = ['Australian Open', 'Roland Garros', 'Wimbledon', 'US Open']
 const COLORS      = Object.keys(COLOR_MAP)
 
-const CL_CLOUD  = 'djkgbl2kx'
-const CL_PRESET = 'serena_williams-fitdex'
-const CL_PREFIX = `https://res.cloudinary.com/${CL_CLOUD}/`
+const BLOCKED_DOMAINS = ['facebook.com', 'fb.com', 'fbcdn.net', 'instagram.com', 'cdninstagram.com', 'instagr.am']
 
-async function uploadToCloudinary(file, publicId) {
-  const cloudName = CL_CLOUD
-  const preset    = CL_PRESET
-  const fd = new FormData()
-  fd.append('file', file)
-  fd.append('upload_preset', preset)
-  if (publicId) fd.append('public_id', publicId)
-  const res  = await fetch(
-    `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
-    { method: 'POST', body: fd },
-  )
-  const data = await res.json()
-  if (!data.secure_url) throw new Error('Cloudinary upload failed')
-  return data.secure_url
+function isBlockedUrl(url) {
+  try {
+    const host = new URL(url).hostname
+    return BLOCKED_DOMAINS.some(d => host === d || host.endsWith('.' + d))
+  } catch {
+    return false
+  }
+}
+
+export function isGettyEmbed(val) {
+  return typeof val === 'string' && val.trimStart().startsWith('<') && val.includes('gettyimages')
 }
 
 const EMPTY = {
-  imageFile:     null,
-  cloudinaryUrl: '',
-  previewSrc:    '',
-  focal_point:   'center',
-  year:          '',
-  tournament:    '',
+  gettyEmbed:      '',
+  imageUrl:        '',
+  focal_point:     'center',
+  year:            '',
+  tournament:      '',
   otherTournament: '',
-  discipline:    '',
-  round:         '',
-  colors:        [],
-  notes:         '',
-  brand:         null,
+  discipline:      '',
+  round:           '',
+  colors:          [],
+  notes:           '',
+  brand:           null,
 }
 
 export default function AddOutfitForm({ onAdd, outfits = [] }) {
   const [f,          setF]          = useState(EMPTY)
-  const [dragging,   setDragging]   = useState(false)
-  const [uploading,  setUploading]  = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [errors,     setErrors]     = useState({})
-  const fileRef = useRef(null)
 
   const set = (key, val) => setF(prev => ({ ...prev, [key]: val }))
 
@@ -78,17 +69,6 @@ export default function AddOutfitForm({ onAdd, outfits = [] }) {
     return max > 0 ? ROUND_SEQUENCE.slice(0, max) : ROUND_SEQUENCE
   }, [f.discipline, effectiveTournament, yearNum])
 
-  // How many entries already exist for this exact slot (used to number new uploads)
-  const slotCount = useMemo(() => {
-    if (!yearNum || !effectiveTournament || !f.discipline || !f.round) return 0
-    return outfits.filter(o =>
-      o.year       === yearNum             &&
-      o.tournament === effectiveTournament &&
-      o.discipline === f.discipline        &&
-      o.round      === f.round
-    ).length
-  }, [outfits, yearNum, effectiveTournament, f.discipline, f.round])
-
   useEffect(() => {
     if (f.discipline === 'Mixed' && f.tournament === 'Olympics') set('discipline', '')
   }, [f.tournament])
@@ -98,38 +78,26 @@ export default function AddOutfitForm({ onAdd, outfits = [] }) {
   }, [validRounds])
 
   // ── Image handlers ──────────────────────────────────────────────────────
-  const handleFile = useCallback((file) => {
-    if (!file?.type.startsWith('image/')) return
-    setF(prev => ({
-      ...prev,
-      imageFile:     file,
-      previewSrc:    URL.createObjectURL(file),
-      cloudinaryUrl: '',
-    }))
-    setErrors(prev => ({ ...prev, image: undefined, cloudinaryUrl: undefined }))
-  }, [])
+  const handleGettyEmbed = (val) => {
+    setF(prev => ({ ...prev, gettyEmbed: val, imageUrl: val.trim() ? '' : prev.imageUrl }))
+    setErrors(prev => ({ ...prev, image: undefined, imageUrl: undefined }))
+  }
 
-  const handleCloudinaryUrl = (url) => {
-    const trimmed = url.trim()
-    setF(prev => ({
-      ...prev,
-      cloudinaryUrl: url,
-      previewSrc:    trimmed ? trimmed : prev.previewSrc,
-      imageFile:     trimmed ? null    : prev.imageFile,
-    }))
-    setErrors(prev => ({ ...prev, image: undefined, cloudinaryUrl: undefined }))
+  const handleImageUrl = (url) => {
+    setF(prev => ({ ...prev, imageUrl: url, gettyEmbed: url.trim() ? '' : prev.gettyEmbed }))
+    setErrors(prev => ({ ...prev, image: undefined, imageUrl: undefined }))
   }
 
   // ── Validation ───────────────────────────────────────────────────────────
   const validate = () => {
     const e = {}
-    const hasFile = !!f.imageFile
-    const hasCl   = !!f.cloudinaryUrl.trim()
+    const hasGetty = !!f.gettyEmbed.trim()
+    const hasUrl   = !!f.imageUrl.trim()
 
-    if (!hasFile && !hasCl) {
-      e.image = 'Image is required — upload a file or paste a Cloudinary URL'
-    } else if (hasCl && !f.cloudinaryUrl.trim().startsWith(CL_PREFIX)) {
-      e.cloudinaryUrl = `URL must start with ${CL_PREFIX}`
+    if (!hasGetty && !hasUrl) {
+      e.image = 'Image is required — paste a Getty embed code or an image URL'
+    } else if (hasUrl && isBlockedUrl(f.imageUrl.trim())) {
+      e.imageUrl = 'Facebook and Instagram links are not supported (images time out)'
     }
 
     if (!f.year || !yearNum)    e.year       = 'Year is required'
@@ -151,21 +119,7 @@ export default function AddOutfitForm({ onAdd, outfits = [] }) {
     setErrors({})
 
     try {
-      let finalUrl
-
-      if (f.cloudinaryUrl.trim()) {
-        // Direct Cloudinary URL — skip upload, write straight to Supabase
-        finalUrl = f.cloudinaryUrl.trim()
-      } else {
-        // File upload path — name includes image number for uniqueness
-        setUploading(true)
-        const imageNumber = slotCount + 1
-        const publicId = [yearNum, effectiveTournament, f.discipline, f.round, imageNumber]
-          .join('_')
-          .replace(/\s+/g, '_')
-        finalUrl = await uploadToCloudinary(f.imageFile, publicId)
-        setUploading(false)
-      }
+      const finalUrl = f.gettyEmbed.trim() || f.imageUrl.trim()
 
       await onAdd({
         imageUrl:    finalUrl,
@@ -185,7 +139,6 @@ export default function AddOutfitForm({ onAdd, outfits = [] }) {
       setErrors({ submit: err.message })
     } finally {
       setSubmitting(false)
-      setUploading(false)
     }
   }
 
@@ -202,54 +155,51 @@ export default function AddOutfitForm({ onAdd, outfits = [] }) {
       <div className="flex flex-col gap-3">
         <FieldLabel>Image</FieldLabel>
 
-        {/* Drag / drop zone */}
-        <div
-          role="button"
-          tabIndex={0}
-          onKeyDown={e => e.key === 'Enter' && fileRef.current?.click()}
-          className={`border-2 border-dashed transition-colors cursor-pointer flex items-center justify-center min-h-32 ${
-            dragging ? 'border-[#C9A84C] bg-[#C9A84C]/5' : 'border-[#2a2a2a] hover:border-[#444]'
-          }`}
-          onDragOver={e  => { e.preventDefault(); setDragging(true)  }}
-          onDragLeave={() => setDragging(false)}
-          onDrop={e => {
-            e.preventDefault()
-            setDragging(false)
-            handleFile(e.dataTransfer.files[0])
-          }}
-          onClick={() => fileRef.current?.click()}
-        >
-          <input
-            ref={fileRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={e => handleFile(e.target.files[0])}
+        {/* Getty embed */}
+        <div className="flex flex-col gap-1.5">
+          <FieldLabel>Getty Embed Code</FieldLabel>
+          <textarea
+            value={f.gettyEmbed}
+            onChange={e => handleGettyEmbed(e.target.value)}
+            placeholder="Paste the embed code from Getty Images…"
+            rows={4}
+            className="w-full bg-[#0D0D0D] border border-[#333] text-[#F0EDE6] px-3 py-2 text-sm outline-none focus:border-[#C9A84C] placeholder-[#3a3a3a] resize-y font-mono"
           />
-          {f.previewSrc ? (
-            <img
-              src={f.previewSrc}
-              alt="Preview"
-              className="max-h-48 max-w-full object-contain p-2"
-            />
-          ) : (
-            <p className="text-[#555] text-sm px-4 text-center">
-              Drag &amp; drop an image here, or click to select
+          {f.gettyEmbed.trim() && (
+            <p className="text-xs text-[#8A877F]">
+              Getty embed detected
+              {(() => { const m = f.gettyEmbed.match(/items:'(\d+)'/) ; return m ? ` — asset #${m[1]}` : '' })()}
             </p>
           )}
         </div>
 
-        {/* Cloudinary URL input */}
+        {/* Divider */}
+        <div className="flex items-center gap-3">
+          <div className="flex-1 border-t border-[#2a2a2a]" />
+          <span className="text-[10px] text-[#3a3a3a] uppercase tracking-wider">or</span>
+          <div className="flex-1 border-t border-[#2a2a2a]" />
+        </div>
+
+        {/* Direct image URL */}
         <div className="flex flex-col gap-1.5">
-          <FieldLabel>Or paste a Cloudinary URL</FieldLabel>
+          <FieldLabel>Image URL</FieldLabel>
           <input
             type="url"
-            value={f.cloudinaryUrl}
-            onChange={e => handleCloudinaryUrl(e.target.value)}
-            placeholder={`${CL_PREFIX}…`}
+            value={f.imageUrl}
+            onChange={e => handleImageUrl(e.target.value)}
+            placeholder="https://… (from a news or sports site)"
             className="w-full bg-[#0D0D0D] border border-[#333] text-[#F0EDE6] px-3 py-2 text-sm outline-none focus:border-[#C9A84C] placeholder-[#3a3a3a]"
           />
-          <InlineError msg={errors.cloudinaryUrl} />
+          <p className="text-[10px] text-[#3a3a3a]">Facebook and Instagram links are not supported</p>
+          <InlineError msg={errors.imageUrl} />
+          {f.imageUrl.trim() && !isBlockedUrl(f.imageUrl.trim()) && (
+            <img
+              src={f.imageUrl.trim()}
+              alt="Preview"
+              className="max-h-48 max-w-full object-contain border border-[#2a2a2a] bg-[#111]"
+              onError={e => { e.target.style.display = 'none' }}
+            />
+          )}
         </div>
 
         <InlineError msg={errors.image} />
@@ -412,22 +362,14 @@ export default function AddOutfitForm({ onAdd, outfits = [] }) {
         />
       </div>
 
-      {/* 9. Slot info — shown when slot already has entries */}
-      {slotCount > 0 && f.discipline && f.round && (
-        <p className="text-xs text-[#8A877F] border border-[#2a2a2a] px-3 py-2">
-          {slotCount} existing {slotCount === 1 ? 'entry' : 'entries'} for this slot —
-          new file upload will be named image {slotCount + 1}
-        </p>
-      )}
-
-      {/* 10. Submit */}
+      {/* 9. Submit */}
       <InlineError msg={errors.submit} />
       <button
         type="submit"
         disabled={submitting}
         className="bg-[#C9A84C] text-[#0D0D0D] font-medium text-sm py-3 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
       >
-        {uploading ? 'Uploading…' : submitting ? 'Adding…' : 'Add to Gallery'}
+        {submitting ? 'Adding…' : 'Add to Gallery'}
       </button>
     </form>
   )

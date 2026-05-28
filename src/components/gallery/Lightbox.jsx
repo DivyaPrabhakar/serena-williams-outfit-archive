@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { ROUND_LABELS, COLOR_MAP } from '../../lib/constants'
+import { isGettyEmbed } from '../admin/AddOutfitForm'
 
 function MetaRow({ label, children }) {
   return (
@@ -36,11 +37,21 @@ export default function Lightbox({ outfits, index, onNavigate, onClose }) {
       >
         {/* Image */}
         <div className="flex-1 bg-dark min-h-0 flex items-center justify-center overflow-hidden">
-          <img
-            src={outfit.imageUrl}
-            alt={`${outfit.tournament} ${outfit.year}`}
-            className="w-full h-full object-contain"
-          />
+          {isGettyEmbed(outfit.imageUrl) ? (
+            <iframe
+              key={outfit.id}
+              srcDoc={`<!DOCTYPE html><html><head><style>body{margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:16px;box-sizing:border-box}</style></head><body>${outfit.imageUrl}</body></html>`}
+              title={`${outfit.tournament} ${outfit.year}`}
+              className="w-full h-full border-0"
+              sandbox="allow-scripts allow-same-origin"
+            />
+          ) : (
+            <img
+              src={outfit.imageUrl}
+              alt={`${outfit.tournament} ${outfit.year}`}
+              className="w-full h-full object-contain"
+            />
+          )}
         </div>
 
         {/* Metadata panel */}
