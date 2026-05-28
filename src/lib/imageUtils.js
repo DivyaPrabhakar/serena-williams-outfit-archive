@@ -15,3 +15,9 @@ export function isBlockedUrl(url) {
 export function isGettyEmbed(val) {
   return typeof val === 'string' && val.trimStart().startsWith('<') && val.includes('gettyimages')
 }
+
+export function isGettyLandscape(embedCode) {
+  const w = embedCode.match(/w:'(\d+)px'/)
+  const h = embedCode.match(/h:'(\d+)px'/)
+  return w && h && parseInt(w[1]) > parseInt(h[1])
+}
