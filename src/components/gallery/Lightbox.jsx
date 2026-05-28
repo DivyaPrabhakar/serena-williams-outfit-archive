@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { ROUND_LABELS, COLOR_MAP } from '../../lib/constants'
-import { isGettyEmbed } from '../admin/AddOutfitForm'
+import { isGettyEmbed } from '../../lib/imageUtils'
 
 function MetaRow({ label, children }) {
   return (

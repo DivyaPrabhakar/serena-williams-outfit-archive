@@ -1,5 +1,5 @@
 import { COLOR_MAP, ROUND_LABELS } from '../../lib/constants'
-import { isGettyEmbed } from '../admin/AddOutfitForm'
+import { isGettyEmbed } from '../../lib/imageUtils'
 
 export default function OutfitCard({ outfit, settings, onClick }) {
   const colors = outfit.colors ?? []
