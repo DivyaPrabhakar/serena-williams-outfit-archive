@@ -30,9 +30,14 @@ export default function OutfitCard({ outfit, settings, onClick }) {
         onClick={settings.lightbox ? onClick : undefined}
       >
         {getty ? (
-          <div className="w-full h-full flex flex-col items-center justify-center gap-1 bg-[#111]">
-            <span className="text-[10px] uppercase tracking-widest text-[#444]">Getty Image</span>
-          </div>
+          <iframe
+            key={outfit.id}
+            srcDoc={`<!DOCTYPE html><html><head><style>html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#111}body{display:flex;align-items:flex-start;justify-content:center}</style></head><body>${outfit.imageUrl}</body></html>`}
+            title={label}
+            className="w-full h-full border-0 pointer-events-none"
+            sandbox="allow-scripts allow-same-origin"
+            loading="lazy"
+          />
         ) : (
           <img
             src={outfit.imageUrl}
