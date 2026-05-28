@@ -32,7 +32,7 @@ export default function Lightbox({ outfits, index, onNavigate, onClose }) {
       onClick={onClose}
     >
       <div
-        className="flex flex-col md:flex-row w-full max-w-5xl max-h-[95vh] bg-dark2 rounded-xl overflow-hidden shadow-2xl"
+        className={`flex flex-col md:flex-row w-full max-w-5xl max-h-[95vh] ${isGettyEmbed(outfit.imageUrl) ? 'md:min-h-[90vh]' : ''} bg-dark2 rounded-xl overflow-hidden shadow-2xl`}
         onClick={e => e.stopPropagation()}
       >
         {/* Image */}
