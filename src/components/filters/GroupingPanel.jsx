@@ -2,6 +2,7 @@ const GROUPING_OPTIONS = [
   { value: 'year', label: 'Year' },
   { value: 'tournament', label: 'Tournament' },
   { value: 'color', label: 'Color' },
+  { value: 'color-group', label: 'Color group' },
   { value: 'brand', label: 'Brand' },
 ]
 
