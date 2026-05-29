@@ -21,9 +21,8 @@ export default function ViewerPage() {
   const [showSettings, setShowSettings] = useState(false);
   const [groupingPanelOpen, setGroupingPanelOpen] = useState(false);
 
-  const [mode, setMode] = useState("condensed");
   const [panelOpen, setPanelOpen] = useState(
-    () => readStorage(`serena_hunt_panel_condensed`, "false") === "true",
+    () => readStorage(`serena_hunt_panel_expanded`, "false") === "true",
   );
 
   const [flatGrid, setFlatGrid] = useState(false);
@@ -33,23 +32,18 @@ export default function ViewerPage() {
 
   const { settings, updateSetting } = useSettings();
 
-  function switchMode(m) {
-    setMode(m);
-    setPanelOpen(readStorage(`serena_hunt_panel_${m}`, "false") === "true");
-  }
-
   function togglePanel() {
     setPanelOpen((prev) => {
       const next = !prev;
       if (next) setGroupingPanelOpen(false);
-      writeStorage(`serena_hunt_panel_${mode}`, next);
+      writeStorage(`serena_hunt_panel_expanded`, next);
       return next;
     });
   }
 
   function closePanel() {
     setPanelOpen(false);
-    writeStorage(`serena_hunt_panel_${mode}`, false);
+    writeStorage(`serena_hunt_panel_expanded`, false);
   }
 
   function setGroupBy(value) {
@@ -77,8 +71,8 @@ export default function ViewerPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const { condensedMissing, expandedMissing, missingCount, handleHighlight } =
-    useMissingOutfits(outfits, mode);
+  const { expandedMissing, missingCount, handleHighlight } =
+    useMissingOutfits(outfits, 'expanded');
 
   function openLightbox(outfit) {
     const idx = outfits.findIndex((o) => o.id === outfit.id);
@@ -92,8 +86,6 @@ export default function ViewerPage() {
       className={`min-h-screen bg-dark transition-[padding-right] duration-300 ${anyPanelOpen ? "md:pr-72" : ""}`}
     >
       <FilterBar
-        mode={mode}
-        switchMode={switchMode}
         flatGrid={flatGrid}
         setFlatGrid={setFlatGrid}
         loading={loading}
@@ -124,7 +116,6 @@ export default function ViewerPage() {
             outfits={outfits}
             groupBy={groupBy}
             settings={settings}
-            mode={mode}
             flatGrid={flatGrid}
             onOpenLightbox={openLightbox}
           />
@@ -158,8 +149,6 @@ export default function ViewerPage() {
 
       {panelOpen && (
         <MissingPanel
-          mode={mode}
-          condensedItems={condensedMissing}
           expandedItems={expandedMissing}
           onHighlight={handleHighlight}
           onClose={closePanel}

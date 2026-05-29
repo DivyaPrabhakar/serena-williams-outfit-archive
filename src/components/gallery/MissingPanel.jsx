@@ -23,38 +23,6 @@ function MissingButton({ label, onClick }) {
   );
 }
 
-function CondensedContent({ items, onHighlight }) {
-  const byTournament = {};
-  for (const item of items) {
-    if (!byTournament[item.tournament]) byTournament[item.tournament] = [];
-    byTournament[item.tournament].push(item);
-  }
-  const tournaments = sortTournaments(Object.keys(byTournament));
-  const total = items.length;
-
-  return (
-    <>
-      <p className="text-[10px] text-muted mb-4 flex-shrink-0">
-        {total} missing across {tournaments.length} tournament
-        {tournaments.length !== 1 ? "s" : ""}
-      </p>
-      {tournaments.map((t) => {
-        const tItems = byTournament[t].slice().sort((a, b) => a.year - b.year);
-        return (
-          <TournamentGroup key={t} name={t} count={tItems.length}>
-            {tItems.map((item) => (
-              <MissingButton
-                key={`${item.year}_${item.tournament}`}
-                label={`${item.year} · ${item.tournament}`}
-                onClick={() => onHighlight(item)}
-              />
-            ))}
-          </TournamentGroup>
-        );
-      })}
-    </>
-  );
-}
 
 function ExpandedContent({ items, onHighlight }) {
   const byTournament = {};
@@ -110,13 +78,7 @@ function ExpandedContent({ items, onHighlight }) {
   );
 }
 
-export default function MissingPanel({
-  mode,
-  condensedItems,
-  expandedItems,
-  onHighlight,
-  onClose,
-}) {
+export default function MissingPanel({ expandedItems, onHighlight, onClose }) {
   return (
     <div className="fixed right-0 top-28 bottom-0 z-[45] w-72 bg-dark2 border-l border-dark3 shadow-2xl flex flex-col">
       <div className="flex items-center justify-between px-5 py-4 border-b border-dark3 flex-shrink-0">
@@ -133,16 +95,7 @@ export default function MissingPanel({
       </div>
 
       <div className="flex-1 overflow-y-auto px-5 py-4">
-        {mode === "condensed" ? (
-          condensedItems.length === 0 ? (
-            <p className="text-sm text-gold">All tournaments documented!</p>
-          ) : (
-            <CondensedContent
-              items={condensedItems}
-              onHighlight={onHighlight}
-            />
-          )
-        ) : expandedItems.length === 0 ? (
+        {expandedItems.length === 0 ? (
           <p className="text-sm text-gold">All rounds documented!</p>
         ) : (
           <ExpandedContent items={expandedItems} onHighlight={onHighlight} />

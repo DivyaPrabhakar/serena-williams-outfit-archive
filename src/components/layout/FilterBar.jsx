@@ -8,7 +8,6 @@ const GROUPING_LABELS = {
 }
 
 export default function FilterBar({
-  mode, switchMode,
   flatGrid, setFlatGrid,
   loading, missingCount,
   panelOpen, togglePanel, setPanelOpen,
@@ -32,37 +31,20 @@ export default function FilterBar({
 
       {/* ── Desktop bar ── */}
       <div className="hidden md:flex items-center gap-4">
-        {/* View mode switcher */}
+        {/* Layout toggle */}
         <div className="flex rounded overflow-hidden border border-dark3 flex-shrink-0">
-          {['condensed', 'expanded'].map(m => (
+          {[['tournament', 'By tournament'], ['grid', 'Grid']].map(([val, label]) => (
             <button
-              key={m}
-              onClick={() => switchMode(m)}
-              className={`px-4 py-2 text-sm font-medium transition-colors capitalize ${
-                mode === m ? 'bg-gold text-dark' : 'text-muted hover:text-ink'
+              key={val}
+              onClick={() => setFlatGrid(val === 'grid')}
+              className={`px-4 py-2 text-sm font-medium transition-colors ${
+                (val === 'grid') === flatGrid ? 'bg-gold text-dark' : 'text-muted hover:text-ink'
               }`}
             >
-              {m}
+              {label}
             </button>
           ))}
         </div>
-
-        {/* Expanded layout toggle */}
-        {mode === 'expanded' && (
-          <div className="flex rounded overflow-hidden border border-dark3 flex-shrink-0">
-            {[['tournament', 'By tournament'], ['grid', 'Grid']].map(([val, label]) => (
-              <button
-                key={val}
-                onClick={() => setFlatGrid(val === 'grid')}
-                className={`px-4 py-2 text-sm font-medium transition-colors ${
-                  (val === 'grid') === flatGrid ? 'bg-gold text-dark' : 'text-muted hover:text-ink'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        )}
 
         {/* Right controls */}
         <div className="flex items-center gap-2 flex-shrink-0">
@@ -107,21 +89,6 @@ export default function FilterBar({
 
       {/* ── Mobile bar ── */}
       <div className="flex md:hidden items-center gap-3">
-        {/* View mode switcher */}
-        <div className="flex rounded overflow-hidden border border-dark3 flex-shrink-0">
-          {['condensed', 'expanded'].map(m => (
-            <button
-              key={m}
-              onClick={() => switchMode(m)}
-              className={`px-3 py-2 text-sm font-medium transition-colors capitalize ${
-                mode === m ? 'bg-gold text-dark' : 'text-muted hover:text-ink'
-              }`}
-            >
-              {m}
-            </button>
-          ))}
-        </div>
-
         {/* Active grouping pill (shown when non-default) */}
         {isNonDefault && (
           <span className="text-xs bg-gold text-dark rounded px-2 py-1 truncate max-w-[130px]">
@@ -146,22 +113,20 @@ export default function FilterBar({
       {/* ── Mobile dropdown ── */}
       {mobileMenuOpen && (
         <div className="md:hidden mt-2 space-y-2">
-          {/* Expanded layout toggle */}
-          {mode === 'expanded' && (
-            <div className="flex rounded overflow-hidden border border-dark3">
-              {[['tournament', 'By tournament'], ['grid', 'Grid']].map(([val, label]) => (
-                <button
-                  key={val}
-                  onClick={() => setFlatGrid(val === 'grid')}
-                  className={`flex-1 px-4 py-2 text-sm font-medium transition-colors ${
-                    (val === 'grid') === flatGrid ? 'bg-gold text-dark' : 'text-muted hover:text-ink'
-                  }`}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-          )}
+          {/* Layout toggle */}
+          <div className="flex rounded overflow-hidden border border-dark3">
+            {[['tournament', 'By tournament'], ['grid', 'Grid']].map(([val, label]) => (
+              <button
+                key={val}
+                onClick={() => setFlatGrid(val === 'grid')}
+                className={`flex-1 px-4 py-2 text-sm font-medium transition-colors ${
+                  (val === 'grid') === flatGrid ? 'bg-gold text-dark' : 'text-muted hover:text-ink'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
 
           {/* Group by */}
           <button

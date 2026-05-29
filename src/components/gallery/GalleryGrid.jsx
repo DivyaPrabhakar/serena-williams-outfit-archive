@@ -1,11 +1,10 @@
 import { COLOR_MAP } from '../../lib/constants'
 import { slotsForYear } from '../../lib/rounds'
 import { sortTournaments } from '../../lib/filterUtils'
-import CondensedYearSection from './CondensedYearSection'
 import ExpandedYearSection from './ExpandedYearSection'
 import GroupSection from './GroupSection'
 
-export default function GalleryGrid({ outfits, groupBy = 'year', settings, mode, flatGrid, onOpenLightbox }) {
+export default function GalleryGrid({ outfits, groupBy = 'year', settings, flatGrid, onOpenLightbox }) {
   if (groupBy !== 'year') {
     return (
       <GroupedGallery
@@ -44,20 +43,18 @@ export default function GalleryGrid({ outfits, groupBy = 'year', settings, mode,
 
   return (
     <div>
-      {years.map(year => {
-        const props = {
-          key: year,
-          year,
-          outfitMap,
-          tournaments: tournamentsForYear(year),
-          yearOutfits: outfitsForYear(year),
-          settings,
-          onOpenLightbox,
-        }
-        return mode === 'expanded'
-          ? <ExpandedYearSection {...props} flatGrid={flatGrid} />
-          : <CondensedYearSection {...props} />
-      })}
+      {years.map(year => (
+        <ExpandedYearSection
+          key={year}
+          year={year}
+          outfitMap={outfitMap}
+          tournaments={tournamentsForYear(year)}
+          yearOutfits={outfitsForYear(year)}
+          settings={settings}
+          onOpenLightbox={onOpenLightbox}
+          flatGrid={flatGrid}
+        />
+      ))}
     </div>
   )
 }
