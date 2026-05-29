@@ -6,6 +6,10 @@ export default function OutfitCard({ outfit, settings, onClick }) {
   const getty      = isGettyEmbed(outfit.imageUrl)
   const landscape  = getty && isGettyLandscape(outfit.imageUrl)
 
+  const focalJustify = outfit.focal_point === 'left'  ? 'flex-start'
+                     : outfit.focal_point === 'right' ? 'flex-end'
+                     : 'center'
+
   const label =
     settings.cardLabel === 'notes' && outfit.notes
       ? outfit.notes
@@ -33,7 +37,7 @@ export default function OutfitCard({ outfit, settings, onClick }) {
         {getty ? (
           <iframe
             key={outfit.id}
-            srcDoc={`<!DOCTYPE html><html><head><style>html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#111}body{display:flex;align-items:${landscape ? 'center' : 'flex-start'};justify-content:center;${landscape ? '' : 'margin-top:-44px;height:calc(100% + 44px)'}}</style></head><body>${outfit.imageUrl}</body></html>`}
+            srcDoc={`<!DOCTYPE html><html><head><style>html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#111}body{display:flex;align-items:${landscape ? 'center' : 'flex-start'};justify-content:${landscape ? focalJustify : 'center'};${landscape ? '' : 'margin-top:-44px;height:calc(100% + 44px)'}}</style></head><body>${outfit.imageUrl}</body></html>`}
             title={label}
             className="w-full h-full border-0 pointer-events-none"
             sandbox="allow-scripts allow-same-origin"
