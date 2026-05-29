@@ -1,35 +1,28 @@
-import { ACTIVE_YEARS, OLYMPICS_YEARS, DISCIPLINES, GRAND_SLAMS } from '../../lib/constants'
-import { getRoundsForSlot, getCombinedSlotStatus, slotsForYear } from '../../lib/rounds'
+import { COLOR_MAP } from '../../lib/constants'
+import { slotsForYear } from '../../lib/rounds'
+import { sortTournaments } from '../../lib/filterUtils'
 import CondensedYearSection from './CondensedYearSection'
 import ExpandedYearSection from './ExpandedYearSection'
+import GroupSection from './GroupSection'
 
-const KNOWN_TOURNAMENTS = new Set([...GRAND_SLAMS, 'Olympics'])
+export default function GalleryGrid({ outfits, groupBy = 'year', settings, mode, flatGrid, onOpenLightbox }) {
+  if (groupBy !== 'year') {
+    return (
+      <GroupedGallery
+        outfits={outfits}
+        groupBy={groupBy}
+        settings={settings}
+        onOpenLightbox={onOpenLightbox}
+      />
+    )
+  }
 
-export default function GalleryGrid({ outfits, activeTournament, activeYear, settings, mode, flatGrid, onOpenLightbox }) {
   const outfitMap = new Map(
     outfits.map(o => [`${o.year}_${o.tournament}_${o.discipline}_${o.roundNumber}`, o])
   )
-
-  let years
-  if (activeYear) {
-    years = [activeYear]
-  } else if (activeTournament) {
-    if (KNOWN_TOURNAMENTS.has(activeTournament)) {
-      years = ACTIVE_YEARS.filter(y => {
-        if (activeTournament === 'Olympics' && !OLYMPICS_YEARS.has(y)) return false
-        const played = DISCIPLINES.some(d => getRoundsForSlot(activeTournament, y, d) > 0)
-        const notHeld = getCombinedSlotStatus(activeTournament, y) === 'not-held'
-        return played || notHeld
-      })
-    } else {
-      years = [...new Set(outfits.filter(o => o.tournament === activeTournament).map(o => o.year))].sort((a, b) => a - b)
-    }
-  } else {
-    years = [...new Set(outfits.map(o => o.year))].sort((a, b) => a - b)
-  }
+  const years = [...new Set(outfits.map(o => o.year))].sort((a, b) => a - b)
 
   function tournamentsForYear(year) {
-    if (activeTournament) return [activeTournament]
     const known = slotsForYear(year)
     const extra = [...new Set(outfits.filter(o => o.year === year).map(o => o.tournament))]
       .filter(t => !known.includes(t))
@@ -38,9 +31,7 @@ export default function GalleryGrid({ outfits, activeTournament, activeYear, set
   }
 
   function outfitsForYear(year) {
-    return outfits.filter(o =>
-      o.year === year && (!activeTournament || o.tournament === activeTournament)
-    )
+    return outfits.filter(o => o.year === year)
   }
 
   if (years.length === 0) {
@@ -67,6 +58,69 @@ export default function GalleryGrid({ outfits, activeTournament, activeYear, set
           ? <ExpandedYearSection {...props} flatGrid={flatGrid} />
           : <CondensedYearSection {...props} />
       })}
+    </div>
+  )
+}
+
+function GroupedGallery({ outfits, groupBy, settings, onOpenLightbox }) {
+  let groups = []
+
+  if (groupBy === 'tournament') {
+    const map = {}
+    for (const o of outfits) {
+      if (!map[o.tournament]) map[o.tournament] = []
+      map[o.tournament].push(o)
+    }
+    const sorted = sortTournaments(Object.keys(map))
+    groups = sorted.map(t => ({ key: t, label: t, outfits: map[t] }))
+  } else if (groupBy === 'color') {
+    const colorOrder = Object.keys(COLOR_MAP)
+    const map = {}
+    for (const o of outfits) {
+      for (const c of (o.colors ?? [])) {
+        if (!map[c]) map[c] = []
+        map[c].push(o)
+      }
+    }
+    groups = colorOrder
+      .filter(c => map[c]?.length > 0)
+      .map(c => ({ key: c, label: c, color: COLOR_MAP[c], outfits: map[c] }))
+  } else if (groupBy === 'brand') {
+    const map = {}
+    for (const o of outfits) {
+      const brand = o.brand ?? '__none__'
+      if (!map[brand]) map[brand] = []
+      map[brand].push(o)
+    }
+    const sorted = Object.keys(map).filter(b => b !== '__none__').sort()
+    if (map['__none__']) sorted.push('__none__')
+    groups = sorted.map(b => ({
+      key: b,
+      label: b === '__none__' ? 'No brand listed' : b,
+      outfits: map[b],
+    }))
+  }
+
+  if (groups.length === 0) {
+    return (
+      <div className="flex items-center justify-center py-32 text-muted text-sm">
+        No outfits found
+      </div>
+    )
+  }
+
+  return (
+    <div>
+      {groups.map(g => (
+        <GroupSection
+          key={g.key}
+          label={g.label}
+          color={g.color}
+          outfits={g.outfits}
+          settings={settings}
+          onOpenLightbox={onOpenLightbox}
+        />
+      ))}
     </div>
   )
 }

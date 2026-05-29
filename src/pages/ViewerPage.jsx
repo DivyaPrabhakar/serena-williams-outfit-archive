@@ -1,27 +1,25 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { fetchOutfits } from "../lib/api";
-import { DISCIPLINES, COLOR_MAP } from "../lib/constants";
-import { TOURNAMENT_ORDER, sortTournaments } from "../lib/filterUtils";
+import { DISCIPLINES } from "../lib/constants";
+import { TOURNAMENT_ORDER } from "../lib/filterUtils";
 import { readStorage, writeStorage } from "../lib/storage";
-import { useFilterParams } from "../hooks/useFilterParams";
 import { useSettings } from "../hooks/useSettings";
 import { useMissingOutfits } from "../hooks/useMissingOutfits";
 import FilterBar from "../components/layout/FilterBar";
-import FilterPanel from "../components/filters/FilterPanel";
+import GroupingPanel from "../components/filters/GroupingPanel";
 import GalleryGrid from "../components/gallery/GalleryGrid";
 import Lightbox from "../components/gallery/Lightbox";
 import SettingsPanel from "../components/SettingsPanel";
 import MissingPanel from "../components/gallery/MissingPanel";
 
 export default function ViewerPage() {
-  const { activeTournament, activeYear, activeBrand, activeColor, setFilter, clearAllFilters } = useFilterParams();
   const [outfits, setOutfits] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [lightboxIndex, setLightboxIndex] = useState(null);
 
-  const [showSettings, setShowSettings]     = useState(false);
-  const [filterPanelOpen, setFilterPanelOpen] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [groupingPanelOpen, setGroupingPanelOpen] = useState(false);
 
   const [mode, setMode] = useState("condensed");
   const [panelOpen, setPanelOpen] = useState(
@@ -29,6 +27,9 @@ export default function ViewerPage() {
   );
 
   const [flatGrid, setFlatGrid] = useState(false);
+  const [groupBy, setGroupByState] = useState(
+    () => readStorage('serena_gallery_groupby', 'year'),
+  );
 
   const { settings, updateSetting } = useSettings();
 
@@ -40,7 +41,7 @@ export default function ViewerPage() {
   function togglePanel() {
     setPanelOpen((prev) => {
       const next = !prev;
-      if (next) setFilterPanelOpen(false);
+      if (next) setGroupingPanelOpen(false);
       writeStorage(`serena_hunt_panel_${mode}`, next);
       return next;
     });
@@ -49,6 +50,11 @@ export default function ViewerPage() {
   function closePanel() {
     setPanelOpen(false);
     writeStorage(`serena_hunt_panel_${mode}`, false);
+  }
+
+  function setGroupBy(value) {
+    setGroupByState(value);
+    writeStorage('serena_gallery_groupby', value);
   }
 
   useEffect(() => {
@@ -74,58 +80,12 @@ export default function ViewerPage() {
   const { condensedMissing, expandedMissing, missingCount, handleHighlight } =
     useMissingOutfits(outfits, mode);
 
-  // ── Lightbox ───────────────────────────────────────────────────────────────
-
-  const realOutfits = useMemo(
-    () =>
-      outfits.filter((o) => {
-        if (activeTournament && o.tournament !== activeTournament) return false;
-        if (activeYear && o.year !== activeYear) return false;
-        if (activeBrand && o.brand !== activeBrand) return false;
-        if (activeColor && !(o.colors ?? []).includes(activeColor)) return false;
-        return true;
-      }),
-    [outfits, activeTournament, activeYear, activeBrand, activeColor],
-  );
-
   function openLightbox(outfit) {
-    const idx = realOutfits.findIndex((o) => o.id === outfit.id);
+    const idx = outfits.findIndex((o) => o.id === outfit.id);
     if (idx !== -1) setLightboxIndex(idx);
   }
 
-  // ── Brand/color pre-filtered outfits for the gallery grid ─────────────────
-
-  const galleryOutfits = useMemo(() => {
-    if (!activeBrand && !activeColor) return outfits;
-    return outfits.filter(o => {
-      if (activeBrand && o.brand !== activeBrand) return false;
-      if (activeColor && !(o.colors ?? []).includes(activeColor)) return false;
-      return true;
-    });
-  }, [outfits, activeBrand, activeColor]);
-
-  // ── Derived filter data ────────────────────────────────────────────────────
-
-  const uniqueTournaments = useMemo(
-    () => sortTournaments([...new Set(outfits.map((o) => o.tournament))]),
-    [outfits],
-  );
-  const uniqueYears = useMemo(
-    () => [...new Set(outfits.map((o) => o.year))],
-    [outfits],
-  );
-  const uniqueBrands = useMemo(
-    () => [...new Set(outfits.map((o) => o.brand).filter(Boolean))],
-    [outfits],
-  );
-  const uniqueColors = useMemo(() => {
-    const used = new Set(outfits.flatMap((o) => o.colors ?? []))
-    return Object.keys(COLOR_MAP).filter((c) => used.has(c))
-  }, [outfits]);
-
-  // ── Render ─────────────────────────────────────────────────────────────────
-
-  const anyPanelOpen = panelOpen || filterPanelOpen;
+  const anyPanelOpen = panelOpen || groupingPanelOpen;
 
   return (
     <div
@@ -141,18 +101,13 @@ export default function ViewerPage() {
         panelOpen={panelOpen}
         togglePanel={togglePanel}
         setPanelOpen={setPanelOpen}
-        filterPanelOpen={filterPanelOpen}
-        setFilterPanelOpen={setFilterPanelOpen}
+        groupingPanelOpen={groupingPanelOpen}
+        setGroupingPanelOpen={setGroupingPanelOpen}
         showSettings={showSettings}
         setShowSettings={setShowSettings}
-        activeTournament={activeTournament}
-        activeYear={activeYear}
-        activeBrand={activeBrand}
-        activeColor={activeColor}
-        clearAllFilters={clearAllFilters}
+        groupBy={groupBy}
       />
 
-      {/* Main gallery */}
       <main className="px-3 pt-10 pb-24 max-w-7xl mx-auto">
         {loading && (
           <div className="flex items-center justify-center py-32 text-muted text-sm">
@@ -166,9 +121,8 @@ export default function ViewerPage() {
         )}
         {!loading && !error && (
           <GalleryGrid
-            outfits={galleryOutfits}
-            activeTournament={activeTournament}
-            activeYear={activeYear}
+            outfits={outfits}
+            groupBy={groupBy}
             settings={settings}
             mode={mode}
             flatGrid={flatGrid}
@@ -177,17 +131,15 @@ export default function ViewerPage() {
         )}
       </main>
 
-      {/* Lightbox */}
       {lightboxIndex !== null && (
         <Lightbox
-          outfits={realOutfits}
+          outfits={outfits}
           index={lightboxIndex}
           onNavigate={setLightboxIndex}
           onClose={() => setLightboxIndex(null)}
         />
       )}
 
-      {/* Settings panel */}
       {showSettings && (
         <SettingsPanel
           settings={settings}
@@ -196,26 +148,14 @@ export default function ViewerPage() {
         />
       )}
 
-      {/* Filter panel */}
-      {filterPanelOpen && (
-        <FilterPanel
-          tournaments={uniqueTournaments}
-          activeTournament={activeTournament}
-          onTournamentChange={v => setFilter('tournament', v)}
-          years={uniqueYears}
-          activeYear={activeYear}
-          onYearChange={v => setFilter('year', v)}
-          brands={uniqueBrands}
-          activeBrand={activeBrand}
-          onBrandChange={v => setFilter('brand', v)}
-          colors={uniqueColors}
-          activeColor={activeColor}
-          onColorChange={v => setFilter('color', v)}
-          onClose={() => setFilterPanelOpen(false)}
+      {groupingPanelOpen && (
+        <GroupingPanel
+          activeGrouping={groupBy}
+          onGroupingChange={setGroupBy}
+          onClose={() => setGroupingPanelOpen(false)}
         />
       )}
 
-      {/* Outfits yet to find panel */}
       {panelOpen && (
         <MissingPanel
           mode={mode}

@@ -1,23 +1,28 @@
 import { useState } from 'react'
 
+const GROUPING_LABELS = {
+  year: 'Year',
+  tournament: 'Tournament',
+  color: 'Color',
+  brand: 'Brand',
+}
+
 export default function FilterBar({
   mode, switchMode,
   flatGrid, setFlatGrid,
   loading, missingCount,
   panelOpen, togglePanel, setPanelOpen,
-  filterPanelOpen, setFilterPanelOpen,
+  groupingPanelOpen, setGroupingPanelOpen,
   showSettings, setShowSettings,
-  activeTournament, activeYear, activeBrand, activeColor,
-  clearAllFilters,
+  groupBy,
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const groupingLabel = GROUPING_LABELS[groupBy] ?? groupBy
+  const isNonDefault = groupBy !== 'year'
 
-  const hasActiveFilter = activeTournament || activeYear || activeBrand || activeColor
-  const activeFilterLabel = [activeTournament, activeYear, activeBrand, activeColor].filter(Boolean).join(' · ')
-
-  function openFilter() {
-    const next = !filterPanelOpen
-    setFilterPanelOpen(next)
+  function openGrouping() {
+    const next = !groupingPanelOpen
+    setGroupingPanelOpen(next)
     if (next) setPanelOpen(false)
     setShowSettings(false)
   }
@@ -74,33 +79,21 @@ export default function FilterBar({
               </span>
             </button>
           )}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={openFilter}
-              className={`flex items-center gap-1.5 px-4 py-2 rounded text-sm font-medium transition-colors ${
-                filterPanelOpen || hasActiveFilter
-                  ? 'bg-gold text-dark'
-                  : 'bg-dark3 text-ink hover:text-white'
-              }`}
-            >
-              <span>Filter</span>
-              {hasActiveFilter && (
-                <span className="text-dark/60">{activeFilterLabel}</span>
-              )}
-            </button>
-            {hasActiveFilter && (
-              <button
-                onClick={clearAllFilters}
-                className="text-muted hover:text-ink text-base leading-none transition-colors"
-                aria-label="Clear filters"
-                title="Clear filters"
-              >
-                ×
-              </button>
-            )}
-          </div>
           <button
-            onClick={() => { setShowSettings(s => !s); setFilterPanelOpen(false) }}
+            onClick={openGrouping}
+            className={`flex items-center gap-1.5 px-4 py-2 rounded text-sm font-medium transition-colors ${
+              groupingPanelOpen || isNonDefault
+                ? 'bg-gold text-dark'
+                : 'bg-dark3 text-ink hover:text-white'
+            }`}
+          >
+            <span>Group by</span>
+            <span className={groupingPanelOpen || isNonDefault ? 'text-dark/60' : 'text-gold'}>
+              {groupingLabel}
+            </span>
+          </button>
+          <button
+            onClick={() => { setShowSettings(s => !s); setGroupingPanelOpen(false) }}
             className={`flex items-center gap-1.5 text-sm underline transition-colors ${
               showSettings ? 'text-ink' : 'text-muted hover:text-ink'
             }`}
@@ -129,10 +122,10 @@ export default function FilterBar({
           ))}
         </div>
 
-        {/* Active filter pill */}
-        {hasActiveFilter && (
+        {/* Active grouping pill (shown when non-default) */}
+        {isNonDefault && (
           <span className="text-xs bg-gold text-dark rounded px-2 py-1 truncate max-w-[130px]">
-            {activeFilterLabel}
+            {groupingLabel}
           </span>
         )}
 
@@ -140,7 +133,7 @@ export default function FilterBar({
         <button
           onClick={() => setMobileMenuOpen(o => !o)}
           className={`ml-auto flex items-center gap-1.5 px-3 py-2 rounded text-sm font-medium transition-colors ${
-            mobileMenuOpen || filterPanelOpen || panelOpen || showSettings
+            mobileMenuOpen || groupingPanelOpen || panelOpen || showSettings
               ? 'bg-gold text-dark'
               : 'bg-dark3 text-ink'
           }`}
@@ -170,30 +163,20 @@ export default function FilterBar({
             </div>
           )}
 
-          {/* Filter */}
+          {/* Group by */}
           <button
-            onClick={() => { openFilter(); setMobileMenuOpen(false) }}
+            onClick={() => { openGrouping(); setMobileMenuOpen(false) }}
             className={`w-full flex items-center justify-between px-4 py-2 rounded text-sm font-medium transition-colors ${
-              filterPanelOpen || hasActiveFilter
+              groupingPanelOpen || isNonDefault
                 ? 'bg-gold text-dark'
                 : 'bg-dark3 text-ink hover:text-white'
             }`}
           >
-            <span>Filter</span>
-            {hasActiveFilter && (
-              <span className="text-dark/60 text-xs">{activeFilterLabel}</span>
-            )}
+            <span>Group by</span>
+            <span className={`text-xs ${groupingPanelOpen || isNonDefault ? 'text-dark/60' : 'text-gold'}`}>
+              {groupingLabel}
+            </span>
           </button>
-
-          {/* Clear filters */}
-          {hasActiveFilter && (
-            <button
-              onClick={() => { clearAllFilters(); setMobileMenuOpen(false) }}
-              className="w-full px-4 py-2 rounded text-sm bg-dark3 text-muted hover:text-ink transition-colors"
-            >
-              Clear filters
-            </button>
-          )}
 
           {/* Outfits yet to find */}
           {!loading && missingCount > 0 && (
@@ -210,7 +193,7 @@ export default function FilterBar({
 
           {/* Display settings */}
           <button
-            onClick={() => { setShowSettings(s => !s); setFilterPanelOpen(false); setMobileMenuOpen(false) }}
+            onClick={() => { setShowSettings(s => !s); setGroupingPanelOpen(false); setMobileMenuOpen(false) }}
             className={`w-full flex items-center gap-2 px-4 py-2 rounded text-sm transition-colors bg-dark3 ${
               showSettings ? 'text-ink' : 'text-muted hover:text-ink'
             }`}
