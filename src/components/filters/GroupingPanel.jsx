@@ -5,7 +5,25 @@ const GROUPING_OPTIONS = [
   { value: 'brand', label: 'Brand' },
 ]
 
-export default function GroupingPanel({ activeGrouping, onGroupingChange, onClose }) {
+const SORT_OPTIONS = [
+  { value: 'chronological', label: 'Chronological' },
+  { value: 'filled-first', label: 'Filled first' },
+]
+
+function OptionButton({ active, onClick, children }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`w-full text-left px-4 py-3 rounded text-sm font-medium transition-colors ${
+        active ? 'bg-gold text-dark' : 'bg-dark3 text-ink hover:text-white'
+      }`}
+    >
+      {children}
+    </button>
+  )
+}
+
+export default function GroupingPanel({ activeGrouping, onGroupingChange, sortBy, onSortChange, onClose }) {
   return (
     <div className="fixed right-0 top-28 bottom-0 z-[45] w-72 bg-dark2 border-l border-dark3 shadow-2xl flex flex-col">
       <div className="flex items-center justify-between px-5 py-4 border-b border-dark3 flex-shrink-0">
@@ -18,21 +36,24 @@ export default function GroupingPanel({ activeGrouping, onGroupingChange, onClos
           ×
         </button>
       </div>
-      <div className="flex-1 overflow-y-auto px-5 py-5">
+      <div className="flex-1 overflow-y-auto px-5 py-5 space-y-6">
         <div className="flex flex-col gap-2">
           {GROUPING_OPTIONS.map(({ value, label }) => (
-            <button
-              key={value}
-              onClick={() => onGroupingChange(value)}
-              className={`w-full text-left px-4 py-3 rounded text-sm font-medium transition-colors ${
-                activeGrouping === value
-                  ? 'bg-gold text-dark'
-                  : 'bg-dark3 text-ink hover:text-white'
-              }`}
-            >
+            <OptionButton key={value} active={activeGrouping === value} onClick={() => onGroupingChange(value)}>
               {label}
-            </button>
+            </OptionButton>
           ))}
+        </div>
+
+        <div>
+          <p className="text-xs uppercase tracking-widest text-muted mb-3">Sort</p>
+          <div className="flex flex-col gap-2">
+            {SORT_OPTIONS.map(({ value, label }) => (
+              <OptionButton key={value} active={sortBy === value} onClick={() => onSortChange(value)}>
+                {label}
+              </OptionButton>
+            ))}
+          </div>
         </div>
       </div>
     </div>

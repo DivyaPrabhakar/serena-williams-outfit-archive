@@ -7,7 +7,7 @@ import EmptySlot from './EmptySlot'
 import DimSlot from './DimSlot'
 
 // For tournaments in the participation constants (grand slams + Olympics)
-function ExpandedTournamentBlock({ tournament, year, outfitMap, settings, onOpenLightbox }) {
+function ExpandedTournamentBlock({ tournament, year, outfitMap, settings, sortBy, onOpenLightbox }) {
   const cardWidth = CARD_WIDTHS[settings.gridDensity] ?? 128
 
   const disciplineBlocks = DISCIPLINES.flatMap(discipline => {
@@ -72,6 +72,9 @@ function ExpandedTournamentBlock({ tournament, year, outfitMap, settings, onOpen
       {playedBlocks.map(({ discipline, slots }) => {
         const visible = slots.some(s => s.outfit !== null) || settings.showEmptySlots
         if (!visible) return null
+        const orderedSlots = sortBy === 'filled-first'
+          ? [...slots.filter(s => s.outfit !== null), ...slots.filter(s => s.outfit === null)]
+          : slots
         return (
           <div key={discipline} className="mb-4 pl-3">
             <div className="flex items-center gap-3 mb-2.5">
@@ -79,7 +82,7 @@ function ExpandedTournamentBlock({ tournament, year, outfitMap, settings, onOpen
               <div className="flex-1 h-px bg-dark3" />
             </div>
             <div className="flex flex-wrap gap-2 pb-1.5">
-              {slots.map(({ roundNumber, outfit }) => {
+              {orderedSlots.map(({ roundNumber, outfit }) => {
                 if (!outfit && !settings.showEmptySlots) return null
                 return (
                   <div
@@ -176,9 +179,7 @@ function UnknownTournamentBlock({ tournament, year, outfits, settings, onOpenLig
   )
 }
 
-export default function ExpandedYearSection({ year, outfitMap, tournaments, yearOutfits, settings, flatGrid, onOpenLightbox }) {
-  const cardWidth = CARD_WIDTHS[settings.gridDensity] ?? 128
-
+export default function ExpandedYearSection({ year, outfitMap, tournaments, yearOutfits, settings, sortBy, onOpenLightbox }) {
   const outfitCount = yearOutfits.length
   const majorsWithOutfits = GRAND_SLAMS.filter(t => yearOutfits.some(o => o.tournament === t)).length
   const showMajorsStat = tournaments.length > 1 && tournaments.some(t => GRAND_SLAMS.includes(t))
@@ -226,6 +227,7 @@ export default function ExpandedYearSection({ year, outfitMap, tournaments, year
         year={year}
         outfitMap={outfitMap}
         settings={settings}
+        sortBy={sortBy}
         onOpenLightbox={onOpenLightbox}
       />
     )]
@@ -239,15 +241,7 @@ export default function ExpandedYearSection({ year, outfitMap, tournaments, year
         <h2 className="font-playfair text-5xl text-ink leading-none">{year}</h2>
         <p className="text-sm text-muted mt-1.5">{subtitle}</p>
       </div>
-      {flatGrid ? (
-        <div className="flex flex-wrap gap-2">
-          {yearOutfits.map(outfit => (
-            <div key={outfit.id} style={{ width: cardWidth }}>
-              <OutfitCard outfit={outfit} settings={settings} onClick={() => onOpenLightbox(outfit)} />
-            </div>
-          ))}
-        </div>
-      ) : blocks}
+      {blocks}
     </section>
   )
 }

@@ -25,9 +25,11 @@ export default function ViewerPage() {
     () => readStorage(`serena_hunt_panel_expanded`, "false") === "true",
   );
 
-  const [flatGrid, setFlatGrid] = useState(false);
   const [groupBy, setGroupByState] = useState(
     () => readStorage('serena_gallery_groupby', 'year'),
+  );
+  const [sortBy, setSortByState] = useState(
+    () => readStorage('serena_gallery_sortby', 'chronological'),
   );
 
   const { settings, updateSetting } = useSettings();
@@ -49,6 +51,11 @@ export default function ViewerPage() {
   function setGroupBy(value) {
     setGroupByState(value);
     writeStorage('serena_gallery_groupby', value);
+  }
+
+  function setSortBy(value) {
+    setSortByState(value);
+    writeStorage('serena_gallery_sortby', value);
   }
 
   useEffect(() => {
@@ -86,8 +93,6 @@ export default function ViewerPage() {
       className={`min-h-screen bg-dark transition-[padding-right] duration-300 ${anyPanelOpen ? "md:pr-72" : ""}`}
     >
       <FilterBar
-        flatGrid={flatGrid}
-        setFlatGrid={setFlatGrid}
         loading={loading}
         missingCount={missingCount}
         panelOpen={panelOpen}
@@ -115,8 +120,8 @@ export default function ViewerPage() {
           <GalleryGrid
             outfits={outfits}
             groupBy={groupBy}
+            sortBy={sortBy}
             settings={settings}
-            flatGrid={flatGrid}
             onOpenLightbox={openLightbox}
           />
         )}
@@ -143,6 +148,8 @@ export default function ViewerPage() {
         <GroupingPanel
           activeGrouping={groupBy}
           onGroupingChange={setGroupBy}
+          sortBy={sortBy}
+          onSortChange={setSortBy}
           onClose={() => setGroupingPanelOpen(false)}
         />
       )}

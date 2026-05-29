@@ -8,7 +8,6 @@ const GROUPING_LABELS = {
 }
 
 export default function FilterBar({
-  flatGrid, setFlatGrid,
   loading, missingCount,
   panelOpen, togglePanel, setPanelOpen,
   groupingPanelOpen, setGroupingPanelOpen,
@@ -31,21 +30,6 @@ export default function FilterBar({
 
       {/* ── Desktop bar ── */}
       <div className="hidden md:flex items-center gap-4">
-        {/* Layout toggle */}
-        <div className="flex rounded overflow-hidden border border-dark3 flex-shrink-0">
-          {[['tournament', 'By tournament'], ['grid', 'Grid']].map(([val, label]) => (
-            <button
-              key={val}
-              onClick={() => setFlatGrid(val === 'grid')}
-              className={`px-4 py-2 text-sm font-medium transition-colors ${
-                (val === 'grid') === flatGrid ? 'bg-gold text-dark' : 'text-muted hover:text-ink'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-
         {/* Right controls */}
         <div className="flex items-center gap-2 flex-shrink-0">
           {!loading && missingCount > 0 && (
@@ -113,21 +97,6 @@ export default function FilterBar({
       {/* ── Mobile dropdown ── */}
       {mobileMenuOpen && (
         <div className="md:hidden mt-2 space-y-2">
-          {/* Layout toggle */}
-          <div className="flex rounded overflow-hidden border border-dark3">
-            {[['tournament', 'By tournament'], ['grid', 'Grid']].map(([val, label]) => (
-              <button
-                key={val}
-                onClick={() => setFlatGrid(val === 'grid')}
-                className={`flex-1 px-4 py-2 text-sm font-medium transition-colors ${
-                  (val === 'grid') === flatGrid ? 'bg-gold text-dark' : 'text-muted hover:text-ink'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-
           {/* Group by */}
           <button
             onClick={() => { openGrouping(); setMobileMenuOpen(false) }}

@@ -4,7 +4,7 @@ import { sortTournaments } from '../../lib/filterUtils'
 import ExpandedYearSection from './ExpandedYearSection'
 import GroupSection from './GroupSection'
 
-export default function GalleryGrid({ outfits, groupBy = 'year', settings, flatGrid, onOpenLightbox }) {
+export default function GalleryGrid({ outfits, groupBy = 'year', sortBy = 'chronological', settings, onOpenLightbox }) {
   if (groupBy !== 'year') {
     return (
       <GroupedGallery
@@ -51,8 +51,8 @@ export default function GalleryGrid({ outfits, groupBy = 'year', settings, flatG
           tournaments={tournamentsForYear(year)}
           yearOutfits={outfitsForYear(year)}
           settings={settings}
+          sortBy={sortBy}
           onOpenLightbox={onOpenLightbox}
-          flatGrid={flatGrid}
         />
       ))}
     </div>
