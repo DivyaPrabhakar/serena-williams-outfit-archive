@@ -57,6 +57,7 @@ export const SINGLES_DID_NOT_PLAY = {
   'Roland Garros':   new Set([1995, 1996, 1997, 2000, 2005, 2006, 2011, 2017, 2022]),
   'Wimbledon':       new Set([1995, 1996, 1997, 1999, 2006, 2017]),
   'US Open':         new Set([1995, 1996, 1997, 2003, 2010, 2017, 2021]),
+  'Olympics':        new Set([2020]),
 }
 export const SINGLES_NOT_HELD = {
   'Wimbledon': new Set([2020]),
