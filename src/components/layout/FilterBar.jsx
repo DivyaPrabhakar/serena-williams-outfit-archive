@@ -8,7 +8,7 @@ const GROUPING_LABELS = {
 }
 
 export default function FilterBar({
-  loading, missingCount,
+  loading, foundCount, missingCount,
   panelOpen, togglePanel, setPanelOpen,
   groupingPanelOpen, setGroupingPanelOpen,
   showSettings, setShowSettings,
@@ -32,6 +32,12 @@ export default function FilterBar({
       <div className="hidden md:flex items-center gap-4">
         {/* Right controls */}
         <div className="flex items-center gap-2 flex-shrink-0">
+          {!loading && (
+            <span className="text-sm text-muted whitespace-nowrap">
+              <span className="text-ink font-medium">{foundCount}</span>
+              {' / '}{foundCount + missingCount} found
+            </span>
+          )}
           {!loading && missingCount > 0 && (
             <button
               onClick={togglePanel}
@@ -111,6 +117,14 @@ export default function FilterBar({
               {groupingLabel}
             </span>
           </button>
+
+          {/* Found progress */}
+          {!loading && (
+            <div className="px-4 py-2 text-sm text-muted">
+              <span className="text-ink font-medium">{foundCount}</span>
+              {' / '}{foundCount + missingCount} found
+            </div>
+          )}
 
           {/* Outfits yet to find */}
           {!loading && missingCount > 0 && (

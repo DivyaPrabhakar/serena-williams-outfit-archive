@@ -94,6 +94,7 @@ export default function ViewerPage() {
     >
       <FilterBar
         loading={loading}
+        foundCount={outfits.length}
         missingCount={missingCount}
         panelOpen={panelOpen}
         togglePanel={togglePanel}
