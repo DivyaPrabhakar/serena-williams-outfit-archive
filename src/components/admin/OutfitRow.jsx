@@ -1,14 +1,15 @@
-import { isGettyEmbed } from '../../lib/imageUtils'
+import { isGettyEmbed, gettyEmbedForIframe } from '../../lib/imageUtils'
+import LazyIframe from '../gallery/LazyIframe'
 
 export default function OutfitRow({ o, onEdit, onDelete, children }) {
   return (
     <div className="flex items-center gap-3 px-3 py-2.5 bg-[#111]">
       {isGettyEmbed(o.imageUrl) ? (
-        <iframe
-          srcDoc={`<!DOCTYPE html><html><head><style>html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#111}body{display:flex;align-items:center;justify-content:center}</style></head><body>${o.imageUrl}</body></html>`}
-          className="w-10 h-14 flex-shrink-0 border-0 pointer-events-none"
+        <LazyIframe
+          srcDoc={`<!DOCTYPE html><html><head><style>html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#111}body{display:flex;align-items:center;justify-content:center}</style></head><body>${gettyEmbedForIframe(o.imageUrl)}</body></html>`}
+          wrapperClassName="w-10 h-14 flex-shrink-0 bg-[#111]"
+          iframeClassName="w-full h-full border-0 pointer-events-none"
           sandbox="allow-scripts allow-same-origin"
-          loading="lazy"
         />
       ) : (
         <img

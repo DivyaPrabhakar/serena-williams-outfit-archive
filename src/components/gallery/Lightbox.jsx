@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { ROUND_LABELS, COLOR_MAP } from '../../lib/constants'
-import { isGettyEmbed } from '../../lib/imageUtils'
+import { isGettyEmbed, gettyEmbedForIframe } from '../../lib/imageUtils'
+import LazyIframe from './LazyIframe'
 
 function MetaRow({ label, children }) {
   return (
@@ -38,11 +39,12 @@ export default function Lightbox({ outfits, index, onNavigate, onClose }) {
         {/* Image */}
         <div className="flex-1 bg-dark min-h-0 flex items-center justify-center overflow-hidden">
           {isGettyEmbed(outfit.imageUrl) ? (
-            <iframe
+            <LazyIframe
               key={outfit.id}
-              srcDoc={`<!DOCTYPE html><html><head><style>html,body{margin:0;height:100%;overflow:hidden;background:#000}body{display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box}</style></head><body>${outfit.imageUrl}</body></html>`}
+              srcDoc={`<!DOCTYPE html><html><head><style>html,body{margin:0;height:100%;overflow:hidden;background:#000}body{display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box}</style></head><body>${gettyEmbedForIframe(outfit.imageUrl)}</body></html>`}
               title={`${outfit.tournament} ${outfit.year}`}
-              className="w-full h-full border-0"
+              wrapperClassName="w-full h-full"
+              iframeClassName="w-full h-full border-0"
               sandbox="allow-scripts allow-same-origin"
             />
           ) : (

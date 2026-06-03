@@ -1,3 +1,5 @@
+import { normalizeGettyEmbed } from './imageUtils'
+
 const API = '/.netlify/functions/outfits'
 
 // ── Row ↔ app-model conversion ────────────────────────────────────────────
@@ -21,7 +23,7 @@ export function rowToOutfit(r) {
 export function outfitToRow(o) {
   return {
     id:           o.id,
-    image_url:    o.imageUrl,
+    image_url:    normalizeGettyEmbed(o.imageUrl),
     year:         o.year,
     tournament:   o.tournament,
     discipline:   o.discipline,

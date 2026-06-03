@@ -1,5 +1,6 @@
 import { COLOR_MAP, ROUND_LABELS } from '../../lib/constants'
-import { isGettyEmbed, isGettyLandscape } from '../../lib/imageUtils'
+import { isGettyEmbed, isGettyLandscape, gettyEmbedForIframe } from '../../lib/imageUtils'
+import LazyIframe from './LazyIframe'
 
 export default function OutfitCard({ outfit, settings, onClick }) {
   const colors     = outfit.colors ?? []
@@ -35,13 +36,13 @@ export default function OutfitCard({ outfit, settings, onClick }) {
         onClick={settings.lightbox ? onClick : undefined}
       >
         {getty ? (
-          <iframe
+          <LazyIframe
             key={outfit.id}
-            srcDoc={`<!DOCTYPE html><html><head><style>html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#111}body{display:flex;align-items:${landscape ? 'center' : 'flex-start'};justify-content:${landscape ? focalJustify : 'center'};${landscape ? '' : 'margin-top:-44px;height:calc(100% + 44px)'}}</style></head><body>${outfit.imageUrl}</body></html>`}
+            srcDoc={`<!DOCTYPE html><html><head><style>html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#111}body{display:flex;align-items:${landscape ? 'center' : 'flex-start'};justify-content:${landscape ? focalJustify : 'center'};${landscape ? '' : 'margin-top:-44px;height:calc(100% + 44px)'}}</style></head><body>${gettyEmbedForIframe(outfit.imageUrl)}</body></html>`}
             title={label}
-            className="w-full h-full border-0 pointer-events-none"
+            wrapperClassName="w-full h-full"
+            iframeClassName="w-full h-full border-0 pointer-events-none"
             sandbox="allow-scripts allow-same-origin"
-            loading="lazy"
           />
         ) : (
           <img
