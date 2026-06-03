@@ -2,9 +2,7 @@ import { GRAND_SLAMS, DISCIPLINES, COLOR_MAP } from '../../lib/constants'
 import { getRoundsForSlot, getSlotStatus, getRoundLabel, getCombinedSlotStatus, getRoundNumbers } from '../../lib/rounds'
 import { CARD_WIDTHS, SLAM_TOURNAMENTS, isKnownForYear } from '../../lib/galleryUtils'
 import { getSortedColors } from '../../lib/colorUtils'
-import OutfitCard from './OutfitCard'
-import EmptySlot from './EmptySlot'
-import DimSlot from './DimSlot'
+import DisciplineBlock from './DisciplineBlock'
 
 // For tournaments in the participation constants (grand slams + Olympics)
 function ExpandedTournamentBlock({ tournament, year, outfitMap, settings, sortBy, onOpenLightbox }) {
@@ -68,45 +66,34 @@ function ExpandedTournamentBlock({ tournament, year, outfitMap, settings, sortBy
         )}
       </div>
 
-      {/* Played disciplines — each gets its own row */}
-      {playedBlocks.map(({ discipline, slots }) => {
-        const visible = slots.some(s => s.outfit !== null) || settings.showEmptySlots
-        if (!visible) return null
-        const orderedSlots = sortBy === 'filled-first'
-          ? [...slots.filter(s => s.outfit !== null), ...slots.filter(s => s.outfit === null)]
-          : slots
-        return (
-          <div key={discipline} className="mb-4 pl-3">
-            <div className="flex items-center gap-3 mb-2.5">
-              <span className="text-xs uppercase tracking-widest text-muted">{discipline}</span>
-              <div className="flex-1 h-px bg-dark3" />
-            </div>
-            <div className="flex flex-wrap gap-2 pb-1.5">
-              {orderedSlots.map(({ roundNumber, outfit }) => {
-                if (!outfit && !settings.showEmptySlots) return null
-                return (
-                  <div
-                    key={roundNumber}
-                    id={`slot-${year}-${tournament}-${discipline}-${roundNumber}`}
-                    className="flex-none"
-                    style={{ width: cardWidth }}
-                  >
-                    {outfit ? (
-                      <OutfitCard
-                        outfit={outfit}
-                        settings={settings}
-                        onClick={() => onOpenLightbox(outfit)}
-                      />
-                    ) : (
-                      <EmptySlot label={`${discipline} ${getRoundLabel(roundNumber)}`} />
-                    )}
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        )
-      })}
+      {/* Played disciplines — tinted blocks that flow side by side */}
+      <div className="flex flex-wrap gap-3 items-start pl-3 mb-4">
+        {playedBlocks.map(({ discipline, slots }) => {
+          const visible = slots.some(s => s.outfit !== null) || settings.showEmptySlots
+          if (!visible) return null
+          const orderedSlots = sortBy === 'filled-first'
+            ? [...slots.filter(s => s.outfit !== null), ...slots.filter(s => s.outfit === null)]
+            : slots
+          const items = orderedSlots
+            .filter(({ outfit }) => outfit || settings.showEmptySlots)
+            .map(({ roundNumber, outfit }) => ({
+              key: roundNumber,
+              outfit,
+              emptyLabel: `${discipline} ${getRoundLabel(roundNumber)}`,
+              slotId: `slot-${year}-${tournament}-${discipline}-${roundNumber}`,
+            }))
+          return (
+            <DisciplineBlock
+              key={discipline}
+              discipline={discipline}
+              items={items}
+              cardWidth={cardWidth}
+              settings={settings}
+              onOpenLightbox={onOpenLightbox}
+            />
+          )
+        })}
+      </div>
 
       {/* Non-played disciplines — consolidated into one line */}
       {settings.showDimSlots && dimBlocks.length > 0 && (
@@ -157,24 +144,22 @@ function UnknownTournamentBlock({ tournament, year, outfits, settings, onOpenLig
           </div>
         )}
       </div>
-      {Object.entries(byDiscipline).map(([discipline, dOutfits]) => {
-        const sorted = [...dOutfits].sort((a, b) => (a.roundNumber ?? 0) - (b.roundNumber ?? 0))
-        return (
-          <div key={discipline} className="mb-4 pl-3">
-            <div className="flex items-center gap-3 mb-2.5">
-              <span className="text-xs uppercase tracking-widest text-muted">{discipline}</span>
-              <div className="flex-1 h-px bg-dark3" />
-            </div>
-            <div className="flex flex-wrap gap-2 pb-1.5">
-              {sorted.map(outfit => (
-                <div key={outfit.id} className="flex-none" style={{ width: cardWidth }}>
-                  <OutfitCard outfit={outfit} settings={settings} onClick={() => onOpenLightbox(outfit)} />
-                </div>
-              ))}
-            </div>
-          </div>
-        )
-      })}
+      <div className="flex flex-wrap gap-3 items-start pl-3">
+        {Object.entries(byDiscipline).map(([discipline, dOutfits]) => {
+          const sorted = [...dOutfits].sort((a, b) => (a.roundNumber ?? 0) - (b.roundNumber ?? 0))
+          const items = sorted.map(outfit => ({ key: outfit.id, outfit }))
+          return (
+            <DisciplineBlock
+              key={discipline}
+              discipline={discipline}
+              items={items}
+              cardWidth={cardWidth}
+              settings={settings}
+              onOpenLightbox={onOpenLightbox}
+            />
+          )
+        })}
+      </div>
     </div>
   )
 }

@@ -5,8 +5,7 @@ import { sortTournaments } from '../../lib/filterUtils'
 import { CARD_WIDTHS, isKnownForYear } from '../../lib/galleryUtils'
 import ExpandedYearSection from './ExpandedYearSection'
 import GroupSection from './GroupSection'
-import OutfitCard from './OutfitCard'
-import EmptySlot from './EmptySlot'
+import DisciplineBlock from './DisciplineBlock'
 
 export default function GalleryGrid({ outfits, groupBy = 'year', sortBy = 'chronological', settings, onOpenLightbox }) {
   if (groupBy !== 'year') {
@@ -191,21 +190,34 @@ function TournamentGroupedGallery({ outfits, sortBy, settings, onOpenLightbox })
 
             {years.map(year => {
               if (!isKnownForYear(tournament, year)) {
-                const yearOutfits = tournamentOutfits
-                  .filter(o => o.year === year)
-                  .sort((a, b) => (a.roundNumber ?? 0) - (b.roundNumber ?? 0))
+                const yearOutfits = tournamentOutfits.filter(o => o.year === year)
+                const byDiscipline = {}
+                for (const o of yearOutfits) {
+                  const d = o.discipline ?? 'Singles'
+                  if (!byDiscipline[d]) byDiscipline[d] = []
+                  byDiscipline[d].push(o)
+                }
                 return (
                   <div key={year} className="mb-6">
                     <div className="flex items-center gap-2 mb-3">
                       <span className="text-xs uppercase tracking-widest text-gold/60">{year}</span>
                       <div className="flex-1 h-px bg-dark3" />
                     </div>
-                    <div className="flex flex-wrap gap-2 pl-3 pb-1.5">
-                      {yearOutfits.map(outfit => (
-                        <div key={outfit.id} className="flex-none" style={{ width: cardWidth }}>
-                          <OutfitCard outfit={outfit} settings={settings} onClick={() => onOpenLightbox(outfit)} />
-                        </div>
-                      ))}
+                    <div className="flex flex-wrap gap-3 items-start pl-3">
+                      {Object.entries(byDiscipline).map(([discipline, dOutfits]) => {
+                        const sorted = [...dOutfits].sort((a, b) => (a.roundNumber ?? 0) - (b.roundNumber ?? 0))
+                        const items = sorted.map(outfit => ({ key: outfit.id, outfit }))
+                        return (
+                          <DisciplineBlock
+                            key={discipline}
+                            discipline={discipline}
+                            items={items}
+                            cardWidth={cardWidth}
+                            settings={settings}
+                            onOpenLightbox={onOpenLightbox}
+                          />
+                        )
+                      })}
                     </div>
                   </div>
                 )
@@ -230,33 +242,31 @@ function TournamentGroupedGallery({ outfits, sortBy, settings, onOpenLightbox })
                     <span className="text-xs uppercase tracking-widest text-gold/60">{year}</span>
                     <div className="flex-1 h-px bg-dark3" />
                   </div>
-                  {disciplineBlocks.map(({ discipline, slots }) => {
-                    const orderedSlots = sortBy === 'filled-first'
-                      ? [...slots.filter(s => s.outfit !== null), ...slots.filter(s => s.outfit === null)]
-                      : slots
-                    return (
-                      <div key={discipline} className="mb-4 pl-3">
-                        <div className="flex items-center gap-3 mb-2.5">
-                          <span className="text-xs uppercase tracking-widest text-muted">{discipline}</span>
-                          <div className="flex-1 h-px bg-dark3" />
-                        </div>
-                        <div className="flex flex-wrap gap-2 pb-1.5">
-                          {orderedSlots.map(({ roundNumber, outfit }) => {
-                            if (!outfit && !settings.showEmptySlots) return null
-                            return (
-                              <div key={roundNumber} className="flex-none" style={{ width: cardWidth }}>
-                                {outfit ? (
-                                  <OutfitCard outfit={outfit} settings={settings} onClick={() => onOpenLightbox(outfit)} />
-                                ) : (
-                                  <EmptySlot label={`${discipline} ${getRoundLabel(roundNumber)}`} />
-                                )}
-                              </div>
-                            )
-                          })}
-                        </div>
-                      </div>
-                    )
-                  })}
+                  <div className="flex flex-wrap gap-3 items-start pl-3">
+                    {disciplineBlocks.map(({ discipline, slots }) => {
+                      const orderedSlots = sortBy === 'filled-first'
+                        ? [...slots.filter(s => s.outfit !== null), ...slots.filter(s => s.outfit === null)]
+                        : slots
+                      const items = orderedSlots
+                        .filter(({ outfit }) => outfit || settings.showEmptySlots)
+                        .map(({ roundNumber, outfit }) => ({
+                          key: roundNumber,
+                          outfit,
+                          emptyLabel: `${discipline} ${getRoundLabel(roundNumber)}`,
+                          slotId: `slot-${year}-${tournament}-${discipline}-${roundNumber}`,
+                        }))
+                      return (
+                        <DisciplineBlock
+                          key={discipline}
+                          discipline={discipline}
+                          items={items}
+                          cardWidth={cardWidth}
+                          settings={settings}
+                          onOpenLightbox={onOpenLightbox}
+                        />
+                      )
+                    })}
+                  </div>
                 </div>
               )
             })}
