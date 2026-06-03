@@ -1,6 +1,6 @@
 import { COLOR_MAP, DISCIPLINES } from '../../lib/constants'
 import { getSortedColors } from '../../lib/colorUtils'
-import { slotsForYear, getRoundsForSlot, getRoundLabel, getRoundNumbers } from '../../lib/rounds'
+import { slotsForYear, getRoundLabel, getRoundNumbers } from '../../lib/rounds'
 import { sortTournaments } from '../../lib/filterUtils'
 import { CARD_WIDTHS, isKnownForYear } from '../../lib/galleryUtils'
 import ExpandedYearSection from './ExpandedYearSection'
@@ -179,6 +179,32 @@ function TournamentGroupedGallery({ outfits, sortBy, settings, onOpenLightbox })
         const tournamentOutfits = map[tournament]
         const years = [...new Set(tournamentOutfits.map(o => o.year))].sort((a, b) => a - b)
 
+        // Build one set of discipline blocks per tournament, spanning all years.
+        // Each round slot is unique per year+round; placeholders are year-labeled.
+        const disciplineBlocks = DISCIPLINES.flatMap(discipline => {
+          const slots = []
+          const captured = new Set()
+          for (const year of years) {
+            if (!isKnownForYear(tournament, year)) continue
+            for (const roundNumber of getRoundNumbers(tournament, year, discipline)) {
+              const outfit = outfitMap.get(`${year}_${tournament}_${discipline}_${roundNumber}`) ?? null
+              if (outfit) captured.add(outfit.id)
+              slots.push({ year, roundNumber, outfit })
+            }
+          }
+          // Don't drop logged outfits from unknown years or anomalous rounds.
+          for (const o of tournamentOutfits) {
+            if ((o.discipline ?? 'Singles') !== discipline) continue
+            if (captured.has(o.id)) continue
+            slots.push({ year: o.year, roundNumber: o.roundNumber ?? 0, outfit: o })
+          }
+          if (slots.length === 0) return []
+          const visible = slots.some(s => s.outfit !== null) || settings.showEmptySlots
+          if (!visible) return []
+          slots.sort((a, b) => (a.year - b.year) || ((a.roundNumber ?? 0) - (b.roundNumber ?? 0)))
+          return [{ discipline, slots }]
+        })
+
         return (
           <section key={tournament} className="mb-14">
             <div className="mb-7">
@@ -188,88 +214,31 @@ function TournamentGroupedGallery({ outfits, sortBy, settings, onOpenLightbox })
               </p>
             </div>
 
-            {years.map(year => {
-              if (!isKnownForYear(tournament, year)) {
-                const yearOutfits = tournamentOutfits.filter(o => o.year === year)
-                const byDiscipline = {}
-                for (const o of yearOutfits) {
-                  const d = o.discipline ?? 'Singles'
-                  if (!byDiscipline[d]) byDiscipline[d] = []
-                  byDiscipline[d].push(o)
-                }
+            <div className="flex flex-wrap gap-3 items-start pl-3">
+              {disciplineBlocks.map(({ discipline, slots }) => {
+                const orderedSlots = sortBy === 'filled-first'
+                  ? [...slots.filter(s => s.outfit !== null), ...slots.filter(s => s.outfit === null)]
+                  : slots
+                const items = orderedSlots
+                  .filter(({ outfit }) => outfit || settings.showEmptySlots)
+                  .map(({ year, roundNumber, outfit }) => ({
+                    key: outfit ? outfit.id : `${year}-${roundNumber}`,
+                    outfit,
+                    emptyLabel: `${year} ${getRoundLabel(roundNumber)}`,
+                    slotId: `slot-${year}-${tournament}-${discipline}-${roundNumber}`,
+                  }))
                 return (
-                  <div key={year} className="mb-6">
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="text-xs uppercase tracking-widest text-gold/60">{year}</span>
-                      <div className="flex-1 h-px bg-dark3" />
-                    </div>
-                    <div className="flex flex-wrap gap-3 items-start pl-3">
-                      {Object.entries(byDiscipline).map(([discipline, dOutfits]) => {
-                        const sorted = [...dOutfits].sort((a, b) => (a.roundNumber ?? 0) - (b.roundNumber ?? 0))
-                        const items = sorted.map(outfit => ({ key: outfit.id, outfit }))
-                        return (
-                          <DisciplineBlock
-                            key={discipline}
-                            discipline={discipline}
-                            items={items}
-                            cardWidth={cardWidth}
-                            settings={settings}
-                            onOpenLightbox={onOpenLightbox}
-                          />
-                        )
-                      })}
-                    </div>
-                  </div>
+                  <DisciplineBlock
+                    key={discipline}
+                    discipline={discipline}
+                    items={items}
+                    cardWidth={cardWidth}
+                    settings={settings}
+                    onOpenLightbox={onOpenLightbox}
+                  />
                 )
-              }
-
-              const disciplineBlocks = DISCIPLINES.flatMap(discipline => {
-                const slots = getRoundNumbers(tournament, year, discipline).map(roundNumber => {
-                  const outfit = outfitMap.get(`${year}_${tournament}_${discipline}_${roundNumber}`) ?? null
-                  return { roundNumber, outfit }
-                })
-                if (slots.length === 0) return []
-                const visible = slots.some(s => s.outfit !== null) || settings.showEmptySlots
-                if (!visible) return []
-                return [{ discipline, slots }]
-              })
-
-              if (disciplineBlocks.length === 0) return null
-
-              return (
-                <div key={year} className="mb-6">
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="text-xs uppercase tracking-widest text-gold/60">{year}</span>
-                    <div className="flex-1 h-px bg-dark3" />
-                  </div>
-                  <div className="flex flex-wrap gap-3 items-start pl-3">
-                    {disciplineBlocks.map(({ discipline, slots }) => {
-                      const orderedSlots = sortBy === 'filled-first'
-                        ? [...slots.filter(s => s.outfit !== null), ...slots.filter(s => s.outfit === null)]
-                        : slots
-                      const items = orderedSlots
-                        .filter(({ outfit }) => outfit || settings.showEmptySlots)
-                        .map(({ roundNumber, outfit }) => ({
-                          key: roundNumber,
-                          outfit,
-                          emptyLabel: `${discipline} ${getRoundLabel(roundNumber)}`,
-                          slotId: `slot-${year}-${tournament}-${discipline}-${roundNumber}`,
-                        }))
-                      return (
-                        <DisciplineBlock
-                          key={discipline}
-                          discipline={discipline}
-                          items={items}
-                          cardWidth={cardWidth}
-                          settings={settings}
-                          onOpenLightbox={onOpenLightbox}
-                        />
-                      )
-                    })}
-                  </div>
-                </div>
-              )
-            })}
+              })}
+            </div>
           </section>
         )
       })}

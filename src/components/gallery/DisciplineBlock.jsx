@@ -6,13 +6,18 @@ import EmptySlot from './EmptySlot'
 // label and a flex-wrap grid of card slots. Lets disciplines flow side by side
 // rather than each forced onto its own full-width row.
 // items: [{ key, outfit, emptyLabel, slotId }]
-export default function DisciplineBlock({ discipline, items, cardWidth, settings, onOpenLightbox }) {
+export default function DisciplineBlock({ discipline, items, cardWidth, maxColumns = 4, settings, onOpenLightbox }) {
   const style = DISCIPLINE_STYLE[discipline] ?? DISCIPLINE_STYLE.Singles
+
+  // Cap the block at maxColumns cards wide so disciplines with many slots wrap
+  // their cards internally instead of hogging the full row width. Padding (p-2.5
+  // → 20px) and the inner gap-2 (8px) are included since box-sizing is border-box.
+  const maxWidth = maxColumns * cardWidth + (maxColumns - 1) * 8 + 20
 
   return (
     <div
       className="rounded-lg p-2.5 pt-2 ring-1"
-      style={{ background: style.tint, '--tw-ring-color': style.ring }}
+      style={{ background: style.tint, '--tw-ring-color': style.ring, maxWidth }}
     >
       <span
         className="block text-[10px] uppercase tracking-widest mb-2"
