@@ -1,7 +1,7 @@
 import { useMemo, useRef } from 'react'
 import { ACTIVE_YEARS, DISCIPLINES } from '../lib/constants'
 import {
-  getRoundsForSlot,
+  getRoundNumbers,
   getRoundLabel,
   getCombinedSlotStatus,
   slotsForYear,
@@ -11,7 +11,6 @@ export function useMissingOutfits(outfits, mode) {
   const highlightTimerRef = useRef(null)
 
   const condensedMissing = useMemo(() => {
-    if (!outfits.length) return []
     const outfitKeys = new Set(outfits.map(o => `${o.year}_${o.tournament}`))
     const items = []
     for (const year of ACTIVE_YEARS) {
@@ -28,7 +27,6 @@ export function useMissingOutfits(outfits, mode) {
   }, [outfits])
 
   const expandedMissing = useMemo(() => {
-    if (!outfits.length) return []
     const outfitKeys = new Set(
       outfits.map(o => `${o.year}_${o.tournament}_${o.discipline}_${o.roundNumber}`),
     )
@@ -36,8 +34,7 @@ export function useMissingOutfits(outfits, mode) {
     for (const year of ACTIVE_YEARS) {
       for (const tournament of slotsForYear(year)) {
         for (const discipline of DISCIPLINES) {
-          const rounds = getRoundsForSlot(tournament, year, discipline)
-          for (let r = 1; r <= rounds; r++) {
+          for (const r of getRoundNumbers(tournament, year, discipline)) {
             if (!outfitKeys.has(`${year}_${tournament}_${discipline}_${r}`)) {
               items.push({ year, tournament, discipline, roundNumber: r, round: getRoundLabel(r) })
             }
@@ -48,7 +45,31 @@ export function useMissingOutfits(outfits, mode) {
     return items
   }, [outfits])
 
+  const totalCondensed = useMemo(() => {
+    let total = 0
+    for (const year of ACTIVE_YEARS) {
+      for (const tournament of slotsForYear(year)) {
+        if (getCombinedSlotStatus(tournament, year) === 'played') total++
+      }
+    }
+    return total
+  }, [])
+
+  const totalExpanded = useMemo(() => {
+    let total = 0
+    for (const year of ACTIVE_YEARS) {
+      for (const tournament of slotsForYear(year)) {
+        for (const discipline of DISCIPLINES) {
+          total += getRoundNumbers(tournament, year, discipline).length
+        }
+      }
+    }
+    return total
+  }, [])
+
   const missingCount = mode === 'condensed' ? condensedMissing.length : expandedMissing.length
+  const totalCount = mode === 'condensed' ? totalCondensed : totalExpanded
+  const foundCount = totalCount - missingCount
 
   function handleHighlight(item) {
     if (highlightTimerRef.current) clearTimeout(highlightTimerRef.current)
@@ -76,5 +97,5 @@ export function useMissingOutfits(outfits, mode) {
     }
   }
 
-  return { condensedMissing, expandedMissing, missingCount, handleHighlight }
+  return { condensedMissing, expandedMissing, missingCount, foundCount, totalCount, handleHighlight }
 }

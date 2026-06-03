@@ -78,7 +78,7 @@ export default function ViewerPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const { expandedMissing, missingCount, handleHighlight } =
+  const { expandedMissing, foundCount, missingCount, handleHighlight } =
     useMissingOutfits(outfits, 'expanded');
 
   function openLightbox(outfit) {
@@ -94,7 +94,7 @@ export default function ViewerPage() {
     >
       <FilterBar
         loading={loading}
-        foundCount={outfits.length}
+        foundCount={foundCount}
         missingCount={missingCount}
         panelOpen={panelOpen}
         togglePanel={togglePanel}
