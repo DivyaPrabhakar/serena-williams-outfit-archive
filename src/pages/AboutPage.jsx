@@ -1,5 +1,3 @@
-import { Link } from "react-router-dom";
-
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-dark px-3 py-16">
@@ -50,17 +48,11 @@ export default function AboutPage() {
           </p>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-dark3 flex items-center justify-between">
+        <div className="mt-12 pt-8 border-t border-dark3">
           <p className="text-base text-muted">
             Images sourced from publicly available press and archive
             photography.
           </p>
-          <Link
-            to="/submit"
-            className="text-base text-gold hover:text-gold-light transition-colors flex-shrink-0 ml-6"
-          >
-            Submit an outfit →
-          </Link>
         </div>
       </div>
     </div>
