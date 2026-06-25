@@ -1,5 +1,5 @@
 import { useMemo, useRef } from 'react'
-import { ACTIVE_YEARS, DISCIPLINES } from '../lib/constants'
+import { ACTIVE_YEARS, DISCIPLINES, TOTAL_MATCHES } from '../lib/constants'
 import {
   getRoundNumbers,
   getRoundLabel,
@@ -69,7 +69,16 @@ export function useMissingOutfits(outfits, mode) {
 
   const missingCount = mode === 'condensed' ? condensedMissing.length : expandedMissing.length
   const totalCount = mode === 'condensed' ? totalCondensed : totalExpanded
-  const foundCount = totalCount - missingCount
+
+  // Numerator for the progress indicator: unique outfit entries in the fitdex,
+  // deduped by slot key (same key format used for expandedMissing above).
+  const foundCount = useMemo(
+    () =>
+      new Set(
+        outfits.map(o => `${o.year}_${o.tournament}_${o.discipline}_${o.roundNumber}`),
+      ).size,
+    [outfits],
+  )
 
   function handleHighlight(item) {
     if (highlightTimerRef.current) clearTimeout(highlightTimerRef.current)
@@ -97,5 +106,5 @@ export function useMissingOutfits(outfits, mode) {
     }
   }
 
-  return { condensedMissing, expandedMissing, missingCount, foundCount, totalCount, handleHighlight }
+  return { condensedMissing, expandedMissing, missingCount, foundCount, totalCount, totalMatches: TOTAL_MATCHES, handleHighlight }
 }

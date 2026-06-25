@@ -8,7 +8,7 @@ const GROUPING_LABELS = {
 }
 
 export default function FilterBar({
-  loading, foundCount, missingCount,
+  loading, foundCount, missingCount, totalCount,
   panelOpen, togglePanel, setPanelOpen,
   groupingPanelOpen, setGroupingPanelOpen,
   showSettings, setShowSettings,
@@ -35,7 +35,7 @@ export default function FilterBar({
           {!loading && (
             <span className="text-sm text-muted whitespace-nowrap">
               <span className="text-ink font-medium">{foundCount}</span>
-              {' / '}{foundCount + missingCount} found
+              {' / '}{totalCount} found
             </span>
           )}
           {!loading && missingCount > 0 && (
@@ -122,7 +122,7 @@ export default function FilterBar({
           {!loading && (
             <div className="px-4 py-2 text-sm text-muted">
               <span className="text-ink font-medium">{foundCount}</span>
-              {' / '}{foundCount + missingCount} found
+              {' / '}{totalCount} found
             </div>
           )}
 
