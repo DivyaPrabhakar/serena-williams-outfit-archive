@@ -46,7 +46,7 @@ export default function StickyGroupHeader({ swatches, title, subtitle, className
           <h2 className="font-playfair text-5xl text-ink leading-none transition-all duration-200 group-data-[stuck=true]/sticky:text-2xl">
             {title}
           </h2>
-          <p className="w-full text-sm text-muted transition-all duration-200 group-data-[stuck=true]/sticky:w-auto group-data-[stuck=true]/sticky:text-xs">
+          <p className="w-full text-sm leading-none text-muted transition-all duration-200 group-data-[stuck=true]/sticky:w-auto group-data-[stuck=true]/sticky:text-xs">
             {subtitle}
           </p>
         </div>
