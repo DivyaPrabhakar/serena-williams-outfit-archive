@@ -6,6 +6,7 @@ import { CARD_WIDTHS, isKnownForYear } from '../../lib/galleryUtils'
 import ExpandedYearSection from './ExpandedYearSection'
 import GroupSection from './GroupSection'
 import DisciplineBlock from './DisciplineBlock'
+import StickyGroupHeader from './StickyGroupHeader'
 
 export default function GalleryGrid({ outfits, groupBy = 'year', sortBy = 'chronological', settings, onOpenLightbox }) {
   if (groupBy !== 'year') {
@@ -207,12 +208,11 @@ function TournamentGroupedGallery({ outfits, sortBy, settings, onOpenLightbox })
 
         return (
           <section key={tournament} className="mb-14">
-            <div className="mb-7">
-              <h2 className="font-playfair text-5xl text-ink leading-none">{tournament}</h2>
-              <p className="text-sm text-muted mt-1.5">
-                {tournamentOutfits.length} outfit{tournamentOutfits.length !== 1 ? 's' : ''}
-              </p>
-            </div>
+            <StickyGroupHeader
+              className="mb-7"
+              title={tournament}
+              subtitle={`${tournamentOutfits.length} outfit${tournamentOutfits.length !== 1 ? 's' : ''}`}
+            />
 
             <div className="flex flex-wrap gap-3 items-start pl-3">
               {disciplineBlocks.map(({ discipline, slots }) => {

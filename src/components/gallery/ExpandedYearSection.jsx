@@ -3,6 +3,7 @@ import { getRoundsForSlot, getSlotStatus, getRoundLabel, getCombinedSlotStatus, 
 import { CARD_WIDTHS, SLAM_TOURNAMENTS, isKnownForYear } from '../../lib/galleryUtils'
 import { getSortedColors } from '../../lib/colorUtils'
 import DisciplineBlock from './DisciplineBlock'
+import StickyGroupHeader from './StickyGroupHeader'
 
 // For tournaments in the participation constants (grand slams + Olympics)
 function ExpandedTournamentBlock({ tournament, year, outfitMap, settings, sortBy, onOpenLightbox }) {
@@ -222,10 +223,7 @@ export default function ExpandedYearSection({ year, outfitMap, tournaments, year
 
   return (
     <section id={`year-${year}`} className="mb-14">
-      <div className="mb-7">
-        <h2 className="font-playfair text-5xl text-ink leading-none">{year}</h2>
-        <p className="text-sm text-muted mt-1.5">{subtitle}</p>
-      </div>
+      <StickyGroupHeader className="mb-7" title={String(year)} subtitle={subtitle} />
       {blocks}
     </section>
   )
