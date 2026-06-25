@@ -6,7 +6,7 @@ const GROUPING_LABELS = {
 }
 
 export default function FilterBar({
-  loading, foundCount, missingCount,
+  loading, foundCount, totalCount,
   panelOpen, togglePanel, setPanelOpen,
   groupingPanelOpen, setGroupingPanelOpen,
   groupBy,
@@ -29,7 +29,7 @@ export default function FilterBar({
             panelOpen ? 'bg-gold text-dark' : 'bg-dark3 text-ink hover:text-white'
           }`}
         >
-          {foundCount}/{foundCount + missingCount} outfits found
+          {foundCount}/{totalCount} outfits found
         </button>
       )}
       <button

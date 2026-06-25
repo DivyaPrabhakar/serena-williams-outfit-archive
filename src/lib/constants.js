@@ -6,6 +6,10 @@ export const ACTIVE_YEARS = Array.from({ length: 2022 - 1995 + 1 }, (_, i) => 19
 
 export const DISCIPLINES = ['Singles', 'Doubles', 'Mixed']
 
+// Total career matches played (per online records); used as the
+// denominator for the "outfits found" progress indicator.
+export const TOTAL_MATCHES = 1280
+
 // ── Round helpers ─────────────────────────────────────────────────────────
 // Ordered sequence used for slicing into getValidRounds
 export const ROUND_SEQUENCE = ['R1', 'R2', 'R3', 'R4', 'QF', 'SF', 'F']
