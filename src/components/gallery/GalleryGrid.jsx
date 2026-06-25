@@ -217,7 +217,10 @@ function TournamentGroupedGallery({ outfits, sortBy, settings, onOpenLightbox })
               subtitle={`${tournamentOutfits.length} outfit${tournamentOutfits.length !== 1 ? 's' : ''}`}
             />
 
-            <div className="flex flex-wrap gap-3 items-start pl-3">
+            <div
+              className="grid gap-3 items-start pl-3"
+              style={{ gridTemplateColumns: `repeat(${disciplineBlocks.length}, minmax(0, 1fr))` }}
+            >
               {disciplineBlocks.map(({ discipline, slots }) => {
                 const orderedSlots = sortBy === 'filled-first'
                   ? [...slots.filter(s => s.outfit !== null), ...slots.filter(s => s.outfit === null)]
@@ -236,6 +239,7 @@ function TournamentGroupedGallery({ outfits, sortBy, settings, onOpenLightbox })
                     discipline={discipline}
                     items={items}
                     cardWidth={cardWidth}
+                    fillWidth
                     settings={settings}
                     onOpenLightbox={onOpenLightbox}
                   />
