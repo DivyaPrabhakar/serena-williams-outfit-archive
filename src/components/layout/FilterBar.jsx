@@ -12,7 +12,6 @@ export default function FilterBar({
   groupBy,
 }) {
   const groupingLabel = GROUPING_LABELS[groupBy] ?? groupBy
-  const isNonDefault = groupBy !== 'year'
 
   function openGrouping() {
     const next = !groupingPanelOpen
@@ -25,7 +24,7 @@ export default function FilterBar({
       {!loading && (
         <button
           onClick={togglePanel}
-          className={`px-4 py-2 rounded text-sm font-medium whitespace-nowrap transition-colors ${
+          className={`px-4 py-2 rounded text-sm font-normal whitespace-nowrap transition-colors ${
             panelOpen ? 'bg-gold text-dark' : 'bg-dark3 text-ink hover:text-white'
           }`}
         >
@@ -34,11 +33,12 @@ export default function FilterBar({
       )}
       <button
         onClick={openGrouping}
-        className={`px-4 py-2 rounded text-sm font-medium whitespace-nowrap transition-colors ${
-          groupingPanelOpen || isNonDefault ? 'bg-gold text-dark' : 'bg-dark3 text-ink hover:text-white'
+        className={`px-4 py-2 rounded text-sm font-normal whitespace-nowrap transition-colors ${
+          groupingPanelOpen ? 'bg-gold text-dark' : 'bg-dark3 hover:text-white'
         }`}
       >
-        View by {groupingLabel}
+        <span className={groupingPanelOpen ? 'text-dark/60' : 'text-muted'}>View by: </span>
+        <span className={groupingPanelOpen ? 'text-dark font-medium' : 'text-gold'}>{groupingLabel}</span>
       </button>
     </div>
   )
