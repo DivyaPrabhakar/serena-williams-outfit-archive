@@ -106,7 +106,7 @@ export default function ViewerPage() {
         groupBy={groupBy}
       />
 
-      <main className="px-3 pt-10 pb-24 max-w-7xl mx-auto">
+      <main className="px-3 pt-10 pb-24 max-w-[1600px] mx-auto">
         {loading && (
           <div className="flex items-center justify-center py-32 text-muted text-sm">
             Loading…
