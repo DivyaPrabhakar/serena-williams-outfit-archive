@@ -25,7 +25,7 @@ export default function FilterBar({
         <button
           onClick={togglePanel}
           className={`px-4 py-2 rounded text-sm font-normal whitespace-nowrap transition-colors ${
-            panelOpen ? 'bg-gold text-dark' : 'bg-dark3 text-ink hover:text-white'
+            panelOpen ? 'bg-gold text-dark' : 'bg-dark3 text-muted hover:text-white'
           }`}
         >
           {foundCount}/{totalCount} outfits found
