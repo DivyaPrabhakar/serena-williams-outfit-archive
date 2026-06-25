@@ -25,7 +25,11 @@ export default function StickyGroupHeader({ id, label, swatches, title, subtitle
       // Match the JS pin line to whatever CSS `top` the active breakpoint resolved to.
       const top = parseFloat(getComputedStyle(sticky).top) || 0
       observer = new IntersectionObserver(
-        ([entry]) => setStuck(!entry.isIntersecting),
+        ([entry]) => {
+          // Stuck only when the sentinel has scrolled ABOVE the pin line (top + 1px),
+          // not when it's still below the viewport (also non-intersecting).
+          setStuck(!entry.isIntersecting && entry.boundingClientRect.top <= top + 1)
+        },
         { rootMargin: `-${top + 1}px 0px 0px 0px`, threshold: 0 },
       )
       observer.observe(sentinel)
