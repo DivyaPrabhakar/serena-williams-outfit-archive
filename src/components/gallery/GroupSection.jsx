@@ -3,7 +3,7 @@ import { CARD_WIDTHS } from '../../lib/galleryUtils'
 import OutfitCard from './OutfitCard'
 import StickyGroupHeader from './StickyGroupHeader'
 
-export default function GroupSection({ label, color, colors, outfits, settings, onOpenLightbox }) {
+export default function GroupSection({ navId, label, color, colors, outfits, settings, onOpenLightbox }) {
   const cardWidth = CARD_WIDTHS[settings.gridDensity] ?? 128
 
   const swatches = colors && colors.length > 0 ? (
@@ -27,6 +27,8 @@ export default function GroupSection({ label, color, colors, outfits, settings, 
     <section className="mb-14">
       <StickyGroupHeader
         className="mb-7"
+        id={navId}
+        label={label}
         swatches={swatches}
         title={label}
         subtitle={`${outfits.length} outfit${outfits.length !== 1 ? 's' : ''}`}

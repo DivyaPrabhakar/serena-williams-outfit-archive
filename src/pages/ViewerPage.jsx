@@ -10,6 +10,8 @@ import { HeaderSlotContext } from "../components/layout/HeaderSlot";
 import FilterBar from "../components/layout/FilterBar";
 import GroupingPanel from "../components/filters/GroupingPanel";
 import GalleryGrid from "../components/gallery/GalleryGrid";
+import GroupNav from "../components/gallery/GroupNav";
+import { GroupNavProvider } from "../components/gallery/GroupNavContext";
 import Lightbox from "../components/gallery/Lightbox";
 import MissingPanel from "../components/gallery/MissingPanel";
 
@@ -28,6 +30,9 @@ export default function ViewerPage() {
 
   const [groupBy, setGroupByState] = useState(
     () => readStorage('serena_gallery_groupby', 'year'),
+  );
+  const [navCollapsed, setNavCollapsedState] = useState(
+    () => readStorage('serena_groupnav_collapsed', 'false') === 'true',
   );
   const [sortBy, setSortByState] = useState(
     () => readStorage('serena_gallery_sortby', 'chronological'),
@@ -57,6 +62,14 @@ export default function ViewerPage() {
   function setSortBy(value) {
     setSortByState(value);
     writeStorage('serena_gallery_sortby', value);
+  }
+
+  function toggleNavCollapsed() {
+    setNavCollapsedState((prev) => {
+      const next = !prev;
+      writeStorage('serena_groupnav_collapsed', next);
+      return next;
+    });
   }
 
   useEffect(() => {
@@ -104,8 +117,9 @@ export default function ViewerPage() {
   );
 
   return (
+    <GroupNavProvider>
     <div
-      className={`min-h-screen bg-dark transition-[padding-right] duration-300 ${anyPanelOpen ? "md:pr-72" : ""}`}
+      className={`min-h-screen bg-dark transition-[padding] duration-300 ${anyPanelOpen ? "md:pr-72" : ""} ${navCollapsed ? "lg:pl-10" : "lg:pl-52"}`}
     >
       {/* Desktop: portal controls into the centered header slot */}
       {slotEl && createPortal(controls, slotEl)}
@@ -114,6 +128,9 @@ export default function ViewerPage() {
       <div className="md:hidden sticky top-28 z-30 bg-dark border-b border-dark3 px-3 py-3 flex justify-center">
         {controls}
       </div>
+
+      {/* Desktop-only left jump-nav populated by the rendered group headers */}
+      <GroupNav groupBy={groupBy} collapsed={navCollapsed} onToggle={toggleNavCollapsed} />
 
       <main className="px-3 pt-10 pb-24 max-w-[1600px] mx-auto">
         {loading && (
@@ -164,5 +181,6 @@ export default function ViewerPage() {
         />
       )}
     </div>
+    </GroupNavProvider>
   );
 }
