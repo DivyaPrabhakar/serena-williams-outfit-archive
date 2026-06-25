@@ -6,38 +6,45 @@ export default function AboutPage() {
           About
         </h1>
 
-        <div className="space-y-5 text-ink/75 text-xl leading-relaxed">
+        <div className="space-y-5 text-ink text-xl leading-relaxed">
+          <p className="text-gold text-base uppercase tracking-widest font-medium mb-4">
+            The Project
+          </p>
           <p>
             This is an ongoing effort to catalog every outfit Serena Williams
-            wore at every major: each round, each discipline, each tournament
-            from 1995 to her final match in 2022. The name takes its cue from
-            the Pokédex — a complete compendium with one slot per entry and my
-            obsessive goal of filling every last one.
+            has worn on-court: each round, discipline, and tournament from 1995
+            to <s className="text-muted">her final match in 2022</s> the end of
+            time (SHE&apos;S BAAAACK). The name takes its cue from the Pokédex —
+            a complete compendium with one slot per entry and my obsessive goal
+            of catching &apos;em all.
           </p>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-dark3 space-y-5 text-ink/75 text-xl leading-relaxed">
-          <p className="text-ink text-base uppercase tracking-widest font-medium mb-4">
+        <div className="mt-12 pt-8 border-t border-dark3 space-y-5 text-ink text-xl leading-relaxed">
+          <p className="text-gold text-base uppercase tracking-widest font-medium mb-4">
             The Creator
           </p>
           <p>
+            Divya Prabhakar has loved Serena since Prabhakar was four years old.
+            She memorized Williams&apos;s life story for a 4th grade
+            &quot;Living Museum&quot; project, saw Williams play in-person for
+            the first time at age 8, and when Prabhakar gave birth in 2022, she
+            watched what were then considered to be Serena&apos;s final career
+            matches in between contractions.
+          </p>
+          <p>
+            Prabhakar currently leads UI Design at Form Energy, building
+            software for grid-scale energy storage. Outside of work, she creates
+            projects that surface patterns in large visual datasets across her
+            interests of fashion, culture, and art. View her work at{" "}
             <a
               href="https://divyaprabhakar.com"
               target="_blank"
               rel="noopener noreferrer"
               className="text-gold hover:text-gold-light transition-colors"
             >
-              Divya Prabhakar
-            </a>{" "}
-            has loved Serena since she was four years old. She memorized her
-            life story for a 4th grade "Living Museum" project, saw her play
-            in-person for the first time at 13, and when she gave birth in 2022,
-            Serena's final US Open matches were on in the delivery room.
-          </p>
-          <p>
-            Being a tennis and fashion lover herself, she wanted to document
-            every look Serena wore while dominating the sport. Seeing all the
-            looks together is a new facet of her icon status.
+              divyaprabhakar.com
+            </a>
           </p>
         </div>
 
