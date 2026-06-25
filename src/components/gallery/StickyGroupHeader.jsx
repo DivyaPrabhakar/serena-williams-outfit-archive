@@ -1,12 +1,18 @@
 import { useEffect, useRef, useState } from 'react'
+import { useGroupNav } from './GroupNavContext'
 
 // Top-level group header (Year / Color / Brand / Tournament) that pins below the
 // nav while its section is scrolled. When pinned ("stuck") it collapses into a slim
 // single line: smaller title with the count/subtitle pulled inline beside it.
-export default function StickyGroupHeader({ swatches, title, subtitle, className = '' }) {
+//
+// When an `id` is provided it also registers itself with the GroupNav registry so
+// the left jump-nav can list and scroll to this section. The sentinel/anchor div
+// is the scroll target (with scroll-mt to clear the sticky top nav).
+export default function StickyGroupHeader({ id, label, swatches, title, subtitle, className = '' }) {
   const sentinelRef = useRef(null)
   const stickyRef = useRef(null)
   const [stuck, setStuck] = useState(false)
+  const { register } = useGroupNav()
 
   useEffect(() => {
     const sentinel = sentinelRef.current
@@ -33,9 +39,14 @@ export default function StickyGroupHeader({ swatches, title, subtitle, className
     }
   }, [])
 
+  useEffect(() => {
+    if (!id || !sentinelRef.current) return
+    return register({ id, label: label ?? title, el: sentinelRef.current })
+  }, [id, label, title, register])
+
   return (
     <>
-      <div ref={sentinelRef} aria-hidden className="h-px -mb-px" />
+      <div ref={sentinelRef} id={id} aria-hidden className="h-px -mb-px scroll-mt-28" />
       <div
         ref={stickyRef}
         data-stuck={stuck}

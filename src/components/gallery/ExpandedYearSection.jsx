@@ -223,7 +223,7 @@ export default function ExpandedYearSection({ year, outfitMap, tournaments, year
 
   return (
     <section id={`year-${year}`} className="mb-14">
-      <StickyGroupHeader className="mb-7" title={String(year)} subtitle={subtitle} />
+      <StickyGroupHeader className="mb-7" id={`nav-year-${year}`} label={String(year)} title={String(year)} subtitle={subtitle} />
       {blocks}
     </section>
   )

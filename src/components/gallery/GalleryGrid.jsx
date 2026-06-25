@@ -2,7 +2,7 @@ import { COLOR_MAP, DISCIPLINES } from '../../lib/constants'
 import { getSortedColors } from '../../lib/colorUtils'
 import { slotsForYear, getRoundLabel, getRoundNumbers } from '../../lib/rounds'
 import { sortTournaments } from '../../lib/filterUtils'
-import { CARD_WIDTHS, isKnownForYear } from '../../lib/galleryUtils'
+import { CARD_WIDTHS, isKnownForYear, groupNavId } from '../../lib/galleryUtils'
 import ExpandedYearSection from './ExpandedYearSection'
 import GroupSection from './GroupSection'
 import DisciplineBlock from './DisciplineBlock'
@@ -142,6 +142,7 @@ function GroupedGallery({ outfits, groupBy, sortBy, settings, onOpenLightbox }) 
       {groups.map(g => (
         <GroupSection
           key={g.key}
+          navId={groupNavId('group', g.key)}
           label={g.label}
           color={g.color}
           outfits={g.outfits}
@@ -210,6 +211,8 @@ function TournamentGroupedGallery({ outfits, sortBy, settings, onOpenLightbox })
           <section key={tournament} className="mb-14">
             <StickyGroupHeader
               className="mb-7"
+              id={groupNavId('tournament', tournament)}
+              label={tournament}
               title={tournament}
               subtitle={`${tournamentOutfits.length} outfit${tournamentOutfits.length !== 1 ? 's' : ''}`}
             />
