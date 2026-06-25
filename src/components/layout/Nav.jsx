@@ -9,7 +9,6 @@ export default function Nav() {
       </Link>
       <div className="flex items-center gap-6">
         <Link to="/about" className="text-base text-muted hover:text-ink transition-colors">About</Link>
-        <a href="https://forms.gle/LKe7Cx1EjwSvcFFE8" target="_blank" rel="noreferrer" className="text-base text-muted hover:text-ink transition-colors">Submit</a>
         <Link to="/admin" className="text-base text-muted hover:text-ink transition-colors">Admin</Link>
       </div>
     </nav>
