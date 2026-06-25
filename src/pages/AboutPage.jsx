@@ -9,6 +9,9 @@ export default function AboutPage() {
         </h1>
 
         <div className="space-y-5 text-ink text-xl leading-relaxed">
+          <p className="text-gold text-base uppercase tracking-widest font-medium mb-4">
+            The Project
+          </p>
           <p>
             This is an ongoing effort to catalog every outfit Serena Williams
             has worn on-court: each round, discipline, and tournament from 1995
@@ -20,7 +23,7 @@ export default function AboutPage() {
         </div>
 
         <div className="mt-12 pt-8 border-t border-dark3 space-y-5 text-ink text-xl leading-relaxed">
-          <p className="text-ink text-base uppercase tracking-widest font-medium mb-4">
+          <p className="text-gold text-base uppercase tracking-widest font-medium mb-4">
             The Creator
           </p>
           <p>

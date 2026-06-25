@@ -1,5 +1,3 @@
-import { useState } from 'react'
-
 const GROUPING_LABELS = {
   year: 'Year',
   tournament: 'Tournament',
@@ -8,13 +6,11 @@ const GROUPING_LABELS = {
 }
 
 export default function FilterBar({
-  loading, foundCount, missingCount,
+  loading, foundCount, totalCount,
   panelOpen, togglePanel, setPanelOpen,
   groupingPanelOpen, setGroupingPanelOpen,
-  showSettings, setShowSettings,
   groupBy,
 }) {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const groupingLabel = GROUPING_LABELS[groupBy] ?? groupBy
   const isNonDefault = groupBy !== 'year'
 
@@ -22,135 +18,28 @@ export default function FilterBar({
     const next = !groupingPanelOpen
     setGroupingPanelOpen(next)
     if (next) setPanelOpen(false)
-    setShowSettings(false)
   }
 
   return (
-    <div className="sticky top-28 z-30 bg-dark border-b border-dark3 px-3 py-3 relative">
-
-      {/* ── Desktop bar ── */}
-      <div className="hidden md:flex items-center gap-4">
-        {/* Right controls */}
-        <div className="flex items-center gap-2 flex-shrink-0">
-          {!loading && (
-            <span className="text-sm text-muted whitespace-nowrap">
-              <span className="text-ink font-medium">{foundCount}</span>
-              {' / '}{foundCount + missingCount} found
-            </span>
-          )}
-          {!loading && missingCount > 0 && (
-            <button
-              onClick={togglePanel}
-              className={`flex items-center gap-1.5 px-4 py-2 rounded text-sm font-medium transition-colors ${
-                panelOpen ? 'bg-gold text-dark' : 'bg-dark3 text-ink hover:text-white'
-              }`}
-            >
-              Outfits yet to find
-              <span className={panelOpen ? 'text-dark/70' : 'text-gold'}>
-                ({missingCount})
-              </span>
-            </button>
-          )}
-          <button
-            onClick={openGrouping}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded text-sm font-medium transition-colors ${
-              groupingPanelOpen || isNonDefault
-                ? 'bg-gold text-dark'
-                : 'bg-dark3 text-ink hover:text-white'
-            }`}
-          >
-            <span>Group by</span>
-            <span className={groupingPanelOpen || isNonDefault ? 'text-dark/60' : 'text-gold'}>
-              {groupingLabel}
-            </span>
-          </button>
-          <button
-            onClick={() => { setShowSettings(s => !s); setGroupingPanelOpen(false) }}
-            className={`flex items-center gap-1.5 text-sm underline transition-colors ${
-              showSettings ? 'text-ink' : 'text-muted hover:text-ink'
-            }`}
-            aria-label="Display settings"
-          >
-            <span>⚙</span>
-            <span>Display settings</span>
-          </button>
-        </div>
-      </div>
-
-      {/* ── Mobile bar ── */}
-      <div className="flex md:hidden items-center gap-3">
-        {/* Active grouping pill (shown when non-default) */}
-        {isNonDefault && (
-          <span className="text-xs bg-gold text-dark rounded px-2 py-1 truncate max-w-[130px]">
-            {groupingLabel}
-          </span>
-        )}
-
-        {/* More button */}
+    <div className="flex items-center gap-2">
+      {!loading && (
         <button
-          onClick={() => setMobileMenuOpen(o => !o)}
-          className={`ml-auto flex items-center gap-1.5 px-3 py-2 rounded text-sm font-medium transition-colors ${
-            mobileMenuOpen || groupingPanelOpen || panelOpen || showSettings
-              ? 'bg-gold text-dark'
-              : 'bg-dark3 text-ink'
+          onClick={togglePanel}
+          className={`px-4 py-2 rounded text-sm font-medium whitespace-nowrap transition-colors ${
+            panelOpen ? 'bg-gold text-dark' : 'bg-dark3 text-ink hover:text-white'
           }`}
-          aria-label="Open controls"
         >
-          {mobileMenuOpen ? '✕' : '⋯'}
+          {foundCount}/{totalCount} outfits found
         </button>
-      </div>
-
-      {/* ── Mobile dropdown ── */}
-      {mobileMenuOpen && (
-        <div className="md:hidden mt-2 space-y-2">
-          {/* Group by */}
-          <button
-            onClick={() => { openGrouping(); setMobileMenuOpen(false) }}
-            className={`w-full flex items-center justify-between px-4 py-2 rounded text-sm font-medium transition-colors ${
-              groupingPanelOpen || isNonDefault
-                ? 'bg-gold text-dark'
-                : 'bg-dark3 text-ink hover:text-white'
-            }`}
-          >
-            <span>Group by</span>
-            <span className={`text-xs ${groupingPanelOpen || isNonDefault ? 'text-dark/60' : 'text-gold'}`}>
-              {groupingLabel}
-            </span>
-          </button>
-
-          {/* Found progress */}
-          {!loading && (
-            <div className="px-4 py-2 text-sm text-muted">
-              <span className="text-ink font-medium">{foundCount}</span>
-              {' / '}{foundCount + missingCount} found
-            </div>
-          )}
-
-          {/* Outfits yet to find */}
-          {!loading && missingCount > 0 && (
-            <button
-              onClick={() => { togglePanel(); setMobileMenuOpen(false) }}
-              className={`w-full flex items-center justify-between px-4 py-2 rounded text-sm font-medium transition-colors ${
-                panelOpen ? 'bg-gold text-dark' : 'bg-dark3 text-ink hover:text-white'
-              }`}
-            >
-              <span>Outfits yet to find</span>
-              <span className={panelOpen ? 'text-dark/70' : 'text-gold'}>({missingCount})</span>
-            </button>
-          )}
-
-          {/* Display settings */}
-          <button
-            onClick={() => { setShowSettings(s => !s); setGroupingPanelOpen(false); setMobileMenuOpen(false) }}
-            className={`w-full flex items-center gap-2 px-4 py-2 rounded text-sm transition-colors bg-dark3 ${
-              showSettings ? 'text-ink' : 'text-muted hover:text-ink'
-            }`}
-          >
-            <span>⚙</span>
-            <span>Display settings</span>
-          </button>
-        </div>
       )}
+      <button
+        onClick={openGrouping}
+        className={`px-4 py-2 rounded text-sm font-medium whitespace-nowrap transition-colors ${
+          groupingPanelOpen || isNonDefault ? 'bg-gold text-dark' : 'bg-dark3 text-ink hover:text-white'
+        }`}
+      >
+        View by {groupingLabel}
+      </button>
     </div>
   )
 }
