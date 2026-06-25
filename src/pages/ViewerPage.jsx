@@ -1,15 +1,16 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { fetchOutfits } from "../lib/api";
 import { DISCIPLINES } from "../lib/constants";
 import { TOURNAMENT_ORDER } from "../lib/filterUtils";
 import { readStorage, writeStorage } from "../lib/storage";
 import { useSettings } from "../hooks/useSettings";
 import { useMissingOutfits } from "../hooks/useMissingOutfits";
+import { HeaderSlotContext } from "../components/layout/HeaderSlot";
 import FilterBar from "../components/layout/FilterBar";
 import GroupingPanel from "../components/filters/GroupingPanel";
 import GalleryGrid from "../components/gallery/GalleryGrid";
 import Lightbox from "../components/gallery/Lightbox";
-import SettingsPanel from "../components/SettingsPanel";
 import MissingPanel from "../components/gallery/MissingPanel";
 
 export default function ViewerPage() {
@@ -18,8 +19,8 @@ export default function ViewerPage() {
   const [error, setError] = useState(null);
   const [lightboxIndex, setLightboxIndex] = useState(null);
 
-  const [showSettings, setShowSettings] = useState(false);
   const [groupingPanelOpen, setGroupingPanelOpen] = useState(false);
+  const { slotEl } = useContext(HeaderSlotContext);
 
   const [panelOpen, setPanelOpen] = useState(
     () => readStorage(`serena_hunt_panel_expanded`, "false") === "true",
@@ -32,7 +33,7 @@ export default function ViewerPage() {
     () => readStorage('serena_gallery_sortby', 'chronological'),
   );
 
-  const { settings, updateSetting } = useSettings();
+  const { settings } = useSettings();
 
   function togglePanel() {
     setPanelOpen((prev) => {
@@ -88,23 +89,31 @@ export default function ViewerPage() {
 
   const anyPanelOpen = panelOpen || groupingPanelOpen;
 
+  const controls = (
+    <FilterBar
+      loading={loading}
+      foundCount={foundCount}
+      missingCount={missingCount}
+      panelOpen={panelOpen}
+      togglePanel={togglePanel}
+      setPanelOpen={setPanelOpen}
+      groupingPanelOpen={groupingPanelOpen}
+      setGroupingPanelOpen={setGroupingPanelOpen}
+      groupBy={groupBy}
+    />
+  );
+
   return (
     <div
       className={`min-h-screen bg-dark transition-[padding-right] duration-300 ${anyPanelOpen ? "md:pr-72" : ""}`}
     >
-      <FilterBar
-        loading={loading}
-        foundCount={foundCount}
-        missingCount={missingCount}
-        panelOpen={panelOpen}
-        togglePanel={togglePanel}
-        setPanelOpen={setPanelOpen}
-        groupingPanelOpen={groupingPanelOpen}
-        setGroupingPanelOpen={setGroupingPanelOpen}
-        showSettings={showSettings}
-        setShowSettings={setShowSettings}
-        groupBy={groupBy}
-      />
+      {/* Desktop: portal controls into the centered header slot */}
+      {slotEl && createPortal(controls, slotEl)}
+
+      {/* Mobile: header slot is hidden, so render controls in normal flow */}
+      <div className="md:hidden sticky top-28 z-30 bg-dark border-b border-dark3 px-3 py-3 flex justify-center">
+        {controls}
+      </div>
 
       <main className="px-3 pt-10 pb-24 max-w-7xl mx-auto">
         {loading && (
@@ -134,14 +143,6 @@ export default function ViewerPage() {
           index={lightboxIndex}
           onNavigate={setLightboxIndex}
           onClose={() => setLightboxIndex(null)}
-        />
-      )}
-
-      {showSettings && (
-        <SettingsPanel
-          settings={settings}
-          updateSetting={updateSetting}
-          onClose={() => setShowSettings(false)}
         />
       )}
 
