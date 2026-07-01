@@ -17,7 +17,7 @@ export default function DisciplineBlock({ discipline, items, cardWidth, maxColum
 
   return (
     <div
-      className="rounded-lg p-2.5 pt-2 ring-1"
+      className={`rounded-lg p-2.5 pt-2 ring-1 ${fillWidth ? 'w-full' : ''}`}
       style={{ background: style.tint, '--tw-ring-color': style.ring, maxWidth }}
     >
       <span

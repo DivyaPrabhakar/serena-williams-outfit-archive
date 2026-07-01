@@ -72,7 +72,6 @@ export function useOutfitForm(initialValues) {
     if (f.tournament === 'Other' && !f.otherTournament.trim())
                                 e.tournament = 'Tournament name is required'
     if (!f.discipline)          e.discipline = 'Discipline is required'
-    if (!f.round)               e.round      = 'Round is required'
     return e
   }
 

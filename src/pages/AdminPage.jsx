@@ -8,6 +8,7 @@ import BackfillPanel            from '../components/admin/BackfillPanel'
 import CloudinaryMigrationPanel from '../components/admin/CloudinaryMigrationPanel'
 import BrokenLinksPanel         from '../components/admin/BrokenLinksPanel'
 import OutfitAuditPanel         from '../components/admin/OutfitAuditPanel'
+import DisplaySettingsPanel     from '../components/admin/DisplaySettingsPanel'
 import { useOutfits }           from '../hooks/useOutfits'
 
 const TABS = [
@@ -19,6 +20,7 @@ const TABS = [
   { id: 'no-round',  label: 'No Round' },
   { id: 'no-brand',  label: 'No Brand' },
   { id: 'search',    label: 'All Entries' },
+  { id: 'display',   label: 'Display' },
 ]
 
 export default function AdminPage() {
@@ -71,6 +73,8 @@ export default function AdminPage() {
         return <OutfitAuditPanel outfits={outfits} onEdit={setEditingOutfit} onDelete={remove}
           filter={o => !o.brand} countSuffix="without brand" emptyMessage="All outfits have a brand assigned."
           renderExtra={o => <p className="text-xs text-[#555] mt-0.5">{o.year}</p>} />
+      case 'display':
+        return <DisplaySettingsPanel />
       case 'search':
         return (
           <EntriesList

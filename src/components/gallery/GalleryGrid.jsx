@@ -214,12 +214,12 @@ function TournamentGroupedGallery({ outfits, sortBy, settings, onOpenLightbox })
               id={groupNavId('tournament', tournament)}
               label={tournament}
               title={tournament}
-              subtitle={`${tournamentOutfits.length} outfit${tournamentOutfits.length !== 1 ? 's' : ''}`}
+              subtitle={settings.hideGetty ? null : `${tournamentOutfits.length} outfit${tournamentOutfits.length !== 1 ? 's' : ''}`}
             />
 
             <div
-              className="grid gap-3 items-start pl-3"
-              style={{ gridTemplateColumns: `repeat(${disciplineBlocks.length}, minmax(0, 1fr))` }}
+              className={settings.hideGetty ? 'flex flex-col gap-3 items-start pl-3' : 'grid gap-3 items-start pl-3'}
+              style={settings.hideGetty ? undefined : { gridTemplateColumns: `repeat(${disciplineBlocks.length}, minmax(0, 1fr))` }}
             >
               {disciplineBlocks.map(({ discipline, slots }) => {
                 const orderedSlots = sortBy === 'filled-first'

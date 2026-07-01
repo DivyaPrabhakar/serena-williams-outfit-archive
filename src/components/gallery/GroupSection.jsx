@@ -31,7 +31,7 @@ export default function GroupSection({ navId, label, color, colors, outfits, set
         label={label}
         swatches={swatches}
         title={label}
-        subtitle={`${outfits.length} outfit${outfits.length !== 1 ? 's' : ''}`}
+        subtitle={settings.hideGetty ? null : `${outfits.length} outfit${outfits.length !== 1 ? 's' : ''}`}
       />
       <div className="flex flex-wrap gap-2">
         {outfits.map(outfit => (

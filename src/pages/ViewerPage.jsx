@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { fetchOutfits } from "../lib/api";
+import { isGettyEmbed } from "../lib/imageUtils";
 import { DISCIPLINES } from "../lib/constants";
 import { TOURNAMENT_ORDER } from "../lib/filterUtils";
 import { readStorage, writeStorage } from "../lib/storage";
@@ -39,6 +40,17 @@ export default function ViewerPage() {
   );
 
   const { settings } = useSettings();
+
+  const visibleOutfits = settings.hideGetty
+    ? outfits.filter((o) => !isGettyEmbed(o.imageUrl))
+    : outfits;
+
+  // In the Getty-hidden (screenshot) view, show only populated cards: drop empty
+  // round slots and "did not play / not held" placeholders, and hide the section
+  // subtitles/stats so it reads as a clean, dense grid.
+  const gallerySettings = settings.hideGetty
+    ? { ...settings, showEmptySlots: false, showDimSlots: false }
+    : settings;
 
   function togglePanel() {
     setPanelOpen((prev) => {
@@ -96,7 +108,7 @@ export default function ViewerPage() {
     useMissingOutfits(outfits, 'expanded');
 
   function openLightbox(outfit) {
-    const idx = outfits.findIndex((o) => o.id === outfit.id);
+    const idx = visibleOutfits.findIndex((o) => o.id === outfit.id);
     if (idx !== -1) setLightboxIndex(idx);
   }
 
@@ -145,10 +157,10 @@ export default function ViewerPage() {
         )}
         {!loading && !error && (
           <GalleryGrid
-            outfits={outfits}
+            outfits={visibleOutfits}
             groupBy={groupBy}
             sortBy={sortBy}
-            settings={settings}
+            settings={gallerySettings}
             onOpenLightbox={openLightbox}
           />
         )}
@@ -156,7 +168,7 @@ export default function ViewerPage() {
 
       {lightboxIndex !== null && (
         <Lightbox
-          outfits={outfits}
+          outfits={visibleOutfits}
           index={lightboxIndex}
           onNavigate={setLightboxIndex}
           onClose={() => setLightboxIndex(null)}

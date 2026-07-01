@@ -10,6 +10,7 @@ const DEFAULTS = {
   showEmptySlots: true,
   showDimSlots: true,
   cardLabel: 'tournament', // 'notes' | 'tournament'
+  hideGetty: false,
 }
 
 export function useSettings() {

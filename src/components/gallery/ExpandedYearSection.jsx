@@ -52,7 +52,7 @@ function ExpandedTournamentBlock({ tournament, year, outfitMap, settings, sortBy
       <div className="flex items-center gap-2 mb-4 flex-wrap">
         <span className="w-0.5 h-4 bg-gold flex-shrink-0 rounded-full" />
         <span className="text-base uppercase tracking-widest text-gold font-medium">{tournament}</span>
-        <span className="text-xs uppercase tracking-widest text-gold/60">{year} · {stats}</span>
+        {!settings.hideGetty && <span className="text-xs uppercase tracking-widest text-gold/60">{year} · {stats}</span>}
         {tournamentColors.length > 0 && (
           <div className="flex gap-1 ml-1">
             {tournamentColors.map(color => (
@@ -67,8 +67,8 @@ function ExpandedTournamentBlock({ tournament, year, outfitMap, settings, sortBy
         )}
       </div>
 
-      {/* Played disciplines — tinted blocks that flow side by side */}
-      <div className="flex flex-wrap gap-3 items-start pl-3 mb-4">
+      {/* Played disciplines — tinted blocks that flow side by side (stacked vertically in the Getty-hidden view) */}
+      <div className={`flex ${settings.hideGetty ? 'flex-col' : 'flex-wrap'} gap-3 items-start pl-3 mb-4`}>
         {playedBlocks.map(({ discipline, slots }) => {
           const visible = slots.some(s => s.outfit !== null) || settings.showEmptySlots
           if (!visible) return null
@@ -89,6 +89,7 @@ function ExpandedTournamentBlock({ tournament, year, outfitMap, settings, sortBy
               discipline={discipline}
               items={items}
               cardWidth={cardWidth}
+              fillWidth={settings.hideGetty}
               settings={settings}
               onOpenLightbox={onOpenLightbox}
             />
@@ -131,7 +132,7 @@ function UnknownTournamentBlock({ tournament, year, outfits, settings, onOpenLig
       <div className="flex items-center gap-2 mb-4 flex-wrap">
         <span className="w-0.5 h-4 bg-gold flex-shrink-0 rounded-full" />
         <span className="text-base uppercase tracking-widest text-gold font-medium">{tournament}</span>
-        <span className="text-xs uppercase tracking-widest text-gold/60">{year} · {stats}</span>
+        {!settings.hideGetty && <span className="text-xs uppercase tracking-widest text-gold/60">{year} · {stats}</span>}
         {tournamentColors.length > 0 && (
           <div className="flex gap-1 ml-1">
             {tournamentColors.map(color => (
@@ -145,7 +146,7 @@ function UnknownTournamentBlock({ tournament, year, outfits, settings, onOpenLig
           </div>
         )}
       </div>
-      <div className="flex flex-wrap gap-3 items-start pl-3">
+      <div className={`flex ${settings.hideGetty ? 'flex-col' : 'flex-wrap'} gap-3 items-start pl-3`}>
         {Object.entries(byDiscipline).map(([discipline, dOutfits]) => {
           const sorted = [...dOutfits].sort((a, b) => (a.roundNumber ?? 0) - (b.roundNumber ?? 0))
           const items = sorted.map(outfit => ({ key: outfit.id, outfit }))
@@ -155,6 +156,7 @@ function UnknownTournamentBlock({ tournament, year, outfits, settings, onOpenLig
               discipline={discipline}
               items={items}
               cardWidth={cardWidth}
+              fillWidth={settings.hideGetty}
               settings={settings}
               onOpenLightbox={onOpenLightbox}
             />
@@ -223,7 +225,7 @@ export default function ExpandedYearSection({ year, outfitMap, tournaments, year
 
   return (
     <section id={`year-${year}`} className="mb-14">
-      <StickyGroupHeader className="mb-7" id={`nav-year-${year}`} label={String(year)} title={String(year)} subtitle={subtitle} />
+      <StickyGroupHeader className="mb-7" id={`nav-year-${year}`} label={String(year)} title={String(year)} subtitle={settings.hideGetty ? null : subtitle} />
       {blocks}
     </section>
   )
