@@ -2,19 +2,9 @@ import {
   GRAND_SLAMS,
   OLYMPICS_YEARS,
   ROUND_SEQUENCE,
-  ROUNDS_SINGLES,
-  ROUNDS_DOUBLES,
-  ROUNDS_MIXED,
-  SINGLES_DID_NOT_PLAY,
-  SINGLES_NOT_HELD,
-  DOUBLES_DID_NOT_PLAY,
-  DOUBLES_NOT_HELD,
-  MIXED_DID_NOT_PLAY,
-  MIXED_NOT_HELD,
+  DISCIPLINE_DATA,
   NON_SLAM_ROUNDS_SINGLES,
   NON_SLAM_ROUNDS_DOUBLES,
-  NON_SLAM_EXPLICIT_ROUNDS_SINGLES,
-  NON_SLAM_EXPLICIT_ROUNDS_DOUBLES,
 } from './constants'
 
 // ── Round label ↔ number conversions ─────────────────────────────────────
@@ -37,16 +27,9 @@ export function getSlotStatus(tournament, year, discipline) {
   // Mixed was never offered at the Olympics
   if (discipline === 'Mixed' && tournament === 'Olympics') return 'no-event'
 
-  const dnpMap  = discipline === 'Singles' ? SINGLES_DID_NOT_PLAY
-                : discipline === 'Doubles' ? DOUBLES_DID_NOT_PLAY
-                : MIXED_DID_NOT_PLAY
-
-  const nhMap   = discipline === 'Singles' ? SINGLES_NOT_HELD
-                : discipline === 'Doubles' ? DOUBLES_NOT_HELD
-                : MIXED_NOT_HELD
-
-  if (nhMap[tournament]?.has(y))  return 'not-held'
-  if (dnpMap[tournament]?.has(y)) return 'did-not-play'
+  const data = DISCIPLINE_DATA[discipline]
+  if (data.notHeld[tournament]?.has(y))    return 'not-held'
+  if (data.didNotPlay[tournament]?.has(y)) return 'did-not-play'
   return 'played'
 }
 
@@ -54,36 +37,21 @@ export function getSlotStatus(tournament, year, discipline) {
 export function getRoundsForSlot(tournament, year, discipline) {
   if (getSlotStatus(tournament, year, discipline) !== 'played') return 0
 
-  if (discipline === 'Singles') {
-    const explicit = NON_SLAM_EXPLICIT_ROUNDS_SINGLES[tournament]?.[Number(year)]
-    if (explicit) return explicit.length
-  }
-  if (discipline === 'Doubles') {
-    const explicit = NON_SLAM_EXPLICIT_ROUNDS_DOUBLES[tournament]?.[Number(year)]
-    if (explicit) return explicit.length
-  }
-
   const y = Number(year)
-  if (discipline === 'Singles') {
-    return ROUNDS_SINGLES[tournament]?.[y] ?? NON_SLAM_ROUNDS_SINGLES[tournament]?.[y] ?? 0
-  }
-  if (discipline === 'Doubles') {
-    return ROUNDS_DOUBLES[tournament]?.[y] ?? NON_SLAM_ROUNDS_DOUBLES[tournament]?.[y] ?? 0
-  }
-  return ROUNDS_MIXED[tournament]?.[y] ?? 0
+  const data = DISCIPLINE_DATA[discipline]
+
+  const explicit = data.nonSlamExplicit?.[tournament]?.[y]
+  if (explicit) return explicit.length
+
+  return data.rounds[tournament]?.[y] ?? data.nonSlamRounds?.[tournament]?.[y] ?? 0
 }
 
 // Returns the 1-based ROUND_SEQUENCE indices for each round to display.
 // Handles non-contiguous draws (e.g. 96-draw with no R4, or seeded bye in R1).
 export function getRoundNumbers(tournament, year, discipline) {
-  if (discipline === 'Singles') {
-    const explicit = NON_SLAM_EXPLICIT_ROUNDS_SINGLES[tournament]?.[Number(year)]
-    if (explicit) return explicit
-  }
-  if (discipline === 'Doubles') {
-    const explicit = NON_SLAM_EXPLICIT_ROUNDS_DOUBLES[tournament]?.[Number(year)]
-    if (explicit) return explicit
-  }
+  const explicit = DISCIPLINE_DATA[discipline].nonSlamExplicit?.[tournament]?.[Number(year)]
+  if (explicit) return explicit
+
   const n = getRoundsForSlot(tournament, year, discipline)
   return Array.from({ length: n }, (_, i) => i + 1)
 }
@@ -104,7 +72,7 @@ export function getCombinedSlotStatus(tournament, year) {
   // Event-level cancellation — use singles as the authoritative source
   // (Doubles NOT_HELD for Olympics covers non-Olympic years, which is a
   //  different kind of "not held" and not relevant here)
-  if (SINGLES_NOT_HELD[tournament]?.has(Number(year))) return 'not-held'
+  if (DISCIPLINE_DATA.Singles.notHeld[tournament]?.has(Number(year))) return 'not-held'
 
   for (const discipline of ['Singles', 'Doubles', 'Mixed']) {
     if (getSlotStatus(tournament, year, discipline) === 'played') return 'played'

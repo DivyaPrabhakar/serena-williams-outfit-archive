@@ -3,7 +3,8 @@ import { GRAND_SLAMS, OLYMPICS_YEARS, ROUND_SEQUENCE } from '../lib/constants'
 import { getValidRounds, getRoundsForSlot, getSlotStatus } from '../lib/rounds'
 import { isBlockedUrl } from '../lib/imageUtils'
 
-export const MIXED_SLAMS = ['Australian Open', 'Roland Garros', 'Wimbledon', 'US Open']
+// Mixed doubles is contested at all four Grand Slams.
+export const MIXED_SLAMS = GRAND_SLAMS
 
 export function useOutfitForm(initialValues) {
   const [f, setF]           = useState(initialValues)

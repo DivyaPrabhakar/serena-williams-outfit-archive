@@ -141,6 +141,31 @@ export const NON_SLAM_ROUNDS_DOUBLES = {
   'Porsche Tennis Grand Prix':         { 2008: 2 },
 }
 
+// ── Discipline registry ────────────────────────────────────────────────────
+// One lookup table per discipline so round / participation queries don't need
+// per-discipline branching. nonSlam* maps only exist for Singles & Doubles.
+export const DISCIPLINE_DATA = {
+  Singles: {
+    rounds:          ROUNDS_SINGLES,
+    didNotPlay:      SINGLES_DID_NOT_PLAY,
+    notHeld:         SINGLES_NOT_HELD,
+    nonSlamRounds:   NON_SLAM_ROUNDS_SINGLES,
+    nonSlamExplicit: NON_SLAM_EXPLICIT_ROUNDS_SINGLES,
+  },
+  Doubles: {
+    rounds:          ROUNDS_DOUBLES,
+    didNotPlay:      DOUBLES_DID_NOT_PLAY,
+    notHeld:         DOUBLES_NOT_HELD,
+    nonSlamRounds:   NON_SLAM_ROUNDS_DOUBLES,
+    nonSlamExplicit: NON_SLAM_EXPLICIT_ROUNDS_DOUBLES,
+  },
+  Mixed: {
+    rounds:     ROUNDS_MIXED,
+    didNotPlay: MIXED_DID_NOT_PLAY,
+    notHeld:    MIXED_NOT_HELD,
+  },
+}
+
 // ── Outfit brands ─────────────────────────────────────────────────────────
 export const OUTFIT_BRANDS = ['Nike', 'Puma']
 
