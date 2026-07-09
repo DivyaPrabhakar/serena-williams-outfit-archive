@@ -36,26 +36,17 @@ export function outfitToRow(o) {
   }
 }
 
-// ── Auth ─────────────────────────────────────────────────────────────────
-
-export async function authCheck(password) {
-  const res = await fetch(API, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-admin-token': password },
-    body: JSON.stringify({ _authCheck: true }),
+// ── Fetch helpers ───────────────────────────────────────────────────────────
+// Single place that talks to the outfits function: attaches the admin token
+// (required for every write) and JSON-encodes the body when present.
+async function adminFetch(query = '', { method = 'GET', body, adminToken } = {}) {
+  const headers = { 'Content-Type': 'application/json' }
+  if (adminToken) headers['x-admin-token'] = adminToken
+  return fetch(`${API}${query}`, {
+    method,
+    headers,
+    ...(body !== undefined && { body: JSON.stringify(body) }),
   })
-  if (res.status === 401) return false
-  if (!res.ok) throw new Error('Server error')
-  return true
-}
-
-// ── CRUD ──────────────────────────────────────────────────────────────────
-
-export async function fetchOutfits() {
-  const res = await fetch(API)
-  if (!res.ok) throw new Error('Failed to fetch outfits')
-  const rows = await res.json()
-  return (rows ?? []).map(rowToOutfit)
 }
 
 async function assertOk(res, label) {
@@ -66,31 +57,47 @@ async function assertOk(res, label) {
   }
 }
 
+// ── Auth ─────────────────────────────────────────────────────────────────
+
+export async function authCheck(password) {
+  const res = await adminFetch('', { method: 'POST', adminToken: password, body: { _authCheck: true } })
+  if (res.status === 401) return false
+  if (!res.ok) throw new Error('Server error')
+  return true
+}
+
+// ── CRUD ──────────────────────────────────────────────────────────────────
+
+export async function fetchOutfits() {
+  const res = await adminFetch()
+  if (!res.ok) throw new Error('Failed to fetch outfits')
+  const rows = await res.json()
+  return (rows ?? []).map(rowToOutfit)
+}
+
 export async function insertOutfit(outfit, adminToken) {
   const row = { id: crypto.randomUUID(), ...outfitToRow(outfit) }
-  const res = await fetch(API, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken },
-    body: JSON.stringify(row),
-  })
+  const res = await adminFetch('', { method: 'POST', adminToken, body: row })
   await assertOk(res, 'Insert failed')
   return res.json()
 }
 
 export async function updateOutfit(outfit, adminToken) {
-  const res = await fetch(`${API}?id=${encodeURIComponent(outfit.id)}`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken },
-    body: JSON.stringify(outfitToRow(outfit)),
+  const res = await adminFetch(`?id=${encodeURIComponent(outfit.id)}`, {
+    method: 'PATCH', adminToken, body: outfitToRow(outfit),
   })
   await assertOk(res, 'Update failed')
   return res.json()
 }
 
+// Patch an arbitrary subset of columns on one outfit (partial update).
+export async function patchOutfit(id, fields, adminToken) {
+  const res = await adminFetch(`?id=${encodeURIComponent(id)}`, { method: 'PATCH', adminToken, body: fields })
+  await assertOk(res, 'Save failed')
+  return res.json()
+}
+
 export async function deleteOutfit(id, adminToken) {
-  const res = await fetch(`${API}?id=${encodeURIComponent(id)}`, {
-    method: 'DELETE',
-    headers: { 'x-admin-token': adminToken },
-  })
+  const res = await adminFetch(`?id=${encodeURIComponent(id)}`, { method: 'DELETE', adminToken })
   await assertOk(res, 'Delete failed')
 }

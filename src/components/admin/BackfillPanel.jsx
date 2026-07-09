@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { DISCIPLINES, COLOR_MAP } from '../../lib/constants'
 import { getValidRounds, getRoundNumber } from '../../lib/rounds'
-
-const API = '/.netlify/functions/outfits'
+import { patchOutfit } from '../../lib/api'
 
 const TOURNAMENT_ORDER = ['Australian Open', 'Roland Garros', 'Wimbledon', 'US Open', 'Olympics']
 
@@ -29,15 +28,6 @@ function sortByYearAndTournament(outfits) {
     const tb = TOURNAMENT_ORDER.indexOf(b.tournament)
     return (ta === -1 ? 99 : ta) - (tb === -1 ? 99 : tb)
   })
-}
-
-async function patchDisciplineRound(id, { discipline, round, roundNumber }, adminToken) {
-  const res = await fetch(`${API}?id=${encodeURIComponent(id)}`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken },
-    body: JSON.stringify({ discipline, round, round_number: roundNumber }),
-  })
-  if (!res.ok) throw new Error('Save failed')
 }
 
 // ── Per-card form ─────────────────────────────────────────────────────────────
@@ -81,7 +71,7 @@ function BackfillCard({ outfit, adminToken, onSaved, onSkip }) {
     setSaving(true)
     setSaveError(null)
     try {
-      await patchDisciplineRound(outfit.id, { discipline, round, roundNumber }, adminToken)
+      await patchOutfit(outfit.id, { discipline, round, round_number: roundNumber }, adminToken)
       onSaved(outfit.id)
     } catch (e) {
       setSaveError(e.message)
