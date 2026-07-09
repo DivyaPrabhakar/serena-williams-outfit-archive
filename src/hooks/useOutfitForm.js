@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react'
 import { GRAND_SLAMS, OLYMPICS_YEARS, ROUND_SEQUENCE } from '../lib/constants'
-import { getValidRounds, getRoundsForSlot, getSlotStatus } from '../lib/rounds'
+import { getValidRounds, getRoundsForSlot, getSlotStatus, getRoundNumber } from '../lib/rounds'
 import { isBlockedUrl } from '../lib/imageUtils'
 
 // Mixed doubles is contested at all four Grand Slams.
@@ -108,11 +108,25 @@ export function useOutfitForm(initialValues) {
     setErrors({})
   }
 
+  // The shared outfit payload both the add and edit forms submit.
+  const buildOutfit = () => ({
+    imageUrl:    f.gettyEmbed.trim() || f.imageUrl.trim(),
+    year:        yearNum,
+    tournament:  effectiveTournament,
+    discipline:  f.discipline,
+    round:       f.round || null,
+    roundNumber: getRoundNumber(f.round),
+    colors:      f.colors,
+    notes:       f.notes,
+    focal_point: f.focal_point,
+    brand:       f.brand,
+  })
+
   return {
     f, set, errors, setErrors,
     yearNum, effectiveTournament,
     availableDisciplines, validRounds,
     handleGettyEmbed, handleImageUrl,
-    toggleColor, validate, resetForm,
+    toggleColor, validate, resetForm, buildOutfit,
   }
 }
