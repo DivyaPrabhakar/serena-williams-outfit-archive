@@ -1,7 +1,8 @@
 import { useEffect } from 'react'
-import { ROUND_LABELS, COLOR_MAP } from '../../lib/constants'
+import { ROUND_LABELS } from '../../lib/constants'
 import { isGettyEmbed, gettyEmbedForIframe } from '../../lib/imageUtils'
 import LazyIframe from './LazyIframe'
+import ColorSwatch from '../ColorSwatch'
 
 function MetaRow({ label, children }) {
   return (
@@ -81,9 +82,9 @@ export default function Lightbox({ outfits, index, onNavigate, onClose }) {
                 <dd className="flex flex-wrap gap-x-3 gap-y-1.5">
                   {outfit.colors.map(c => (
                     <span key={c} className="flex items-center gap-1.5">
-                      <span
+                      <ColorSwatch
+                        color={c}
                         className="w-3 h-3 rounded-full flex-shrink-0 ring-1 ring-dark3"
-                        style={{ background: COLOR_MAP[c] ?? c }}
                       />
                       <span className="text-xs text-ink">{c}</span>
                     </span>

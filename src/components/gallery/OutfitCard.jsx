@@ -1,6 +1,7 @@
-import { COLOR_MAP, ROUND_LABELS } from '../../lib/constants'
+import { ROUND_LABELS } from '../../lib/constants'
 import { isGettyEmbed, isGettyLandscape, gettyEmbedForIframe } from '../../lib/imageUtils'
 import LazyIframe from './LazyIframe'
+import ColorSwatch from '../ColorSwatch'
 
 export default function OutfitCard({ outfit, settings, onClick }) {
   const colors     = outfit.colors ?? []
@@ -21,10 +22,10 @@ export default function OutfitCard({ outfit, settings, onClick }) {
       {settings.colorDot && colors.length > 0 && (
         <div className="flex gap-1 mb-1.5">
           {colors.map((color, i) => (
-            <div
+            <ColorSwatch
               key={i}
+              color={color}
               className="w-4 h-4 rounded-sm ring-1 ring-white/25"
-              style={{ background: COLOR_MAP[color] ?? color }}
             />
           ))}
         </div>

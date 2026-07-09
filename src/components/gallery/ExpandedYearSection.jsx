@@ -1,9 +1,10 @@
-import { DISCIPLINES, COLOR_MAP } from '../../lib/constants'
+import { DISCIPLINES } from '../../lib/constants'
 import { getRoundsForSlot, getSlotStatus, getRoundLabel, getCombinedSlotStatus, getRoundNumbers } from '../../lib/rounds'
 import { CARD_WIDTHS, isKnownForYear, getYearSubtitle } from '../../lib/galleryUtils'
 import { getSortedColors } from '../../lib/colorUtils'
 import DisciplineBlock from './DisciplineBlock'
 import StickyGroupHeader from './StickyGroupHeader'
+import ColorSwatch from '../ColorSwatch'
 
 // For tournaments in the participation constants (grand slams + Olympics)
 function ExpandedTournamentBlock({ tournament, year, outfitMap, settings, sortBy, onOpenLightbox }) {
@@ -56,10 +57,10 @@ function ExpandedTournamentBlock({ tournament, year, outfitMap, settings, sortBy
         {tournamentColors.length > 0 && (
           <div className="flex gap-1 ml-1">
             {tournamentColors.map(color => (
-              <div
+              <ColorSwatch
                 key={color}
+                color={color}
                 className="w-5 h-5 rounded-sm ring-1 ring-white/20 flex-shrink-0"
-                style={{ background: COLOR_MAP[color] }}
                 title={color}
               />
             ))}
@@ -136,10 +137,10 @@ function UnknownTournamentBlock({ tournament, year, outfits, settings, onOpenLig
         {tournamentColors.length > 0 && (
           <div className="flex gap-1 ml-1">
             {tournamentColors.map(color => (
-              <div
+              <ColorSwatch
                 key={color}
+                color={color}
                 className="w-5 h-5 rounded-sm ring-1 ring-white/20 flex-shrink-0"
-                style={{ background: COLOR_MAP[color] }}
                 title={color}
               />
             ))}

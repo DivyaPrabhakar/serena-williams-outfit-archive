@@ -1,9 +1,9 @@
-import { COLOR_MAP } from '../../lib/constants'
 import { getCombinedSlotStatus } from '../../lib/rounds'
 import { CARD_WIDTHS, isKnownForYear, getYearSubtitle } from '../../lib/galleryUtils'
 import { getSortedColors } from '../../lib/colorUtils'
 import OutfitCard from './OutfitCard'
 import EmptySlot from './EmptySlot'
+import ColorSwatch from '../ColorSwatch'
 
 export default function CondensedYearSection({ year, tournaments, yearOutfits, settings, onOpenLightbox }) {
   const cardWidth = CARD_WIDTHS[settings.gridDensity] ?? 128
@@ -42,10 +42,10 @@ export default function CondensedYearSection({ year, tournaments, yearOutfits, s
           {yearColors.length > 0 && (
             <div className="flex gap-1">
               {yearColors.map(color => (
-                <div
+                <ColorSwatch
                   key={color}
+                  color={color}
                   className="w-5 h-5 rounded-sm ring-1 ring-white/25 flex-shrink-0"
-                  style={{ background: COLOR_MAP[color] }}
                   title={color}
                 />
               ))}

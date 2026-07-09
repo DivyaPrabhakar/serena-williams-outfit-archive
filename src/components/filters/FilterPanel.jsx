@@ -1,6 +1,6 @@
-import { COLOR_MAP } from '../../lib/constants'
 import { sortTournaments } from '../../lib/filterUtils'
 import FilterBtn from './FilterBtn'
+import ColorSwatch from '../ColorSwatch'
 
 export default function FilterPanel({
   tournaments,
@@ -105,9 +105,9 @@ export default function FilterPanel({
                     active={activeColor === c}
                     onClick={() => onColorChange(activeColor === c ? null : c)}
                   >
-                    <span
+                    <ColorSwatch
+                      color={c}
                       className="w-2.5 h-2.5 rounded-sm inline-block mr-1.5 flex-shrink-0 align-middle"
-                      style={{ background: COLOR_MAP[c] }}
                     />
                     {c}
                   </FilterBtn>

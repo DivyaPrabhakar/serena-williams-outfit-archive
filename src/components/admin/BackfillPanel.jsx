@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
-import { DISCIPLINES, COLOR_MAP } from '../../lib/constants'
+import { DISCIPLINES } from '../../lib/constants'
 import { getValidRounds, getRoundNumber } from '../../lib/rounds'
 import { patchOutfit } from '../../lib/api'
+import ColorSwatch from '../ColorSwatch'
 
 const TOURNAMENT_ORDER = ['Australian Open', 'Roland Garros', 'Wimbledon', 'US Open', 'Olympics']
 
@@ -104,9 +105,9 @@ function BackfillCard({ outfit, adminToken, onSaved, onSkip }) {
               <div className="flex flex-wrap gap-x-2 gap-y-0.5 mt-1">
                 {outfit.colors.map(c => (
                   <span key={c} className="flex items-center gap-1">
-                    <span
+                    <ColorSwatch
+                      color={c}
                       className="w-2 h-2 rounded-full flex-shrink-0"
-                      style={{ background: COLOR_MAP[c] ?? c }}
                     />
                     <span className="text-[10px] text-[#8A877F]">{c}</span>
                   </span>

@@ -4,6 +4,7 @@ import { PickerBtn, FieldLabel, InlineError } from './adminFormPrimitives'
 import { useOutfitForm, MIXED_SLAMS } from '../../hooks/useOutfitForm'
 import { isGettyEmbed } from '../../lib/imageUtils'
 import ImageInputField from './ImageInputField'
+import ColorSwatch from '../ColorSwatch'
 
 const COLORS = Object.keys(COLOR_MAP)
 
@@ -180,9 +181,9 @@ export default function EditOutfitModal({ outfit, onSave, onClose }) {
             <div className="flex flex-wrap gap-2">
               {COLORS.map(color => (
                 <PickerBtn key={color} active={f.colors.includes(color)} onClick={() => toggleColor(color)}>
-                  <span
+                  <ColorSwatch
+                    color={color}
                     className="w-2.5 h-2.5 rounded-sm inline-block mr-1.5 flex-shrink-0 align-middle"
-                    style={{ background: COLOR_MAP[color] }}
                   />
                   {color}
                 </PickerBtn>
