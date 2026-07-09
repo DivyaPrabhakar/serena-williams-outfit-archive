@@ -1,6 +1,6 @@
-import { GRAND_SLAMS, COLOR_MAP } from '../../lib/constants'
+import { COLOR_MAP } from '../../lib/constants'
 import { getCombinedSlotStatus } from '../../lib/rounds'
-import { CARD_WIDTHS, SLAM_TOURNAMENTS, isKnownForYear } from '../../lib/galleryUtils'
+import { CARD_WIDTHS, isKnownForYear, getYearSubtitle } from '../../lib/galleryUtils'
 import { getSortedColors } from '../../lib/colorUtils'
 import OutfitCard from './OutfitCard'
 import EmptySlot from './EmptySlot'
@@ -30,13 +30,7 @@ export default function CondensedYearSection({ year, tournaments, yearOutfits, s
 
   if (slots.length === 0) return null
 
-  const outfitCount = yearOutfits.length
-  const majorsWithOutfits = GRAND_SLAMS.filter(t => yearOutfits.some(o => o.tournament === t)).length
-  const showMajorsStat = tournaments.length > 1 && tournaments.some(t => GRAND_SLAMS.includes(t))
-  const subtitle = [
-    `${outfitCount} outfit${outfitCount !== 1 ? 's' : ''}`,
-    showMajorsStat ? `${majorsWithOutfits} of 4 majors` : null,
-  ].filter(Boolean).join(' · ')
+  const subtitle = getYearSubtitle(yearOutfits, tournaments)
 
   const yearColors = getSortedColors(yearOutfits.flatMap(o => o.colors ?? []))
 

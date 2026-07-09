@@ -1,21 +1,11 @@
-import { GRAND_SLAMS, DISCIPLINES } from '../../lib/constants'
+import { DISCIPLINES } from '../../lib/constants'
 import { getRoundsForSlot, getSlotStatus, getRoundLabel, getCombinedSlotStatus } from '../../lib/rounds'
+import { CARD_WIDTHS, getYearSubtitle } from '../../lib/galleryUtils'
 import FeatureBreak from './FeatureBreak'
 import DimSlot from './DimSlot'
 
-const CARD_WIDTHS = { small: 88, standard: 128, large: 172 }
-
 export default function YearSection({ year, outfitMap, tournaments, yearOutfits, settings, onOpenLightbox }) {
-  const outfitCount = yearOutfits.length
-  const majorsWithOutfits = GRAND_SLAMS.filter(t =>
-    yearOutfits.some(o => o.tournament === t)
-  ).length
-
-  const showMajorsStat = tournaments.length > 1 && tournaments.some(t => GRAND_SLAMS.includes(t))
-  const subtitle = [
-    `${outfitCount} outfit${outfitCount !== 1 ? 's' : ''}`,
-    showMajorsStat ? `${majorsWithOutfits} of 4 majors` : null,
-  ].filter(Boolean).join(' · ')
+  const subtitle = getYearSubtitle(yearOutfits, tournaments)
 
   const cardWidth = CARD_WIDTHS[settings.gridDensity] ?? 128
 

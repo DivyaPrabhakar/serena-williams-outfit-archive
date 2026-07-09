@@ -1,6 +1,6 @@
-import { GRAND_SLAMS, DISCIPLINES, COLOR_MAP } from '../../lib/constants'
+import { DISCIPLINES, COLOR_MAP } from '../../lib/constants'
 import { getRoundsForSlot, getSlotStatus, getRoundLabel, getCombinedSlotStatus, getRoundNumbers } from '../../lib/rounds'
-import { CARD_WIDTHS, SLAM_TOURNAMENTS, isKnownForYear } from '../../lib/galleryUtils'
+import { CARD_WIDTHS, isKnownForYear, getYearSubtitle } from '../../lib/galleryUtils'
 import { getSortedColors } from '../../lib/colorUtils'
 import DisciplineBlock from './DisciplineBlock'
 import StickyGroupHeader from './StickyGroupHeader'
@@ -168,13 +168,7 @@ function UnknownTournamentBlock({ tournament, year, outfits, settings, onOpenLig
 }
 
 export default function ExpandedYearSection({ year, outfitMap, tournaments, yearOutfits, settings, sortBy, onOpenLightbox }) {
-  const outfitCount = yearOutfits.length
-  const majorsWithOutfits = GRAND_SLAMS.filter(t => yearOutfits.some(o => o.tournament === t)).length
-  const showMajorsStat = tournaments.length > 1 && tournaments.some(t => GRAND_SLAMS.includes(t))
-  const subtitle = [
-    `${outfitCount} outfit${outfitCount !== 1 ? 's' : ''}`,
-    showMajorsStat ? `${majorsWithOutfits} of 4 majors` : null,
-  ].filter(Boolean).join(' · ')
+  const subtitle = getYearSubtitle(yearOutfits, tournaments)
 
   const blocks = tournaments.flatMap(tournament => {
     if (!isKnownForYear(tournament, year)) {
