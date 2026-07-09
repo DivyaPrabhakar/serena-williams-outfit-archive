@@ -53,7 +53,16 @@ export default function GroupNav({ groupBy, collapsed, onToggle }) {
   }, [sections])
 
   function jumpTo(section) {
-    section.el?.scrollIntoView({ behavior: 'smooth' })
+    const el = section.el
+    if (!el) return
+    // Smooth-scrolling across many sections animates the viewport through every
+    // section in between, which wakes up all of their lazy content (heavy Getty
+    // iframes especially) at once and can hang the tab. For far jumps, snap
+    // instantly so only the destination's content mounts; keep smooth for nearby
+    // hops where the animation is cheap and nice.
+    const distance = Math.abs(el.getBoundingClientRect().top)
+    const behavior = distance > window.innerHeight * 2 ? 'auto' : 'smooth'
+    el.scrollIntoView({ behavior })
   }
 
   // Nothing to navigate between.
