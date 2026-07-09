@@ -159,6 +159,7 @@ function TournamentGroupedGallery({ outfits, sortBy, settings, onOpenLightbox })
     outfits.map(o => [`${o.year}_${o.tournament}_${o.discipline}_${o.roundNumber}`, o])
   )
   const cardWidth = CARD_WIDTHS[settings.gridDensity] ?? 128
+  const stacked = settings.hideGetty || settings.layout === 'vertical'
 
   const map = {}
   for (const o of outfits) {
@@ -218,8 +219,8 @@ function TournamentGroupedGallery({ outfits, sortBy, settings, onOpenLightbox })
             />
 
             <div
-              className={settings.hideGetty ? 'flex flex-col gap-3 items-start pl-3' : 'grid gap-3 items-start pl-3'}
-              style={settings.hideGetty ? undefined : { gridTemplateColumns: `repeat(${disciplineBlocks.length}, minmax(0, 1fr))` }}
+              className={stacked ? 'flex flex-col gap-3 items-start pl-3' : 'grid gap-3 items-start pl-3'}
+              style={stacked ? undefined : { gridTemplateColumns: `repeat(${disciplineBlocks.length}, minmax(0, 1fr))` }}
             >
               {disciplineBlocks.map(({ discipline, slots }) => {
                 const orderedSlots = sortBy === 'filled-first'

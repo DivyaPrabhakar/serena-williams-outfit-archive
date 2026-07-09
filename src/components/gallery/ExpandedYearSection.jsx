@@ -48,6 +48,14 @@ function ExpandedTournamentBlock({ tournament, year, outfitMap, settings, sortBy
     playedBlocks.flatMap(d => d.slots.flatMap(s => s.outfit?.colors ?? []))
   )
 
+  const stacked = settings.hideGetty || settings.layout === 'vertical'
+
+  // Only disciplines with visible content get a column, so the equal-width grid
+  // divides evenly across what actually renders (2 disciplines → halves, 3 → thirds).
+  const visibleBlocks = playedBlocks.filter(
+    ({ slots }) => slots.some(s => s.outfit !== null) || settings.showEmptySlots
+  )
+
   return (
     <div className="mb-8">
       <div className="flex items-center gap-2 mb-4 flex-wrap">
@@ -68,11 +76,13 @@ function ExpandedTournamentBlock({ tournament, year, outfitMap, settings, sortBy
         )}
       </div>
 
-      {/* Played disciplines — tinted blocks that flow side by side (stacked vertically in the Getty-hidden view) */}
-      <div className={`flex ${settings.hideGetty ? 'flex-col' : 'flex-wrap'} gap-3 items-start pl-3 mb-4`}>
-        {playedBlocks.map(({ discipline, slots }) => {
-          const visible = slots.some(s => s.outfit !== null) || settings.showEmptySlots
-          if (!visible) return null
+      {/* Played disciplines — side by side they divide the width into equal columns
+          (1/N each); stacked they each span the full width. */}
+      <div
+        className={stacked ? 'flex flex-col gap-3 items-start pl-3 mb-4' : 'grid gap-3 items-start pl-3 mb-4'}
+        style={stacked ? undefined : { gridTemplateColumns: `repeat(${visibleBlocks.length}, minmax(0, 1fr))` }}
+      >
+        {visibleBlocks.map(({ discipline, slots }) => {
           const orderedSlots = sortBy === 'filled-first'
             ? [...slots.filter(s => s.outfit !== null), ...slots.filter(s => s.outfit === null)]
             : slots
@@ -90,7 +100,7 @@ function ExpandedTournamentBlock({ tournament, year, outfitMap, settings, sortBy
               discipline={discipline}
               items={items}
               cardWidth={cardWidth}
-              fillWidth={settings.hideGetty}
+              fillWidth
               settings={settings}
               onOpenLightbox={onOpenLightbox}
             />
@@ -128,6 +138,9 @@ function UnknownTournamentBlock({ tournament, year, outfits, settings, onOpenLig
 
   const tournamentColors = getSortedColors(outfits.flatMap(o => o.colors ?? []))
 
+  const stacked = settings.hideGetty || settings.layout === 'vertical'
+  const disciplineEntries = Object.entries(byDiscipline)
+
   return (
     <div className="mb-8">
       <div className="flex items-center gap-2 mb-4 flex-wrap">
@@ -147,8 +160,11 @@ function UnknownTournamentBlock({ tournament, year, outfits, settings, onOpenLig
           </div>
         )}
       </div>
-      <div className={`flex ${settings.hideGetty ? 'flex-col' : 'flex-wrap'} gap-3 items-start pl-3`}>
-        {Object.entries(byDiscipline).map(([discipline, dOutfits]) => {
+      <div
+        className={stacked ? 'flex flex-col gap-3 items-start pl-3' : 'grid gap-3 items-start pl-3'}
+        style={stacked ? undefined : { gridTemplateColumns: `repeat(${disciplineEntries.length}, minmax(0, 1fr))` }}
+      >
+        {disciplineEntries.map(([discipline, dOutfits]) => {
           const sorted = [...dOutfits].sort((a, b) => (a.roundNumber ?? 0) - (b.roundNumber ?? 0))
           const items = sorted.map(outfit => ({ key: outfit.id, outfit }))
           return (
@@ -157,7 +173,7 @@ function UnknownTournamentBlock({ tournament, year, outfits, settings, onOpenLig
               discipline={discipline}
               items={items}
               cardWidth={cardWidth}
-              fillWidth={settings.hideGetty}
+              fillWidth
               settings={settings}
               onOpenLightbox={onOpenLightbox}
             />
