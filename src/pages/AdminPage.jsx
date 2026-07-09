@@ -54,7 +54,7 @@ export default function AdminPage() {
     if (loading && outfits.length === 0) return <p className="text-[#555] text-sm">Loading…</p>
     switch (tab) {
       case 'upload':
-        return <AddOutfitForm onAdd={insert} outfits={outfits} />
+        return <AddOutfitForm onAdd={insert} />
       case 'migrate':
         return <CloudinaryMigrationPanel outfits={outfits} onUpdate={update} />
       case 'broken':
