@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react'
 import { GRAND_SLAMS, OLYMPICS_YEARS, ROUND_SEQUENCE } from '../lib/constants'
-import { getValidRounds, getRoundsForSlot } from '../lib/rounds'
+import { getValidRounds, getRoundsForSlot, getSlotStatus } from '../lib/rounds'
 import { isBlockedUrl } from '../lib/imageUtils'
 
 export const MIXED_SLAMS = ['Australian Open', 'Roland Garros', 'Wimbledon', 'US Open']
@@ -14,18 +14,38 @@ export function useOutfitForm(initialValues) {
   const yearNum             = parseInt(f.year) || 0
   const effectiveTournament = f.tournament === 'Other' ? f.otherTournament.trim() : f.tournament
 
+  // A slot is "known" (we can validate participation against metadata) when the
+  // tournament is a Grand Slam / Olympics, or when any discipline has recorded
+  // rounds for this year. Free-form "Other" / sparse non-slam years stay permissive.
+  const slotIsKnown = useMemo(() => {
+    if (!effectiveTournament || !yearNum) return false
+    if (GRAND_SLAMS.includes(effectiveTournament) || effectiveTournament === 'Olympics') return true
+    return ['Singles', 'Doubles', 'Mixed'].some(
+      d => getRoundsForSlot(effectiveTournament, yearNum, d) > 0,
+    )
+  }, [effectiveTournament, yearNum])
+
   const availableDisciplines = useMemo(() => {
     if (!f.tournament) return []
-    if (f.tournament === 'Olympics') return ['Singles', 'Doubles']
-    if (MIXED_SLAMS.includes(f.tournament)) return ['Singles', 'Doubles', 'Mixed']
-    return ['Singles', 'Doubles']
-  }, [f.tournament])
+    const base = f.tournament === 'Olympics'
+      ? ['Singles', 'Doubles']
+      : MIXED_SLAMS.includes(f.tournament)
+      ? ['Singles', 'Doubles', 'Mixed']
+      : ['Singles', 'Doubles']
+
+    // Without a year we can't validate participation — show the full base list.
+    if (!yearNum || !slotIsKnown) return base
+    return base.filter(d => getSlotStatus(effectiveTournament, yearNum, d) === 'played')
+  }, [f.tournament, effectiveTournament, yearNum, slotIsKnown])
 
   const validRounds = useMemo(() => {
     if (!effectiveTournament || !yearNum) return []
     if (f.discipline) {
       const rounds = getValidRounds(effectiveTournament, yearNum, f.discipline)
-      return rounds.length > 0 ? rounds : ROUND_SEQUENCE
+      if (rounds.length > 0) return rounds
+      // No recorded rounds: known slot ⇒ she didn't play ⇒ no rounds (round is
+      // optional). Unknown/free-form slot ⇒ fall back to the full sequence.
+      return slotIsKnown ? [] : ROUND_SEQUENCE
     }
     const max = Math.max(
       getRoundsForSlot(effectiveTournament, yearNum, 'Singles'),
@@ -33,12 +53,15 @@ export function useOutfitForm(initialValues) {
       getRoundsForSlot(effectiveTournament, yearNum, 'Mixed'),
       0,
     )
-    return max > 0 ? ROUND_SEQUENCE.slice(0, max) : ROUND_SEQUENCE
-  }, [f.discipline, effectiveTournament, yearNum])
+    if (max > 0) return ROUND_SEQUENCE.slice(0, max)
+    return slotIsKnown ? [] : ROUND_SEQUENCE
+  }, [f.discipline, effectiveTournament, yearNum, slotIsKnown])
 
+  // Clear a discipline that's no longer valid for the current tournament + year
+  // (e.g. Mixed selected, then 2018 Roland Garros entered — even if year is last).
   useEffect(() => {
-    if (f.discipline === 'Mixed' && f.tournament === 'Olympics') set('discipline', '')
-  }, [f.tournament])
+    if (f.discipline && !availableDisciplines.includes(f.discipline)) set('discipline', '')
+  }, [availableDisciplines])
 
   useEffect(() => {
     if (f.round && validRounds.length > 0 && !validRounds.includes(f.round)) set('round', '')
@@ -72,6 +95,10 @@ export function useOutfitForm(initialValues) {
     if (f.tournament === 'Other' && !f.otherTournament.trim())
                                 e.tournament = 'Tournament name is required'
     if (!f.discipline)          e.discipline = 'Discipline is required'
+    else if (f.discipline && !availableDisciplines.includes(f.discipline))
+                                e.discipline = 'Serena did not compete in this discipline that year'
+    if (f.round && validRounds.length > 0 && !validRounds.includes(f.round))
+                                e.round      = 'That round does not exist for this event'
     return e
   }
 
