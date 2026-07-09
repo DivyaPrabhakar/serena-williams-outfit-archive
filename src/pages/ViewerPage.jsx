@@ -38,6 +38,9 @@ export default function ViewerPage() {
   const [sortBy, setSortByState] = useState(
     () => readStorage('serena_gallery_sortby', 'chronological'),
   );
+  const [layout, setLayoutState] = useState(
+    () => readStorage('serena_gallery_layout', 'horizontal'),
+  );
 
   const { settings } = useSettings();
 
@@ -49,8 +52,8 @@ export default function ViewerPage() {
   // round slots and "did not play / not held" placeholders, and hide the section
   // subtitles/stats so it reads as a clean, dense grid.
   const gallerySettings = settings.hideGetty
-    ? { ...settings, showEmptySlots: false, showDimSlots: false }
-    : settings;
+    ? { ...settings, showEmptySlots: false, showDimSlots: false, layout }
+    : { ...settings, layout };
 
   function togglePanel() {
     setPanelOpen((prev) => {
@@ -74,6 +77,11 @@ export default function ViewerPage() {
   function setSortBy(value) {
     setSortByState(value);
     writeStorage('serena_gallery_sortby', value);
+  }
+
+  function setLayout(value) {
+    setLayoutState(value);
+    writeStorage('serena_gallery_layout', value);
   }
 
   function toggleNavCollapsed() {
@@ -125,6 +133,8 @@ export default function ViewerPage() {
       groupingPanelOpen={groupingPanelOpen}
       setGroupingPanelOpen={setGroupingPanelOpen}
       groupBy={groupBy}
+      layout={layout}
+      onLayoutChange={setLayout}
     />
   );
 

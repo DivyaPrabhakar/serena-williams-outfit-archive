@@ -10,13 +10,19 @@ export default function FilterBar({
   panelOpen, togglePanel, setPanelOpen,
   groupingPanelOpen, setGroupingPanelOpen,
   groupBy,
+  layout, onLayoutChange,
 }) {
   const groupingLabel = GROUPING_LABELS[groupBy] ?? groupBy
+  const isStacked = layout === 'vertical'
 
   function openGrouping() {
     const next = !groupingPanelOpen
     setGroupingPanelOpen(next)
     if (next) setPanelOpen(false)
+  }
+
+  function toggleLayout() {
+    onLayoutChange(isStacked ? 'horizontal' : 'vertical')
   }
 
   return (
@@ -39,6 +45,13 @@ export default function FilterBar({
       >
         <span className={groupingPanelOpen ? 'text-dark/60' : 'text-muted'}>View by: </span>
         <span className={groupingPanelOpen ? 'text-dark font-medium' : 'text-gold'}>{groupingLabel}</span>
+      </button>
+      <button
+        onClick={toggleLayout}
+        className="px-4 py-2 rounded text-sm font-normal whitespace-nowrap transition-colors bg-dark3 hover:text-white"
+      >
+        <span className="text-muted">Layout: </span>
+        <span className="text-gold">{isStacked ? 'Stacked' : 'Side by side'}</span>
       </button>
     </div>
   )
