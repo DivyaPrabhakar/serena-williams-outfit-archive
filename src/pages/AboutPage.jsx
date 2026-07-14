@@ -33,15 +33,31 @@ export default function AboutPage() {
             matches in between contractions.
           </p>
           <p>
-            Prabhakar currently leads UI Design at Form Energy, building
-            software for grid-scale energy storage. Outside of work, she creates
-            projects that surface patterns in large visual datasets across her
-            interests of fashion, culture, and art. View her work at{" "}
+            <a
+              href="https://www.linkedin.com/in/divyaprabhakar/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gold underline hover:text-gold-light transition-colors"
+            >
+              Prabhakar currently leads
+            </a>{" "}
+            Digital Products Design at{" "}
+            <a
+              href="https://formenergy.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gold underline hover:text-gold-light transition-colors"
+            >
+              Form Energy
+            </a>
+            , building software for grid-scale energy storage. Outside of work,
+            she creates projects that surface patterns in large visual datasets
+            across her interests of fashion, culture, and art. View her work at{" "}
             <a
               href="https://divyaprabhakar.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gold hover:text-gold-light transition-colors"
+              className="text-gold underline hover:text-gold-light transition-colors"
             >
               divyaprabhakar.com
             </a>
