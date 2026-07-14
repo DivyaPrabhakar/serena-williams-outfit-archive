@@ -7,7 +7,7 @@ export default function Nav() {
   return (
     <nav className="sticky top-0 z-40 bg-dark border-b border-dark3 px-6 h-28 flex items-center justify-between relative">
       <Link to="/" className="flex flex-col items-start hover:opacity-80 transition-opacity">
-        <span className="font-[family-name:var(--font-bebas)] text-4xl text-gold tracking-wide leading-none">Serena Williams Fit-dex</span>
+        <span className="font-[family-name:var(--font-bebas)] text-2xl sm:text-4xl text-gold tracking-wide leading-none">Serena Williams Fit-dex</span>
         <span className="font-[family-name:var(--font-cormorant)] text-lg italic text-muted hidden sm:inline leading-none mt-0.5">Gotta Find 'Em All</span>
       </Link>
 
