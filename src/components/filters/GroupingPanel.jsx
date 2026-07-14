@@ -26,15 +26,16 @@ function OptionButton({ active, onClick, children }) {
 
 export default function GroupingPanel({ activeGrouping, onGroupingChange, sortBy, onSortChange, onClose }) {
   return (
-    <div className="fixed right-0 top-28 bottom-0 z-[45] w-72 bg-dark2 border-l border-dark3 shadow-2xl flex flex-col">
+    <div className="fixed right-0 top-28 bottom-0 z-[45] w-full sm:w-72 bg-dark2 border-l border-dark3 shadow-2xl flex flex-col">
       <div className="flex items-center justify-between px-5 py-4 border-b border-dark3 flex-shrink-0">
         <h3 className="font-playfair text-gold text-base">Group by</h3>
         <button
           onClick={onClose}
-          className="text-muted hover:text-ink text-xl leading-none"
+          className="flex items-center gap-1.5 text-sm font-medium text-ink bg-dark3 hover:bg-gold hover:text-dark rounded px-3 py-1.5 transition-colors"
           aria-label="Close"
         >
-          ×
+          <span className="text-lg leading-none">×</span>
+          Close
         </button>
       </div>
       <div className="flex-1 overflow-y-auto px-5 py-5 space-y-6">
