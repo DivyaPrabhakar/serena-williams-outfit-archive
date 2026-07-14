@@ -26,7 +26,7 @@ export default function FilterBar({
   }
 
   return (
-    <div className="flex flex-wrap items-center justify-center gap-2">
+    <div className="flex flex-wrap md:flex-nowrap items-center justify-center gap-2">
       {!loading && (
         <button
           onClick={togglePanel}
