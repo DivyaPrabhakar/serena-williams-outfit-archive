@@ -36,7 +36,7 @@ async function sbFetch(path, opts = {}) {
   return { status: res.status, body: text };
 }
 
-exports.handler = async (event) => {
+export const handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 204, headers: CORS, body: '' };
   }
