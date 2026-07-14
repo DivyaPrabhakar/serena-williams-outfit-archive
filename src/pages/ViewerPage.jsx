@@ -30,7 +30,7 @@ export default function ViewerPage() {
   );
 
   const [groupBy, setGroupByState] = useState(
-    () => readStorage('serena_gallery_groupby', 'year'),
+    () => readStorage('serena_gallery_groupby', 'tournament'),
   );
   const [navCollapsed, setNavCollapsedState] = useState(
     () => readStorage('serena_groupnav_collapsed', 'false') === 'true',
@@ -39,7 +39,7 @@ export default function ViewerPage() {
     () => readStorage('serena_gallery_sortby', 'chronological'),
   );
   const [layout, setLayoutState] = useState(
-    () => readStorage('serena_gallery_layout', 'horizontal'),
+    () => readStorage('serena_gallery_layout', 'vertical'),
   );
 
   const { settings } = useSettings();
