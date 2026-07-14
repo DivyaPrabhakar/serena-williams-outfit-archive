@@ -17,7 +17,7 @@ export default function DisciplineBlock({ discipline, items, cardWidth, maxColum
 
   return (
     <div
-      className={`rounded-lg p-2.5 pt-2 ring-1 ${fillWidth ? 'w-full' : ''}`}
+      className={`rounded-lg p-2.5 ring-1 ${fillWidth ? 'w-full' : ''}`}
       style={{ background: style.tint, '--tw-ring-color': style.ring, maxWidth }}
     >
       <span
@@ -28,7 +28,7 @@ export default function DisciplineBlock({ discipline, items, cardWidth, maxColum
       </span>
       <div className="flex flex-wrap gap-2">
         {items.map(item => (
-          <div key={item.key} id={item.slotId} className="flex-none" style={{ width: cardWidth }}>
+          <div key={item.key} id={item.slotId} className="flex-none gallery-card" style={{ '--card-w': `${cardWidth}px` }}>
             {item.outfit ? (
               <OutfitCard outfit={item.outfit} settings={settings} onClick={() => onOpenLightbox(item.outfit)} />
             ) : (

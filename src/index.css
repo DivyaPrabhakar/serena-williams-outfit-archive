@@ -30,3 +30,15 @@ body {
   animation: slot-highlight 0.9s ease-out 3;
   border-radius: 4px;
 }
+
+/* Card width is driven by the --card-w CSS variable set inline per card
+   (from the gridDensity setting). Shrink cards a bit on mobile. */
+.gallery-card {
+  width: var(--card-w);
+}
+
+@media (max-width: 640px) {
+  .gallery-card {
+    width: calc(var(--card-w) * 0.82);
+  }
+}

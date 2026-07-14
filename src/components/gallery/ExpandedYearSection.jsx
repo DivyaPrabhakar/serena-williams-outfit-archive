@@ -79,7 +79,7 @@ function ExpandedTournamentBlock({ tournament, year, outfitMap, settings, sortBy
       {/* Played disciplines — side by side they divide the width into equal columns
           (1/N each); stacked they each span the full width. */}
       <div
-        className={stacked ? 'flex flex-col gap-3 items-start pl-3 mb-4' : 'grid gap-3 items-start pl-3 mb-4'}
+        className={stacked ? 'flex flex-col gap-3 items-start pl-0 sm:pl-3 mb-4' : 'grid gap-3 items-start pl-0 sm:pl-3 mb-4'}
         style={stacked ? undefined : { gridTemplateColumns: `repeat(${visibleBlocks.length}, minmax(0, 1fr))` }}
       >
         {visibleBlocks.map(({ discipline, slots }) => {
@@ -110,7 +110,7 @@ function ExpandedTournamentBlock({ tournament, year, outfitMap, settings, sortBy
 
       {/* Non-played disciplines — consolidated into one line */}
       {settings.showDimSlots && dimBlocks.length > 0 && (
-        <div className="pl-3 mb-2">
+        <div className="pl-0 sm:pl-3 mb-2">
           <span className="text-xs text-muted/50 uppercase tracking-widest">
             Did not play · {dimBlocks.map(d => d.discipline).join(' · ')}
           </span>
@@ -161,7 +161,7 @@ function UnknownTournamentBlock({ tournament, year, outfits, settings, onOpenLig
         )}
       </div>
       <div
-        className={stacked ? 'flex flex-col gap-3 items-start pl-3' : 'grid gap-3 items-start pl-3'}
+        className={stacked ? 'flex flex-col gap-3 items-start pl-0 sm:pl-3' : 'grid gap-3 items-start pl-0 sm:pl-3'}
         style={stacked ? undefined : { gridTemplateColumns: `repeat(${disciplineEntries.length}, minmax(0, 1fr))` }}
       >
         {disciplineEntries.map(([discipline, dOutfits]) => {
