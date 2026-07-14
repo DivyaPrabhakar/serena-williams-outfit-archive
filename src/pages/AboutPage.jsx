@@ -64,7 +64,16 @@ export default function AboutPage() {
           </p>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-dark3">
+        <div className="mt-12 pt-8 border-t border-dark3 space-y-3">
+          <p className="text-base text-muted">
+            Contact:{" "}
+            <a
+              href="mailto:divyaworks1234@gmail.com"
+              className="text-gold underline hover:text-gold-light transition-colors"
+            >
+              divyaworks1234@gmail.com
+            </a>
+          </p>
           <p className="text-base text-muted">
             Images sourced from publicly available press and archive
             photography.
