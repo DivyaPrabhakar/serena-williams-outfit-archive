@@ -1,5 +1,6 @@
 import { ROUND_LABELS } from '../../lib/constants'
 import { isGettyEmbed, isGettyLandscape, gettyEmbedForIframe } from '../../lib/imageUtils'
+import { outfitAlt } from '../../lib/outfitText'
 import LazyIframe from './LazyIframe'
 import ColorSwatch from '../ColorSwatch'
 
@@ -16,6 +17,10 @@ export default function OutfitCard({ outfit, settings, onClick }) {
     settings.cardLabel === 'notes' && outfit.notes
       ? outfit.notes
       : `${outfit.tournament} · ${outfit.year} · ${outfit.discipline} · ${ROUND_LABELS[outfit.round] ?? outfit.round ?? ''}`
+
+  // Descriptive alt/title incl. "Serena Williams" for image search; the visible
+  // hover caption keeps the compact `label` above.
+  const alt = outfitAlt(outfit)
 
   return (
     <div>
@@ -40,7 +45,7 @@ export default function OutfitCard({ outfit, settings, onClick }) {
           <LazyIframe
             key={outfit.id}
             srcDoc={`<!DOCTYPE html><html><head><style>html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#111}body{display:flex;align-items:${landscape ? 'center' : 'flex-start'};justify-content:${landscape ? focalJustify : 'center'};${landscape ? '' : 'margin-top:-44px;height:calc(100% + 44px)'}}</style></head><body>${gettyEmbedForIframe(outfit.imageUrl)}</body></html>`}
-            title={label}
+            title={alt}
             wrapperClassName="w-full h-full"
             iframeClassName="w-full h-full border-0 pointer-events-none"
             sandbox="allow-scripts allow-same-origin"
@@ -48,7 +53,7 @@ export default function OutfitCard({ outfit, settings, onClick }) {
         ) : (
           <img
             src={outfit.imageUrl}
-            alt={label}
+            alt={alt}
             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.04]"
             style={{ objectPosition: outfit.focal_point === 'left' ? 'left center' : outfit.focal_point === 'right' ? 'right center' : 'center center' }}
             loading="lazy"

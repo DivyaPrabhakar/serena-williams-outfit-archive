@@ -10,6 +10,11 @@ import BrokenLinksPanel         from '../components/admin/BrokenLinksPanel'
 import OutfitAuditPanel         from '../components/admin/OutfitAuditPanel'
 import DisplaySettingsPanel     from '../components/admin/DisplaySettingsPanel'
 import { useOutfits }           from '../hooks/useOutfits'
+import Seo                       from '../lib/seo'
+
+const ADMIN_SEO = (
+  <Seo title="Admin — Serena Williams Fit-dex" description="Private admin area." path="/admin" noindex />
+)
 
 const TABS = [
   { id: 'upload',    label: 'Upload' },
@@ -48,7 +53,7 @@ export default function AdminPage() {
       return next
     })
 
-  if (!adminToken) return <AdminLogin onSuccess={setAdminToken} />
+  if (!adminToken) return <>{ADMIN_SEO}<AdminLogin onSuccess={setAdminToken} /></>
 
   const renderTab = () => {
     if (loading && outfits.length === 0) return <p className="text-[#555] text-sm">Loading…</p>
@@ -92,6 +97,7 @@ export default function AdminPage() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
+      {ADMIN_SEO}
       {/* Header */}
       <div className="mb-6 flex items-center justify-between">
         <div>

@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { ROUND_LABELS } from '../../lib/constants'
 import { isGettyEmbed, gettyEmbedForIframe } from '../../lib/imageUtils'
+import { outfitAlt } from '../../lib/outfitText'
 import LazyIframe from './LazyIframe'
 import ColorSwatch from '../ColorSwatch'
 
@@ -43,7 +44,7 @@ export default function Lightbox({ outfits, index, onNavigate, onClose }) {
             <LazyIframe
               key={outfit.id}
               srcDoc={`<!DOCTYPE html><html><head><style>html,body{margin:0;height:100%;overflow:hidden;background:#000}body{display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box}</style></head><body>${gettyEmbedForIframe(outfit.imageUrl)}</body></html>`}
-              title={`${outfit.tournament} ${outfit.year}`}
+              title={outfitAlt(outfit)}
               wrapperClassName="w-full h-full"
               iframeClassName="w-full h-full border-0"
               sandbox="allow-scripts allow-same-origin"
@@ -51,7 +52,7 @@ export default function Lightbox({ outfits, index, onNavigate, onClose }) {
           ) : (
             <img
               src={outfit.imageUrl}
-              alt={`${outfit.tournament} ${outfit.year}`}
+              alt={outfitAlt(outfit)}
               className="w-full h-full object-contain"
             />
           )}

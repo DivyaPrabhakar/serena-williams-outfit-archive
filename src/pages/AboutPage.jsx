@@ -1,6 +1,13 @@
+import Seo from "../lib/seo";
+
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-dark px-3 py-16">
+      <Seo
+        title="About the Serena Williams Fit-dex | Serena Williams Outfits Archive"
+        description="The story behind the Serena Williams Fit-dex — an ongoing archive cataloguing every on-court Serena Williams outfit by tournament, year, discipline, and round."
+        path="/about"
+      />
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl text-ink uppercase tracking-widest font-medium leading-none mb-10">
           About

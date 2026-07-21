@@ -8,6 +8,10 @@ import { readStorage, writeStorage } from "../lib/storage";
 import { useSettings } from "../hooks/useSettings";
 import { useMissingOutfits } from "../hooks/useMissingOutfits";
 import { HeaderSlotContext } from "../components/layout/HeaderSlot";
+import Seo from "../lib/seo";
+import { absoluteUrl } from "../lib/siteUrl";
+import { snapshotOutfits } from "../lib/snapshot";
+import { tournamentPath } from "../lib/slugs";
 import FilterBar from "../components/layout/FilterBar";
 import GroupingPanel from "../components/filters/GroupingPanel";
 import GalleryGrid from "../components/gallery/GalleryGrid";
@@ -17,8 +21,11 @@ import Lightbox from "../components/gallery/Lightbox";
 import MissingPanel from "../components/gallery/MissingPanel";
 
 export default function ViewerPage() {
-  const [outfits, setOutfits] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // Seed from the build-time snapshot so static generation and the first client
+  // paint render the full gallery (real content for crawlers); the effect below
+  // then refetches live data so users always see the latest.
+  const [outfits, setOutfits] = useState(snapshotOutfits);
+  const [loading, setLoading] = useState(snapshotOutfits.length === 0);
   const [error, setError] = useState(null);
   const [lightboxIndex, setLightboxIndex] = useState(null);
 
@@ -122,6 +129,45 @@ export default function ViewerPage() {
 
   const anyPanelOpen = panelOpen || groupingPanelOpen;
 
+  const homeJsonLd = (() => {
+    const seen = new Map();
+    for (const o of outfits) {
+      const p = tournamentPath(o.tournament, o.year);
+      if (!seen.has(p)) seen.set(p, `${o.tournament} ${o.year}`);
+    }
+    const items = [...seen.entries()];
+    return [
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        name: "Serena Williams Fit-dex",
+        url: absoluteUrl("/"),
+        description:
+          "A complete visual archive of Serena Williams' on-court tournament outfits.",
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        name: "Serena Williams Outfits Archive",
+        about: {
+          "@type": "Person",
+          name: "Serena Williams",
+          sameAs: "https://en.wikipedia.org/wiki/Serena_Williams",
+        },
+        mainEntity: {
+          "@type": "ItemList",
+          numberOfItems: items.length,
+          itemListElement: items.map(([p, name], i) => ({
+            "@type": "ListItem",
+            position: i + 1,
+            url: absoluteUrl(p),
+            name,
+          })),
+        },
+      },
+    ];
+  })();
+
   const controls = (
     <FilterBar
       loading={loading}
@@ -143,6 +189,17 @@ export default function ViewerPage() {
     <div
       className={`min-h-screen bg-dark transition-[padding] duration-300 ${anyPanelOpen ? "md:pr-72" : ""} ${navCollapsed ? "lg:pl-10" : "lg:pl-52"}`}
     >
+      <Seo
+        title="Serena Williams Outfits — Every Tournament Look | Serena Williams Fit-dex"
+        description="A complete visual archive of Serena Williams' outfits — every on-court look catalogued by tournament, year, discipline, and round, from 1995 to today."
+        path="/"
+        jsonLd={homeJsonLd}
+      />
+      <h1 className="sr-only">
+        Serena Williams Outfits — every on-court tournament look, catalogued by
+        year, tournament, discipline, and round
+      </h1>
+
       {/* Desktop: portal controls into the centered header slot */}
       {slotEl && createPortal(controls, slotEl)}
 

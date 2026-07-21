@@ -13,6 +13,20 @@ const CORS = {
   'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, OPTIONS',
 };
 
+// After a successful write, ping the Netlify build hook so the pre-rendered
+// static pages (built from a snapshot) pick up the change. Fire-and-forget and a
+// no-op unless NETLIFY_BUILD_HOOK_URL is configured. Netlify coalesces overlapping
+// builds, so a burst of edits won't queue a build storm.
+async function triggerRebuild() {
+  const hook = process.env.NETLIFY_BUILD_HOOK_URL;
+  if (!hook) return;
+  try {
+    await fetch(hook, { method: 'POST' });
+  } catch (err) {
+    console.error('Build-hook trigger failed:', err.message);
+  }
+}
+
 function unauthorized() {
   return {
     statusCode: 401,
@@ -99,6 +113,11 @@ export const handler = async (event) => {
 
     } else {
       return { statusCode: 405, headers: CORS, body: JSON.stringify({ error: 'Method not allowed' }) };
+    }
+
+    // Refresh the pre-rendered pages when a write succeeded.
+    if (isWrite && result.status >= 200 && result.status < 300) {
+      await triggerRebuild();
     }
 
     return {
