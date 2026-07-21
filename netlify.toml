@@ -2,6 +2,16 @@
   command = "npm run build"
   publish = "dist"
 
+# Redirect the raw Netlify deploy URL to the primary apex domain so search engines
+# index a single canonical host. Must stay ABOVE the SPA catch-all below: Netlify
+# evaluates redirects top-to-bottom and stops at the first match, and the "/*" rewrite
+# matches every host (including .netlify.app), so if it came first this would never fire.
+[[redirects]]
+  from = "https://serena-williams-fitdex.netlify.app/*"
+  to = "https://serena-williams-fitdex.com/:splat"
+  status = 301
+  force = true
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
