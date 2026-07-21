@@ -14,12 +14,46 @@ const CORS = {
 };
 
 // After a successful write, ping the Netlify build hook so the pre-rendered
-// static pages (built from a snapshot) pick up the change. Fire-and-forget and a
-// no-op unless NETLIFY_BUILD_HOOK_URL is configured. Netlify coalesces overlapping
-// builds, so a burst of edits won't queue a build storm.
+// static pages (built from a snapshot) pick up the change. Debounced to ~1
+// build/minute via an atomic compare-and-set on the single-row `build_state`
+// table: the PATCH only matches (and returns a row) when >60s have passed since
+// the last trigger, so cataloguing a whole round back-to-back collapses to one
+// build instead of one per edit. No-op unless NETLIFY_BUILD_HOOK_URL is set.
+//
+// Awaiting the hook POST only waits for Netlify to ACCEPT the trigger (~ms), not
+// for the build to finish — the admin's request returns immediately either way.
+// We await deliberately: in Lambda the execution context freezes once the
+// response returns, so a non-awaited "background" fetch may never be sent.
 async function triggerRebuild() {
   const hook = process.env.NETLIFY_BUILD_HOOK_URL;
   if (!hook) return;
+
+  const now = new Date();
+  const cutoff = new Date(now.getTime() - 60_000).toISOString();
+  try {
+    // Atomic claim: UPDATE ... WHERE last_triggered_at < cutoff. Concurrent
+    // invocations serialize on the row lock; only the first past the window wins.
+    const claim = await sbFetch(
+      `build_state?id=eq.1&last_triggered_at=lt.${encodeURIComponent(cutoff)}`,
+      {
+        method: 'PATCH',
+        adminWrite: true,
+        prefer: 'return=representation',
+        body: JSON.stringify({ last_triggered_at: now.toISOString() }),
+      }
+    );
+    let rows = [];
+    try { rows = JSON.parse(claim.body || '[]'); } catch (_) {}
+    // Skip ONLY when the claim clearly succeeded but matched no row (recent build).
+    // Any error / non-2xx falls through and fires anyway (fail open: publishing
+    // the edit matters more than a rare extra build).
+    if (claim.status >= 200 && claim.status < 300 && Array.isArray(rows) && rows.length === 0) {
+      return;
+    }
+  } catch (err) {
+    console.error('Build-hook debounce check failed, firing anyway:', err.message);
+  }
+
   try {
     await fetch(hook, { method: 'POST' });
   } catch (err) {
