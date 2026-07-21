@@ -1,6 +1,7 @@
 import Layout from './components/layout/Layout'
 import ViewerPage from './pages/ViewerPage'
 import AboutPage from './pages/AboutPage'
+import MethodologyPage from './pages/MethodologyPage'
 import AdminPage from './pages/AdminPage'
 import TournamentPage from './pages/TournamentPage'
 import OutfitPage from './pages/OutfitPage'
@@ -14,6 +15,7 @@ export const routes = [
     children: [
       { index: true, element: <ViewerPage /> },
       { path: 'about', element: <AboutPage /> },
+      { path: 'methodology', element: <MethodologyPage /> },
       { path: 'admin', element: <AdminPage /> },
       // /us-open/2012
       { path: ':tournament/:year', element: <TournamentPage /> },
