@@ -125,6 +125,8 @@ export default function AdminPage() {
         </div>
       )}
 
+      <RebuildStatusPanel adminToken={adminToken} />
+
       {/* Tab bar */}
       <div className="flex border-b border-[#2a2a2a] mb-6 overflow-x-auto">
         {TABS.map(t => (
@@ -146,8 +148,6 @@ export default function AdminPage() {
       <div className="bg-[#1A1A1A] border border-[#2a2a2a] p-6">
         {renderTab()}
       </div>
-
-      <RebuildStatusPanel adminToken={adminToken} />
 
       {!loading && (
         <BackfillPanel adminToken={adminToken} totalOutfits={outfits.length} />

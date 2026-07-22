@@ -84,7 +84,7 @@ export default function RebuildStatusPanel({ adminToken }) {
   const hasPending = pending > 0
 
   return (
-    <div className="mt-8 bg-[#1A1A1A] border border-[#2a2a2a] p-6">
+    <div className="mb-6 bg-[#1A1A1A] border border-[#2a2a2a] p-6">
       <div className="flex items-center justify-between gap-4">
         <div className="min-w-0">
           <h3 className="font-[family-name:var(--font-playfair)] text-base font-bold text-[#F0EDE6]">
