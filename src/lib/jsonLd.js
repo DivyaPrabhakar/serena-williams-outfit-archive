@@ -1,19 +1,18 @@
 import { absoluteUrl } from './siteUrl'
+import { personRef } from './schema'
 
 // Schema.org CollectionPage + ItemList used by the tournament and hub pages. Both
 // pages are collections that funnel to child pages (outfits, or years); this keeps
 // the structured-data shape in one place. `items` is [{ url, name }] in order.
-export function collectionPageJsonLd({ name, description, items }) {
+// `about` references Serena by @id (defined once site-wide in Layout's @graph);
+// callers may pass extra `about` nodes (e.g. a SportsEvent) to append.
+export function collectionPageJsonLd({ name, description, items, about = [] }) {
   return {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
     name,
     ...(description ? { description } : {}),
-    about: {
-      '@type': 'Person',
-      name: 'Serena Williams',
-      sameAs: 'https://en.wikipedia.org/wiki/Serena_Williams',
-    },
+    about: [personRef(), ...about],
     mainEntity: {
       '@type': 'ItemList',
       numberOfItems: items.length,

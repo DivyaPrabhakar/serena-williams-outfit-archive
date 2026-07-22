@@ -9,6 +9,7 @@ import { useSettings } from "../hooks/useSettings";
 import { useMissingOutfits } from "../hooks/useMissingOutfits";
 import { HeaderSlotContext } from "../components/layout/HeaderSlot";
 import Seo from "../lib/seo";
+import { personRef } from "../lib/schema";
 import { absoluteUrl } from "../lib/siteUrl";
 import { snapshotOutfits } from "../lib/snapshot";
 import { tournamentPath } from "../lib/slugs";
@@ -149,11 +150,7 @@ export default function ViewerPage() {
         "@context": "https://schema.org",
         "@type": "CollectionPage",
         name: "Serena Williams Outfits Archive",
-        about: {
-          "@type": "Person",
-          name: "Serena Williams",
-          sameAs: "https://en.wikipedia.org/wiki/Serena_Williams",
-        },
+        about: personRef(),
         mainEntity: {
           "@type": "ItemList",
           numberOfItems: items.length,

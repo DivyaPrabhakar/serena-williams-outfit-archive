@@ -52,6 +52,30 @@ export function outfitAlt(o) {
   return `Serena Williams at ${outfitContext(o)}${suffix}`
 }
 
+// Article `headline`: the direct fact — event + round + discipline, no
+// brand/color. e.g. "Serena Williams' Singles outfit at the Final of the 2015
+// Wimbledon" or, when the round is unknown, "…at the 2015 Wimbledon".
+export function outfitHeadline(o) {
+  const disc = o.discipline || 'Singles'
+  const rl = roundLabel(o.round)
+  const where = rl ? `the ${rl} of the ${o.year} ${o.tournament}` : `the ${o.year} ${o.tournament}`
+  return `Serena Williams' ${disc} outfit at ${where}`
+}
+
+// Article JSON-LD `description`: a flat, factual string built ONLY from fields
+// shown in the OutfitPage metadata panel, in panel order —
+// `{year} {tournament}` → discipline → round → brand → colours. Missing fields
+// drop their clause (Round shows '—' on the panel but is a placeholder, not a
+// value, so it's omitted here). Notes is intentionally excluded. Deliberately
+// NOT derived from outfitDescription() (prose) or the Getty caption.
+export function outfitSchemaDescription(o) {
+  const event = [`${o.year} ${o.tournament}`, o.discipline || 'Singles', roundLabel(o.round)]
+    .filter(Boolean)
+    .join(', ')
+  const outfit = [o.brand, colorPhrase(o.colors)].filter(Boolean).join(', ')
+  return outfit ? `${event} — ${outfit}.` : `${event}.`
+}
+
 export function tournamentTitle(t, year) {
   return `Serena Williams Outfits — ${t} ${year} | Serena Williams Fit-dex`
 }
