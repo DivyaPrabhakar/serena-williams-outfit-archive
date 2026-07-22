@@ -2,6 +2,7 @@ import { COLOR_MAP, DISCIPLINES } from '../../lib/constants'
 import { getSortedColors } from '../../lib/colorUtils'
 import { slotsForYear, getRoundLabel, getRoundNumbers } from '../../lib/rounds'
 import { sortTournaments } from '../../lib/filterUtils'
+import { tournamentHubPath } from '../../lib/slugs'
 import { CARD_WIDTHS, isKnownForYear, groupNavId } from '../../lib/galleryUtils'
 import ExpandedYearSection from './ExpandedYearSection'
 import GroupSection from './GroupSection'
@@ -215,6 +216,7 @@ function TournamentGroupedGallery({ outfits, sortBy, settings, onOpenLightbox })
               id={groupNavId('tournament', tournament)}
               label={tournament}
               title={tournament}
+              titleHref={tournamentHubPath(tournament)}
               subtitle={settings.hideGetty ? null : `${tournamentOutfits.length} outfit${tournamentOutfits.length !== 1 ? 's' : ''}`}
             />
 

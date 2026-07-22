@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useGroupNav } from './GroupNavContext'
 
 // Top-level group header (Year / Color / Brand / Tournament) that pins below the
@@ -8,7 +9,7 @@ import { useGroupNav } from './GroupNavContext'
 // When an `id` is provided it also registers itself with the GroupNav registry so
 // the left jump-nav can list and scroll to this section. The sentinel/anchor div
 // is the scroll target (with scroll-mt to clear the sticky top nav).
-export default function StickyGroupHeader({ id, label, swatches, title, subtitle, className = '' }) {
+export default function StickyGroupHeader({ id, label, swatches, title, titleHref, subtitle, className = '' }) {
   const sentinelRef = useRef(null)
   const stickyRef = useRef(null)
   const [stuck, setStuck] = useState(false)
@@ -59,7 +60,11 @@ export default function StickyGroupHeader({ id, label, swatches, title, subtitle
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
           {swatches}
           <h2 className="font-playfair text-5xl text-ink leading-none transition-all duration-200 group-data-[stuck=true]/sticky:text-2xl">
-            {title}
+            {titleHref ? (
+              <Link to={titleHref} className="hover:text-gold hover:underline underline-offset-4 transition-colors">{title}</Link>
+            ) : (
+              title
+            )}
           </h2>
           {subtitle && (
             <p className="w-full text-sm leading-none text-muted transition-all duration-200 group-data-[stuck=true]/sticky:w-auto group-data-[stuck=true]/sticky:text-xs">

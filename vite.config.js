@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url'
 import process from 'node:process'
 // Static import so esbuild inlines the outfits JSON when Vite loads this config
 // (a runtime dynamic import would hit Node's JSON import-assertion requirement).
-import { allOutfitPaths, allTournamentYearPaths } from './src/lib/slugs.js'
+import { allOutfitPaths, allTournamentYearPaths, allTournamentHubPaths } from './src/lib/slugs.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -24,6 +24,7 @@ function ssgPaths() {
     '/',
     '/about',
     '/methodology',
+    ...allTournamentHubPaths(),
     ...allTournamentYearPaths(),
     ...allOutfitPaths(),
   ]

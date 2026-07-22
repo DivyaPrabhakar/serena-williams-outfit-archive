@@ -95,6 +95,35 @@ export function tournamentPath(tournament, year) {
   return `/${tournamentToSlug(tournament)}/${year}`
 }
 
+// ── Tournament hub pages ──────────────────────────────────────────────────────
+// One crawlable landing page per tournament, spanning all its years. The `-outfits`
+// suffix keeps it a single, unambiguous segment (never collides with the two-segment
+// /{tournament}/{year}) and signals the page's subject to searchers.
+const HUB_SUFFIX = '-outfits'
+
+export function tournamentHubPath(tournament) {
+  return `/${tournamentToSlug(tournament)}${HUB_SUFFIX}`
+}
+
+// Resolve a hub route param (e.g. "wimbledon-outfits") to its tournament, the years
+// it spans, and its outfits. Returns null for unknown or non-hub params.
+export function tournamentHubFromParam(hub) {
+  if (!hub || !hub.endsWith(HUB_SUFFIX)) return null
+  const slug = hub.slice(0, -HUB_SUFFIX.length)
+  const name = slugToTournament(slug)
+  if (!name) return null
+  const outfits = snapshotOutfits.filter((o) => o.tournament === name)
+  if (outfits.length === 0) return null
+  const years = [...new Set(outfits.map((o) => o.year))].sort((a, b) => a - b)
+  return { tournament: name, outfits, years }
+}
+
+export function allTournamentHubPaths() {
+  const set = new Set()
+  for (const o of snapshotOutfits) set.add(tournamentHubPath(o.tournament))
+  return [...set]
+}
+
 export function pathForOutfit(outfit) {
   return pathByOutfitId.get(outfit.id) ?? basePath(outfit)
 }
