@@ -34,7 +34,7 @@ export default function AdminPage() {
   const [editingOutfit, setEditingOutfit] = useState(null)
   const [searchParams,  setSearchParams]  = useSearchParams()
 
-  const { outfits, loading, error, insert, update, remove } = useOutfits(adminToken)
+  const { outfits, loading, error, insert, update, remove, removeMany } = useOutfits(adminToken)
 
   const tab   = searchParams.get('tab') || 'upload'
   const query = searchParams.get('q')   || ''
@@ -64,19 +64,19 @@ export default function AdminPage() {
       case 'migrate':
         return <CloudinaryMigrationPanel outfits={outfits} onUpdate={update} />
       case 'broken':
-        return <BrokenLinksPanel outfits={outfits} onEdit={setEditingOutfit} onDelete={remove} />
+        return <BrokenLinksPanel outfits={outfits} onEdit={setEditingOutfit} onDelete={remove} onDeleteMany={removeMany} />
       case 'no-colors':
-        return <OutfitAuditPanel outfits={outfits} onEdit={setEditingOutfit} onDelete={remove}
+        return <OutfitAuditPanel outfits={outfits} onEdit={setEditingOutfit} onDelete={remove} onDeleteMany={removeMany}
           filter={o => !o.colors?.length} countSuffix="without colors" emptyMessage="All outfits have colors assigned." />
       case 'no-image':
-        return <OutfitAuditPanel outfits={outfits} onEdit={setEditingOutfit} onDelete={remove}
+        return <OutfitAuditPanel outfits={outfits} onEdit={setEditingOutfit} onDelete={remove} onDeleteMany={removeMany}
           filter={o => !o.imageUrl} countSuffix="without any image" emptyMessage="All outfits have images."
           renderExtra={o => <p className="text-xs text-[#555] truncate mt-0.5">{o.imageUrl || '(no image)'}</p>} />
       case 'no-round':
-        return <OutfitAuditPanel outfits={outfits} onEdit={setEditingOutfit} onDelete={remove}
+        return <OutfitAuditPanel outfits={outfits} onEdit={setEditingOutfit} onDelete={remove} onDeleteMany={removeMany}
           filter={o => !o.round} countSuffix="without round" emptyMessage="All outfits have a round assigned." />
       case 'no-brand':
-        return <OutfitAuditPanel outfits={outfits} onEdit={setEditingOutfit} onDelete={remove}
+        return <OutfitAuditPanel outfits={outfits} onEdit={setEditingOutfit} onDelete={remove} onDeleteMany={removeMany}
           filter={o => !o.brand} countSuffix="without brand" emptyMessage="All outfits have a brand assigned."
           renderExtra={o => <p className="text-xs text-[#555] mt-0.5">{o.year}</p>} />
       case 'display':
@@ -89,6 +89,7 @@ export default function AdminPage() {
             onSearchChange={setQuery}
             onEdit={setEditingOutfit}
             onDelete={remove}
+            onDeleteMany={removeMany}
           />
         )
       default:

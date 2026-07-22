@@ -36,5 +36,11 @@ export function useOutfits(adminToken) {
     setOutfits(prev => prev.filter(o => o.id !== id))
   }
 
-  return { outfits, loading, error, insert, update, remove, reload }
+  const removeMany = async (ids) => {
+    await Promise.all(ids.map(id => deleteOutfit(id, adminToken)))
+    const gone = new Set(ids)
+    setOutfits(prev => prev.filter(o => !gone.has(o.id)))
+  }
+
+  return { outfits, loading, error, insert, update, remove, removeMany, reload }
 }

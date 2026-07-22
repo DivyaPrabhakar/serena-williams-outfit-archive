@@ -1,9 +1,17 @@
 import { isGettyEmbed, gettyEmbedForIframe } from '../../lib/imageUtils'
 import LazyIframe from '../gallery/LazyIframe'
 
-export default function OutfitRow({ o, onEdit, onDelete, children }) {
+export default function OutfitRow({ o, onEdit, onDelete, children, selectable, selected, onToggleSelect }) {
   return (
     <div className="flex items-center gap-3 px-3 py-2.5 bg-[#111]">
+      {selectable && (
+        <input
+          type="checkbox"
+          checked={!!selected}
+          onChange={() => onToggleSelect(o.id)}
+          className="flex-shrink-0 w-4 h-4 accent-[#C9A84C] cursor-pointer"
+        />
+      )}
       {isGettyEmbed(o.imageUrl) ? (
         <LazyIframe
           srcDoc={`<!DOCTYPE html><html><head><style>html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#111}body{display:flex;align-items:center;justify-content:center}</style></head><body>${gettyEmbedForIframe(o.imageUrl)}</body></html>`}

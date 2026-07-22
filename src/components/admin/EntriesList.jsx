@@ -1,10 +1,13 @@
 import { filterByQuery } from '../../lib/adminUtils'
 import { isGettyEmbed, gettyEmbedForIframe } from '../../lib/imageUtils'
+import { useRowSelection } from '../../hooks/useRowSelection'
 import LazyIframe from '../gallery/LazyIframe'
+import SelectionBar from './SelectionBar'
 
 const ROUND_ORDER = ['R1', 'R2', 'R3', 'R4', 'QF', 'SF', 'F']
 
-export default function EntriesList({ outfits, onEdit, onDelete, search = '', onSearchChange }) {
+export default function EntriesList({ outfits, onEdit, onDelete, onDeleteMany, search = '', onSearchChange }) {
+  const { selected, toggle, setAll, clear } = useRowSelection()
   const filtered = filterByQuery(outfits, search)
     .sort((a, b) => {
       const tCmp = (a.tournament ?? '').localeCompare(b.tournament ?? '')
@@ -16,9 +19,16 @@ export default function EntriesList({ outfits, onEdit, onDelete, search = '', on
       return (aRound === -1 ? 99 : aRound) - (bRound === -1 ? 99 : bRound)
     })
 
+  const allSelected = filtered.length > 0 && filtered.every(o => selected.has(o.id))
+
   const handleDelete = (id) => {
     if (!window.confirm('Delete this outfit?')) return
     onDelete(id)
+  }
+
+  const handleBulkDelete = async () => {
+    await onDeleteMany([...selected])
+    clear()
   }
 
   return (
@@ -32,10 +42,25 @@ export default function EntriesList({ outfits, onEdit, onDelete, search = '', on
         className="w-full bg-[#0D0D0D] border border-[#333] text-[#F0EDE6] px-3 py-2 text-sm outline-none focus:border-[#C9A84C] placeholder-[#3a3a3a]"
       />
 
-      {/* Count */}
-      <p className="text-xs text-[#8A877F] tracking-wide uppercase">
-        {filtered.length} / {outfits.length} entries
-      </p>
+      {/* Count + select-all */}
+      <div className="flex items-center gap-3">
+        <p className="text-xs text-[#8A877F] tracking-wide uppercase">
+          {filtered.length} / {outfits.length} entries
+        </p>
+        {filtered.length > 0 && (
+          <label className="flex items-center gap-1.5 text-xs text-[#8A877F] cursor-pointer">
+            <input
+              type="checkbox"
+              checked={allSelected}
+              onChange={e => setAll(filtered.map(o => o.id), e.target.checked)}
+              className="w-4 h-4 accent-[#C9A84C] cursor-pointer"
+            />
+            Select all
+          </label>
+        )}
+      </div>
+
+      <SelectionBar count={selected.size} onDelete={handleBulkDelete} onClear={clear} />
 
       {/* List */}
       {filtered.length === 0 ? (
@@ -49,6 +74,14 @@ export default function EntriesList({ outfits, onEdit, onDelete, search = '', on
               key={o.id}
               className="flex items-center gap-3 bg-[#1A1A1A] px-3 py-2.5"
             >
+              {/* Select */}
+              <input
+                type="checkbox"
+                checked={selected.has(o.id)}
+                onChange={() => toggle(o.id)}
+                className="flex-shrink-0 w-4 h-4 accent-[#C9A84C] cursor-pointer"
+              />
+
               {/* Thumbnail */}
               {isGettyEmbed(o.imageUrl) ? (
                 <LazyIframe

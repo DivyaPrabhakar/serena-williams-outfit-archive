@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import { isGettyEmbed } from '../../lib/imageUtils'
 import { filterByQuery } from '../../lib/adminUtils'
+import { useRowSelection } from '../../hooks/useRowSelection'
 import TabSearch from './TabSearch'
 import OutfitRow from './OutfitRow'
+import SelectionBar from './SelectionBar'
 
 function checkImageUrl(url) {
   if (!url) return Promise.resolve(false)
@@ -16,16 +18,18 @@ function checkImageUrl(url) {
   })
 }
 
-export default function BrokenLinksPanel({ outfits, onEdit, onDelete }) {
+export default function BrokenLinksPanel({ outfits, onEdit, onDelete, onDeleteMany }) {
   const [status,  setStatus]  = useState({})
   const [checked, setChecked] = useState(0)
   const [running, setRunning] = useState(false)
   const [search,  setSearch]  = useState('')
+  const { selected, toggle, setAll, clear } = useRowSelection()
 
   const run = () => {
     setStatus({})
     setChecked(0)
     setSearch('')
+    clear()
     setRunning(true)
     outfits.forEach(o => {
       checkImageUrl(o.imageUrl).then(ok => {
@@ -42,6 +46,12 @@ export default function BrokenLinksPanel({ outfits, onEdit, onDelete }) {
   const done    = !running && checked > 0
   const broken  = outfits.filter(o => status[o.id] === 'broken')
   const visible = filterByQuery(broken, search)
+  const allSelected = visible.length > 0 && visible.every(o => selected.has(o.id))
+
+  const handleBulkDelete = async () => {
+    await onDeleteMany([...selected])
+    clear()
+  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -63,12 +73,27 @@ export default function BrokenLinksPanel({ outfits, onEdit, onDelete }) {
       {done && broken.length > 0 && (
         <>
           <TabSearch value={search} onChange={setSearch} />
-          <p className="text-xs text-[#8A877F] uppercase tracking-wide">
-            {visible.length} / {broken.length} entries
-          </p>
+          <div className="flex items-center gap-3">
+            <p className="text-xs text-[#8A877F] uppercase tracking-wide">
+              {visible.length} / {broken.length} entries
+            </p>
+            {visible.length > 0 && (
+              <label className="flex items-center gap-1.5 text-xs text-[#8A877F] cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={allSelected}
+                  onChange={e => setAll(visible.map(o => o.id), e.target.checked)}
+                  className="w-4 h-4 accent-[#C9A84C] cursor-pointer"
+                />
+                Select all
+              </label>
+            )}
+          </div>
+          <SelectionBar count={selected.size} onDelete={handleBulkDelete} onClear={clear} />
           <div className="flex flex-col gap-px">
             {visible.map(o => (
-              <OutfitRow key={o.id} o={o} onEdit={onEdit} onDelete={onDelete}>
+              <OutfitRow key={o.id} o={o} onEdit={onEdit} onDelete={onDelete}
+                selectable selected={selected.has(o.id)} onToggleSelect={toggle}>
                 <p className="text-xs text-red-400 truncate mt-0.5">{o.imageUrl || '(no URL)'}</p>
               </OutfitRow>
             ))}
