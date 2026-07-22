@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
-import { writeFileSync } from 'node:fs'
+import { writeFileSync, existsSync, copyFileSync } from 'node:fs'
 import { resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import process from 'node:process'
@@ -17,9 +17,9 @@ const SITE_URL = (
   process.env.VITE_SITE_URL || 'https://serena-williams-fitdex.com'
 ).replace(/\/$/, '')
 
-// Concrete paths to statically pre-render (dynamic route params can't be crawled
-// automatically). /admin is intentionally excluded — it stays client-only.
-function ssgPaths() {
+// Real, indexable content paths — these go in the sitemap. /admin is intentionally
+// excluded (client-only, noindex).
+function contentPaths() {
   return [
     '/',
     '/about',
@@ -28,6 +28,13 @@ function ssgPaths() {
     ...allTournamentYearPaths(),
     ...allOutfitPaths(),
   ]
+}
+
+// Everything to statically pre-render (dynamic route params can't be crawled
+// automatically). Adds the noindex /404 page — prerendered so Netlify can serve a
+// real 404 body/status for unknown URLs — but it must NOT appear in the sitemap.
+function ssgPaths() {
+  return [...contentPaths(), '/404']
 }
 
 // AI crawlers/assistants we explicitly welcome (in addition to `User-agent: *`).
@@ -42,7 +49,7 @@ const AI_BOTS = [
 ]
 
 function writeSeoFiles() {
-  const urls = ssgPaths()
+  const urls = contentPaths()
   const sitemap =
     `<?xml version="1.0" encoding="UTF-8"?>\n` +
     `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
@@ -82,6 +89,16 @@ function writeSeoFiles() {
     `- [Archive stats](${SITE_URL}/stats): live found/unfound counts and ` +
     `coverage. -->\n`
   writeFileSync(resolve(__dirname, 'dist/llms.txt'), llms)
+
+  // Netlify serves dist/404.html (with a 404 status) via the catch-all in
+  // netlify.toml. vite-react-ssg may emit the prerendered /404 route as either
+  // dist/404.html (flat) or dist/404/index.html (nested) depending on dirStyle —
+  // normalize to dist/404.html so the redirect target always exists.
+  const flat404 = resolve(__dirname, 'dist/404.html')
+  const nested404 = resolve(__dirname, 'dist/404/index.html')
+  if (!existsSync(flat404) && existsSync(nested404)) {
+    copyFileSync(nested404, flat404)
+  }
 }
 
 export default defineConfig({

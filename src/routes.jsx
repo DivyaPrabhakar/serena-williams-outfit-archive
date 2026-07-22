@@ -6,6 +6,7 @@ import AdminPage from './pages/AdminPage'
 import TournamentPage from './pages/TournamentPage'
 import TournamentHubPage from './pages/TournamentHubPage'
 import OutfitPage from './pages/OutfitPage'
+import NotFoundPage from './pages/NotFoundPage'
 
 // Route tree as data, consumed by vite-react-ssg (which owns the router). The
 // static /about and /admin routes outrank the single-segment :tournamentHub param,
@@ -19,6 +20,10 @@ export const routes = [
       { path: 'about', element: <AboutPage /> },
       { path: 'methodology', element: <MethodologyPage /> },
       { path: 'admin', element: <AdminPage /> },
+      // Concrete /404 is prerendered (in ssgPaths) → dist/404.html, which Netlify
+      // serves with a real 404 status for unmatched URLs. Static, so it outranks
+      // the :tournamentHub param below.
+      { path: '404', element: <NotFoundPage /> },
       // /wimbledon-outfits — per-tournament hub spanning all years
       { path: ':tournamentHub', element: <TournamentHubPage /> },
       // /us-open/2012
@@ -27,6 +32,9 @@ export const routes = [
       { path: ':tournament/:year/:round', element: <OutfitPage /> },
       // /wimbledon/2012/doubles/final
       { path: ':tournament/:year/:discipline/:round', element: <OutfitPage /> },
+      // Client-side fallback for anything the param routes above don't match
+      // (e.g. 5+ segment URLs). Prerendered unknowns are handled by Netlify.
+      { path: '*', element: <NotFoundPage /> },
     ],
   },
 ]
