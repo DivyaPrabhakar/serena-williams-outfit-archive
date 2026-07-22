@@ -77,6 +77,9 @@ export default function Lightbox({ outfits, index, onNavigate, onClose }) {
             <MetaRow label="Round">
               {ROUND_LABELS[outfit.round] ?? outfit.round}
             </MetaRow>
+            {outfit.brand && (
+              <MetaRow label="Brand">{outfit.brand}</MetaRow>
+            )}
             {outfit.colors?.length > 0 && (
               <div>
                 <dt className="text-[10px] uppercase tracking-widest text-muted mb-2">Colors</dt>

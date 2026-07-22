@@ -8,6 +8,7 @@ import ExpandedYearSection from './ExpandedYearSection'
 import GroupSection from './GroupSection'
 import DisciplineBlock from './DisciplineBlock'
 import StickyGroupHeader from './StickyGroupHeader'
+import HeaderSwatches from './HeaderSwatches'
 
 export default function GalleryGrid({ outfits, groupBy = 'year', sortBy = 'chronological', settings, onOpenLightbox }) {
   if (groupBy !== 'year') {
@@ -90,7 +91,7 @@ function GroupedGallery({ outfits, groupBy, sortBy, settings, onOpenLightbox }) 
     }
     groups = colorOrder
       .filter(c => map[c]?.length > 0)
-      .map(c => ({ key: c, label: c, color: COLOR_MAP[c], outfits: map[c] }))
+      .map(c => ({ key: c, label: c, outfits: map[c] }))
   } else if (groupBy === 'color-group') {
     const colorOrder = Object.keys(COLOR_MAP)
     const map = {}
@@ -126,6 +127,7 @@ function GroupedGallery({ outfits, groupBy, sortBy, settings, onOpenLightbox }) 
     groups = sorted.map(b => ({
       key: b,
       label: b === '__none__' ? 'No brand listed' : b,
+      swatchColors: getSortedColors(map[b].flatMap(o => o.colors ?? [])),
       outfits: map[b],
     }))
   }
@@ -145,7 +147,7 @@ function GroupedGallery({ outfits, groupBy, sortBy, settings, onOpenLightbox }) 
           key={g.key}
           navId={groupNavId('group', g.key)}
           label={g.label}
-          color={g.color}
+          colors={g.swatchColors}
           outfits={g.outfits}
           settings={settings}
           onOpenLightbox={onOpenLightbox}
@@ -181,6 +183,7 @@ function TournamentGroupedGallery({ outfits, sortBy, settings, onOpenLightbox })
     <div>
       {sorted.map(tournament => {
         const tournamentOutfits = map[tournament]
+        const tournamentColors = getSortedColors(tournamentOutfits.flatMap(o => o.colors ?? []))
         const years = [...new Set(tournamentOutfits.map(o => o.year))].sort((a, b) => a - b)
 
         // Build one set of discipline blocks per tournament, spanning all years.
@@ -215,6 +218,7 @@ function TournamentGroupedGallery({ outfits, sortBy, settings, onOpenLightbox })
               className="mb-7"
               id={groupNavId('tournament', tournament)}
               label={tournament}
+              swatches={<HeaderSwatches colors={tournamentColors} />}
               title={tournament}
               titleHref={tournamentHubPath(tournament)}
               subtitle={settings.hideGetty ? null : `${tournamentOutfits.length} outfit${tournamentOutfits.length !== 1 ? 's' : ''}`}

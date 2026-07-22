@@ -6,6 +6,7 @@ import { getSortedColors } from '../../lib/colorUtils'
 import { tournamentPath } from '../../lib/slugs'
 import DisciplineBlock from './DisciplineBlock'
 import StickyGroupHeader from './StickyGroupHeader'
+import HeaderSwatches from './HeaderSwatches'
 import ColorSwatch from '../ColorSwatch'
 
 // For tournaments in the participation constants (grand slams + Olympics)
@@ -192,6 +193,7 @@ function UnknownTournamentBlock({ tournament, year, outfits, settings, onOpenLig
 
 export default function ExpandedYearSection({ year, outfitMap, tournaments, yearOutfits, settings, sortBy, onOpenLightbox }) {
   const subtitle = getYearSubtitle(yearOutfits, tournaments)
+  const yearColors = getSortedColors(yearOutfits.flatMap(o => o.colors ?? []))
 
   const blocks = tournaments.flatMap(tournament => {
     if (!isKnownForYear(tournament, year)) {
@@ -242,7 +244,7 @@ export default function ExpandedYearSection({ year, outfitMap, tournaments, year
 
   return (
     <section id={`year-${year}`} className="mb-14">
-      <StickyGroupHeader className="mb-7" id={`nav-year-${year}`} label={String(year)} title={String(year)} subtitle={settings.hideGetty ? null : subtitle} />
+      <StickyGroupHeader className="mb-7" id={`nav-year-${year}`} label={String(year)} swatches={<HeaderSwatches colors={yearColors} />} title={String(year)} subtitle={settings.hideGetty ? null : subtitle} />
       {blocks}
     </section>
   )
