@@ -11,4 +11,7 @@ import { rowToOutfit } from './api'
 export const snapshotOutfits = (rawRows ?? []).map((r) => ({
   ...rowToOutfit(r),
   createdAt: r.created_at ?? null,
+  // No updated_at column exists today; fall back to created_at so dateModified is
+  // always present, and pick up a real updated_at automatically if it's ever added.
+  updatedAt: r.updated_at ?? r.created_at ?? null,
 }))

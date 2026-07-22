@@ -1,30 +1,45 @@
 import { Link, useParams } from 'react-router-dom'
 import { outfitFromParams, tournamentPath, tournamentToSlug } from '../lib/slugs'
 import { isGettyEmbed, isGettyLandscape, gettyEmbedForIframe } from '../lib/imageUtils'
-import { outfitAlt, outfitDescription, outfitHeading, outfitTitle, roundLabel } from '../lib/outfitText'
+import {
+  outfitAlt,
+  outfitDescription,
+  outfitHeading,
+  outfitHeadline,
+  outfitSchemaDescription,
+  outfitTitle,
+  roundLabel,
+} from '../lib/outfitText'
+import {
+  personRef,
+  authorRef,
+  publisherRef,
+  sportsEventLd,
+  outfitImageLd,
+} from '../lib/schema'
 import Seo from '../lib/seo'
 import { absoluteUrl } from '../lib/siteUrl'
 import ColorSwatch from '../components/ColorSwatch'
 
-function gettyDetailUrl(embed) {
-  const m = String(embed).match(/href='(https:\/\/www\.gettyimages\.com\/detail\/[^']+)'/)
-  return m ? m[1] : null
-}
-
-function imageObjectJsonLd(o, path) {
-  const getty = isGettyEmbed(o.imageUrl)
+// Article for a single outfit. `about` links Serena (by @id) and the tournament
+// SportsEvent; `image` carries the correct Getty attribution; `creator` (the
+// outfit's brand) is distinct from the photo credit inside `image`. author /
+// publisher resolve to the site-wide @graph in Layout.
+function articleJsonLd(o, path) {
   return {
     '@context': 'https://schema.org',
-    '@type': 'ImageObject',
+    '@type': 'Article',
+    headline: outfitHeadline(o),
     name: outfitHeading(o),
-    description: outfitDescription(o),
-    caption: outfitAlt(o),
-    representativeOfPage: true,
-    ...(getty ? { acquireLicensePage: gettyDetailUrl(o.imageUrl) || undefined } : { contentUrl: o.imageUrl }),
+    description: outfitSchemaDescription(o),
     url: absoluteUrl(path),
-    contentLocation: { '@type': 'Place', name: o.tournament },
-    about: { '@type': 'Person', name: 'Serena Williams', sameAs: 'https://en.wikipedia.org/wiki/Serena_Williams' },
-    ...(o.brand ? { creditText: o.brand } : {}),
+    image: outfitImageLd(o, { name: outfitHeading(o), caption: outfitAlt(o) }),
+    datePublished: o.createdAt || undefined,
+    dateModified: o.updatedAt || o.createdAt || undefined,
+    author: authorRef(),
+    publisher: publisherRef(),
+    about: [personRef(), sportsEventLd(o.tournament, o.year)],
+    ...(o.brand ? { creator: { '@type': 'Organization', name: o.brand } } : {}),
   }
 }
 
@@ -71,7 +86,7 @@ export default function OutfitPage() {
         path={path}
         image={getty ? undefined : outfit.imageUrl}
         type="article"
-        jsonLd={imageObjectJsonLd(outfit, path)}
+        jsonLd={articleJsonLd(outfit, path)}
       />
 
       <div className="max-w-3xl mx-auto">

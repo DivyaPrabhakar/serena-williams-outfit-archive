@@ -3,6 +3,7 @@ import { tournamentFromParams, pathForOutfit } from '../lib/slugs'
 import { sortByDisciplineRound, firstPhotoUrl } from '../lib/galleryUtils'
 import { outfitAlt, tournamentDescription, tournamentHeading, tournamentTitle } from '../lib/outfitText'
 import { collectionPageJsonLd } from '../lib/jsonLd'
+import { sportsEventLd } from '../lib/schema'
 import Seo from '../lib/seo'
 import OutfitGrid from '../components/gallery/OutfitGrid'
 import NotFoundNotice from '../components/NotFoundNotice'
@@ -30,6 +31,7 @@ export default function TournamentPage() {
           name: tournamentHeading(tournament, year),
           description: tournamentDescription(tournament, year, outfits.length),
           items: sorted.map((o) => ({ url: pathForOutfit(o), name: outfitAlt(o) })),
+          about: [sportsEventLd(tournament, year)],
         })}
       />
 
