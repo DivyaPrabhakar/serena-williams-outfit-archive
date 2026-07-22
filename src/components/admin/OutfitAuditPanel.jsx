@@ -4,6 +4,7 @@ import { useRowSelection } from '../../hooks/useRowSelection'
 import TabSearch from './TabSearch'
 import OutfitRow from './OutfitRow'
 import SelectionBar from './SelectionBar'
+import ListHeader from './ListHeader'
 
 export default function OutfitAuditPanel({ outfits, onEdit, onDelete, onDeleteMany, filter, countSuffix, emptyMessage, renderExtra }) {
   const [search, setSearch] = useState('')
@@ -21,22 +22,14 @@ export default function OutfitAuditPanel({ outfits, onEdit, onDelete, onDeleteMa
   return (
     <div className="flex flex-col gap-3">
       <TabSearch value={search} onChange={setSearch} />
-      <div className="flex items-center gap-3">
-        <p className="text-xs text-[#8A877F] uppercase tracking-wide">
-          {visible.length} / {list.length} {countSuffix}
-        </p>
-        {visible.length > 0 && (
-          <label className="flex items-center gap-1.5 text-xs text-[#8A877F] cursor-pointer">
-            <input
-              type="checkbox"
-              checked={allSelected}
-              onChange={e => setAll(visible.map(o => o.id), e.target.checked)}
-              className="w-4 h-4 accent-[#C9A84C] cursor-pointer"
-            />
-            Select all
-          </label>
-        )}
-      </div>
+      <ListHeader
+        shown={visible.length}
+        total={list.length}
+        suffix={countSuffix}
+        selectable={visible.length > 0}
+        allSelected={allSelected}
+        onToggleAll={on => setAll(visible.map(o => o.id), on)}
+      />
       <SelectionBar count={selected.size} onDelete={handleBulkDelete} onClear={clear} />
       {list.length === 0 ? (
         <p className="text-[#555] text-sm">{emptyMessage}</p>

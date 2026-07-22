@@ -2,6 +2,7 @@ import { filterByQuery } from '../../lib/adminUtils'
 import { useRowSelection } from '../../hooks/useRowSelection'
 import OutfitRow from './OutfitRow'
 import SelectionBar from './SelectionBar'
+import ListHeader from './ListHeader'
 
 const ROUND_ORDER = ['R1', 'R2', 'R3', 'R4', 'QF', 'SF', 'F']
 
@@ -37,22 +38,14 @@ export default function EntriesList({ outfits, onEdit, onDelete, onDeleteMany, s
       />
 
       {/* Count + select-all */}
-      <div className="flex items-center gap-3">
-        <p className="text-xs text-[#8A877F] tracking-wide uppercase">
-          {filtered.length} / {outfits.length} entries
-        </p>
-        {filtered.length > 0 && (
-          <label className="flex items-center gap-1.5 text-xs text-[#8A877F] cursor-pointer">
-            <input
-              type="checkbox"
-              checked={allSelected}
-              onChange={e => setAll(filtered.map(o => o.id), e.target.checked)}
-              className="w-4 h-4 accent-[#C9A84C] cursor-pointer"
-            />
-            Select all
-          </label>
-        )}
-      </div>
+      <ListHeader
+        shown={filtered.length}
+        total={outfits.length}
+        suffix="entries"
+        selectable={filtered.length > 0}
+        allSelected={allSelected}
+        onToggleAll={on => setAll(filtered.map(o => o.id), on)}
+      />
 
       <SelectionBar count={selected.size} onDelete={handleBulkDelete} onClear={clear} />
 

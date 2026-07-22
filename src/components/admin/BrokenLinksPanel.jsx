@@ -5,6 +5,7 @@ import { useRowSelection } from '../../hooks/useRowSelection'
 import TabSearch from './TabSearch'
 import OutfitRow from './OutfitRow'
 import SelectionBar from './SelectionBar'
+import ListHeader from './ListHeader'
 
 function checkImageUrl(url) {
   if (!url) return Promise.resolve(false)
@@ -73,22 +74,14 @@ export default function BrokenLinksPanel({ outfits, onEdit, onDelete, onDeleteMa
       {done && broken.length > 0 && (
         <>
           <TabSearch value={search} onChange={setSearch} />
-          <div className="flex items-center gap-3">
-            <p className="text-xs text-[#8A877F] uppercase tracking-wide">
-              {visible.length} / {broken.length} entries
-            </p>
-            {visible.length > 0 && (
-              <label className="flex items-center gap-1.5 text-xs text-[#8A877F] cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={allSelected}
-                  onChange={e => setAll(visible.map(o => o.id), e.target.checked)}
-                  className="w-4 h-4 accent-[#C9A84C] cursor-pointer"
-                />
-                Select all
-              </label>
-            )}
-          </div>
+          <ListHeader
+            shown={visible.length}
+            total={broken.length}
+            suffix="entries"
+            selectable={visible.length > 0}
+            allSelected={allSelected}
+            onToggleAll={on => setAll(visible.map(o => o.id), on)}
+          />
           <SelectionBar count={selected.size} onDelete={handleBulkDelete} onClear={clear} />
           <div className="flex flex-col gap-px">
             {visible.map(o => (
