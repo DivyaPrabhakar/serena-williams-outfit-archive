@@ -9,6 +9,7 @@ import CloudinaryMigrationPanel from '../components/admin/CloudinaryMigrationPan
 import BrokenLinksPanel         from '../components/admin/BrokenLinksPanel'
 import OutfitAuditPanel         from '../components/admin/OutfitAuditPanel'
 import DisplaySettingsPanel     from '../components/admin/DisplaySettingsPanel'
+import RebuildStatusPanel       from '../components/admin/RebuildStatusPanel'
 import { useOutfits }           from '../hooks/useOutfits'
 import Seo                       from '../lib/seo'
 
@@ -145,6 +146,8 @@ export default function AdminPage() {
       <div className="bg-[#1A1A1A] border border-[#2a2a2a] p-6">
         {renderTab()}
       </div>
+
+      <RebuildStatusPanel adminToken={adminToken} />
 
       {!loading && (
         <BackfillPanel adminToken={adminToken} totalOutfits={outfits.length} />

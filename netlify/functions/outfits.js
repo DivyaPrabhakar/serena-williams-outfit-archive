@@ -13,52 +13,57 @@ const CORS = {
   'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, OPTIONS',
 };
 
-// After a successful write, ping the Netlify build hook so the pre-rendered
-// static pages (built from a snapshot) pick up the change. Debounced to ~1
-// build/minute via an atomic compare-and-set on the single-row `build_state`
-// table: the PATCH only matches (and returns a row) when >60s have passed since
-// the last trigger, so cataloguing a whole round back-to-back collapses to one
-// build instead of one per edit. No-op unless NETLIFY_BUILD_HOOK_URL is set.
-//
-// Awaiting the hook POST only waits for Netlify to ACCEPT the trigger (~ms), not
-// for the build to finish — the admin's request returns immediately either way.
-// We await deliberately: in Lambda the execution context freezes once the
-// response returns, so a non-awaited "background" fetch may never be sent.
-async function triggerRebuild() {
+// Rebuild strategy: writes don't trigger a build directly. Instead each
+// successful write marks the site "dirty" (bumps pending_count + last_change_at
+// on the single-row `build_state` table). A separate hourly scheduled function
+// (rebuild-scheduler) fires the Netlify build hook at most once per hour, and
+// only when there are pending changes — so cataloguing a whole session of images
+// produces ONE rebuild instead of one per edit. The admin can also force an
+// immediate rebuild via the "_triggerRebuild" action below.
+
+// Mark the site dirty after a successful write (atomic increment via RPC).
+async function recordChange() {
+  try {
+    await sbFetch('rpc/record_outfit_change', { method: 'POST', adminWrite: true, body: '{}' });
+  } catch (err) {
+    console.error('recordChange failed:', err.message);
+  }
+}
+
+// Read the current rebuild state for the admin UI's status panel.
+async function getBuildStatus() {
+  const res = await sbFetch(
+    'build_state?id=eq.1&select=pending_count,last_change_at,last_triggered_at',
+    { adminWrite: true },
+  );
+  let row = {};
+  try { row = JSON.parse(res.body || '[]')[0] || {}; } catch (_) {}
+  return {
+    pendingCount:    row.pending_count ?? 0,
+    lastChangeAt:    row.last_change_at ?? null,
+    lastTriggeredAt: row.last_triggered_at ?? null,
+    serverNow:       new Date().toISOString(),
+  };
+}
+
+// Force an immediate rebuild (admin "Rebuild now" button): reset the pending
+// counter and ping the build hook. Awaiting the POST only waits for Netlify to
+// ACCEPT the trigger (~ms), not for the build to finish.
+async function fireBuildNow() {
   const hook = process.env.NETLIFY_BUILD_HOOK_URL;
-  if (!hook) return;
-
-  const now = new Date();
-  const cutoff = new Date(now.getTime() - 60_000).toISOString();
-  try {
-    // Atomic claim: UPDATE ... WHERE last_triggered_at < cutoff. Concurrent
-    // invocations serialize on the row lock; only the first past the window wins.
-    const claim = await sbFetch(
-      `build_state?id=eq.1&last_triggered_at=lt.${encodeURIComponent(cutoff)}`,
-      {
-        method: 'PATCH',
-        adminWrite: true,
-        prefer: 'return=representation',
-        body: JSON.stringify({ last_triggered_at: now.toISOString() }),
-      }
-    );
-    let rows = [];
-    try { rows = JSON.parse(claim.body || '[]'); } catch (_) {}
-    // Skip ONLY when the claim clearly succeeded but matched no row (recent build).
-    // Any error / non-2xx falls through and fires anyway (fail open: publishing
-    // the edit matters more than a rare extra build).
-    if (claim.status >= 200 && claim.status < 300 && Array.isArray(rows) && rows.length === 0) {
-      return;
+  await sbFetch('build_state?id=eq.1', {
+    method: 'PATCH',
+    adminWrite: true,
+    body: JSON.stringify({ last_triggered_at: new Date().toISOString(), pending_count: 0 }),
+  });
+  if (hook) {
+    try {
+      await fetch(hook, { method: 'POST' });
+    } catch (err) {
+      console.error('Manual build-hook trigger failed:', err.message);
     }
-  } catch (err) {
-    console.error('Build-hook debounce check failed, firing anyway:', err.message);
   }
-
-  try {
-    await fetch(hook, { method: 'POST' });
-  } catch (err) {
-    console.error('Build-hook trigger failed:', err.message);
-  }
+  return { ok: true, triggered: !!hook };
 }
 
 function unauthorized() {
@@ -108,6 +113,16 @@ export const handler = async (event) => {
       if (body._authCheck) {
         return { statusCode: 200, headers: { ...CORS, 'Content-Type': 'application/json' }, body: JSON.stringify({ ok: true }) };
       }
+      // Admin rebuild-status panel: current pending count + last build time.
+      if (body._buildStatus) {
+        const status = await getBuildStatus();
+        return { statusCode: 200, headers: { ...CORS, 'Content-Type': 'application/json' }, body: JSON.stringify(status) };
+      }
+      // Admin "Rebuild now" button: fire a build immediately.
+      if (body._triggerRebuild) {
+        const out = await fireBuildNow();
+        return { statusCode: 200, headers: { ...CORS, 'Content-Type': 'application/json' }, body: JSON.stringify(out) };
+      }
     }
 
     let result;
@@ -149,9 +164,10 @@ export const handler = async (event) => {
       return { statusCode: 405, headers: CORS, body: JSON.stringify({ error: 'Method not allowed' }) };
     }
 
-    // Refresh the pre-rendered pages when a write succeeded.
+    // Mark the site dirty when a write succeeded — the hourly scheduled function
+    // turns accumulated changes into a single rebuild.
     if (isWrite && result.status >= 200 && result.status < 300) {
-      await triggerRebuild();
+      await recordChange();
     }
 
     return {

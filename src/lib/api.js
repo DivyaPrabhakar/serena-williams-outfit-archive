@@ -66,6 +66,23 @@ export async function authCheck(password) {
   return true
 }
 
+// ── Rebuild status ──────────────────────────────────────────────────────────
+
+// Current dirty-state for the admin rebuild panel: how many changes are pending
+// and when the site was last (re)built. Requires the admin token.
+export async function getBuildStatus(adminToken) {
+  const res = await adminFetch('', { method: 'POST', adminToken, body: { _buildStatus: true } })
+  await assertOk(res, 'Failed to load rebuild status')
+  return res.json()
+}
+
+// Force an immediate rebuild ("Rebuild now" button). Requires the admin token.
+export async function triggerRebuildNow(adminToken) {
+  const res = await adminFetch('', { method: 'POST', adminToken, body: { _triggerRebuild: true } })
+  await assertOk(res, 'Failed to trigger rebuild')
+  return res.json()
+}
+
 // ── CRUD ──────────────────────────────────────────────────────────────────
 
 export async function fetchOutfits() {
