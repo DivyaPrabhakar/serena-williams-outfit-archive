@@ -7,7 +7,6 @@ import ListHeader from './ListHeader'
 const ROUND_ORDER = ['R1', 'R2', 'R3', 'R4', 'QF', 'SF', 'F']
 
 export default function EntriesList({ outfits, onEdit, onDelete, onDeleteMany, search = '', onSearchChange }) {
-  const { selected, toggle, setAll, clear } = useRowSelection()
   const filtered = filterByQuery(outfits, search)
     .sort((a, b) => {
       const tCmp = (a.tournament ?? '').localeCompare(b.tournament ?? '')
@@ -19,12 +18,8 @@ export default function EntriesList({ outfits, onEdit, onDelete, onDeleteMany, s
       return (aRound === -1 ? 99 : aRound) - (bRound === -1 ? 99 : bRound)
     })
 
-  const allSelected = filtered.length > 0 && filtered.every(o => selected.has(o.id))
-
-  const handleBulkDelete = async () => {
-    await onDeleteMany([...selected])
-    clear()
-  }
+  const { selected, toggle, clear, allSelected, toggleAll, removeSelected } =
+    useRowSelection(filtered.map(o => o.id), onDeleteMany)
 
   return (
     <div className="flex flex-col gap-3">
@@ -44,10 +39,10 @@ export default function EntriesList({ outfits, onEdit, onDelete, onDeleteMany, s
         suffix="entries"
         selectable={filtered.length > 0}
         allSelected={allSelected}
-        onToggleAll={on => setAll(filtered.map(o => o.id), on)}
+        onToggleAll={toggleAll}
       />
 
-      <SelectionBar count={selected.size} onDelete={handleBulkDelete} onClear={clear} />
+      <SelectionBar count={selected.size} onDelete={removeSelected} onClear={clear} />
 
       {/* List */}
       {filtered.length === 0 ? (

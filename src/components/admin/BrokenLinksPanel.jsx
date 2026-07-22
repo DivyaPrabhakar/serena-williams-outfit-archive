@@ -24,7 +24,16 @@ export default function BrokenLinksPanel({ outfits, onEdit, onDelete, onDeleteMa
   const [checked, setChecked] = useState(0)
   const [running, setRunning] = useState(false)
   const [search,  setSearch]  = useState('')
-  const { selected, toggle, setAll, clear } = useRowSelection()
+
+  useEffect(() => {
+    if (running && checked >= outfits.length) setRunning(false)
+  }, [checked, outfits.length, running])
+
+  const done    = !running && checked > 0
+  const broken  = outfits.filter(o => status[o.id] === 'broken')
+  const visible = filterByQuery(broken, search)
+  const { selected, toggle, clear, allSelected, toggleAll, removeSelected } =
+    useRowSelection(visible.map(o => o.id), onDeleteMany)
 
   const run = () => {
     setStatus({})
@@ -38,20 +47,6 @@ export default function BrokenLinksPanel({ outfits, onEdit, onDelete, onDeleteMa
         setChecked(n => n + 1)
       })
     })
-  }
-
-  useEffect(() => {
-    if (running && checked >= outfits.length) setRunning(false)
-  }, [checked, outfits.length, running])
-
-  const done    = !running && checked > 0
-  const broken  = outfits.filter(o => status[o.id] === 'broken')
-  const visible = filterByQuery(broken, search)
-  const allSelected = visible.length > 0 && visible.every(o => selected.has(o.id))
-
-  const handleBulkDelete = async () => {
-    await onDeleteMany([...selected])
-    clear()
   }
 
   return (
@@ -80,9 +75,9 @@ export default function BrokenLinksPanel({ outfits, onEdit, onDelete, onDeleteMa
             suffix="entries"
             selectable={visible.length > 0}
             allSelected={allSelected}
-            onToggleAll={on => setAll(visible.map(o => o.id), on)}
+            onToggleAll={toggleAll}
           />
-          <SelectionBar count={selected.size} onDelete={handleBulkDelete} onClear={clear} />
+          <SelectionBar count={selected.size} onDelete={removeSelected} onClear={clear} />
           <div className="flex flex-col gap-px">
             {visible.map(o => (
               <OutfitRow key={o.id} o={o} onEdit={onEdit} onDelete={onDelete}

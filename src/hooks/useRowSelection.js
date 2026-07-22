@@ -2,7 +2,11 @@ import { useState } from 'react'
 
 // Shared row-selection state for the admin list panels. Kept per-panel so that
 // switching tabs (which unmounts the panel) clears any pending selection.
-export function useRowSelection() {
+//
+// Pass the currently-visible (post-search-filter) ids and the bulk-delete
+// callback so the hook can derive the "select all" state and the confirm-then-
+// delete flow, leaving each panel with no selection boilerplate of its own.
+export function useRowSelection(visibleIds = [], onDeleteMany) {
   const [selected, setSelected] = useState(() => new Set())
 
   const toggle = (id) =>
@@ -12,8 +16,6 @@ export function useRowSelection() {
       return next
     })
 
-  // Add/remove a batch of ids at once — used by the "Select all" checkbox,
-  // which passes the currently-visible (post-search-filter) ids.
   const setAll = (ids, on) =>
     setSelected(prev => {
       const next = new Set(prev)
@@ -23,5 +25,13 @@ export function useRowSelection() {
 
   const clear = () => setSelected(new Set())
 
-  return { selected, toggle, setAll, clear }
+  const allSelected = visibleIds.length > 0 && visibleIds.every(id => selected.has(id))
+  const toggleAll   = (on) => setAll(visibleIds, on)
+
+  const removeSelected = async () => {
+    await onDeleteMany([...selected])
+    clear()
+  }
+
+  return { selected, toggle, setAll, clear, allSelected, toggleAll, removeSelected }
 }
