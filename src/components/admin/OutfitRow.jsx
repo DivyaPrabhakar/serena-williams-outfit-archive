@@ -1,5 +1,4 @@
-import { isGettyEmbed, gettyEmbedForIframe } from '../../lib/imageUtils'
-import LazyIframe from '../gallery/LazyIframe'
+import OutfitThumbnail from './OutfitThumbnail'
 
 export default function OutfitRow({ o, onEdit, onDelete, children, selectable, selected, onToggleSelect }) {
   return (
@@ -12,21 +11,7 @@ export default function OutfitRow({ o, onEdit, onDelete, children, selectable, s
           className="flex-shrink-0 w-4 h-4 accent-[#C9A84C] cursor-pointer"
         />
       )}
-      {isGettyEmbed(o.imageUrl) ? (
-        <LazyIframe
-          srcDoc={`<!DOCTYPE html><html><head><style>html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#111}body{display:flex;align-items:center;justify-content:center}</style></head><body>${gettyEmbedForIframe(o.imageUrl)}</body></html>`}
-          wrapperClassName="w-10 h-14 flex-shrink-0 bg-[#111]"
-          iframeClassName="w-full h-full border-0 pointer-events-none"
-          sandbox="allow-scripts allow-same-origin"
-        />
-      ) : (
-        <img
-          src={o.imageUrl}
-          alt=""
-          className="w-10 h-14 object-cover flex-shrink-0 bg-[#222]"
-          onError={e => { e.target.style.opacity = '0.2' }}
-        />
-      )}
+      <OutfitThumbnail o={o} />
       <div className="flex-1 min-w-0">
         <p className="text-sm text-[#F0EDE6] truncate">
           {o.year} {o.tournament}

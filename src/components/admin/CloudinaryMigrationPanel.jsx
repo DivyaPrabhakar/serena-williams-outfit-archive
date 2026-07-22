@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { isGettyEmbed } from '../../lib/imageUtils'
 import { filterByQuery } from '../../lib/adminUtils'
 import TabSearch from './TabSearch'
-import OutfitRow from './OutfitRow'
+import OutfitThumbnail from './OutfitThumbnail'
 
 export default function CloudinaryMigrationPanel({ outfits, onUpdate }) {
   const [search, setSearch] = useState('')
@@ -62,12 +62,7 @@ export default function CloudinaryMigrationPanel({ outfits, onUpdate }) {
           {visible.map(o => (
             <div key={o.id} className="border border-[#2a2a2a] bg-[#111]">
               <div className="flex items-center gap-3 px-3 py-2.5">
-                <img
-                  src={o.imageUrl}
-                  alt=""
-                  className="w-10 h-14 object-cover flex-shrink-0 bg-[#222]"
-                  onError={e => { e.target.style.opacity = '0.15' }}
-                />
+                <OutfitThumbnail o={o} />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm text-[#F0EDE6] truncate">
                     {o.year} {o.tournament}
