@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom'
 import { HeaderSlotProvider } from './HeaderSlot'
 import Nav from './Nav'
+import ScrollToTop from './ScrollToTop'
 
 // Root layout for every route: the header-slot provider + nav shell, with the
 // matched page rendered into <Outlet />. Extracted from the old App.jsx so the
@@ -8,6 +9,7 @@ import Nav from './Nav'
 export default function Layout() {
   return (
     <HeaderSlotProvider>
+      <ScrollToTop />
       <Nav />
       <Outlet />
     </HeaderSlotProvider>

@@ -1,7 +1,9 @@
+import { Link } from 'react-router-dom'
 import { DISCIPLINES } from '../../lib/constants'
 import { getRoundsForSlot, getSlotStatus, getRoundLabel, getCombinedSlotStatus, getRoundNumbers } from '../../lib/rounds'
 import { CARD_WIDTHS, isKnownForYear, getYearSubtitle } from '../../lib/galleryUtils'
 import { getSortedColors } from '../../lib/colorUtils'
+import { tournamentPath } from '../../lib/slugs'
 import DisciplineBlock from './DisciplineBlock'
 import StickyGroupHeader from './StickyGroupHeader'
 import ColorSwatch from '../ColorSwatch'
@@ -60,8 +62,10 @@ function ExpandedTournamentBlock({ tournament, year, outfitMap, settings, sortBy
     <div className="mb-8">
       <div className="flex items-center gap-2 mb-4 flex-wrap">
         <span className="w-0.5 h-4 bg-gold flex-shrink-0 rounded-full" />
-        <span className="text-base uppercase tracking-widest text-gold font-medium">{tournament}</span>
-        {!settings.hideGetty && <span className="text-xs uppercase tracking-widest text-gold/60">{year} · {stats}</span>}
+        <Link to={tournamentPath(tournament, year)} className="flex items-center gap-2 flex-wrap hover:opacity-80 transition-opacity">
+          <span className="text-base uppercase tracking-widest text-gold font-medium">{tournament}</span>
+          {!settings.hideGetty && <span className="text-xs uppercase tracking-widest text-gold/60">{year} · {stats}</span>}
+        </Link>
         {tournamentColors.length > 0 && (
           <div className="flex gap-1 ml-1">
             {tournamentColors.map(color => (
@@ -145,8 +149,10 @@ function UnknownTournamentBlock({ tournament, year, outfits, settings, onOpenLig
     <div className="mb-8">
       <div className="flex items-center gap-2 mb-4 flex-wrap">
         <span className="w-0.5 h-4 bg-gold flex-shrink-0 rounded-full" />
-        <span className="text-base uppercase tracking-widest text-gold font-medium">{tournament}</span>
-        {!settings.hideGetty && <span className="text-xs uppercase tracking-widest text-gold/60">{year} · {stats}</span>}
+        <Link to={tournamentPath(tournament, year)} className="flex items-center gap-2 flex-wrap hover:opacity-80 transition-opacity">
+          <span className="text-base uppercase tracking-widest text-gold font-medium">{tournament}</span>
+          {!settings.hideGetty && <span className="text-xs uppercase tracking-widest text-gold/60">{year} · {stats}</span>}
+        </Link>
         {tournamentColors.length > 0 && (
           <div className="flex gap-1 ml-1">
             {tournamentColors.map(color => (

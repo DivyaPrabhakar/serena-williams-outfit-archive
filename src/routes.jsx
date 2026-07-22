@@ -4,10 +4,12 @@ import AboutPage from './pages/AboutPage'
 import MethodologyPage from './pages/MethodologyPage'
 import AdminPage from './pages/AdminPage'
 import TournamentPage from './pages/TournamentPage'
+import TournamentHubPage from './pages/TournamentHubPage'
 import OutfitPage from './pages/OutfitPage'
 
-// Route tree as data, consumed by vite-react-ssg (which owns the router). Dynamic
-// routes are all >= 2 segments so they never collide with /about or /admin.
+// Route tree as data, consumed by vite-react-ssg (which owns the router). The
+// static /about and /admin routes outrank the single-segment :tournamentHub param,
+// and the outfit routes are all >= 2 segments, so nothing collides.
 export const routes = [
   {
     path: '/',
@@ -17,6 +19,8 @@ export const routes = [
       { path: 'about', element: <AboutPage /> },
       { path: 'methodology', element: <MethodologyPage /> },
       { path: 'admin', element: <AdminPage /> },
+      // /wimbledon-outfits — per-tournament hub spanning all years
+      { path: ':tournamentHub', element: <TournamentHubPage /> },
       // /us-open/2012
       { path: ':tournament/:year', element: <TournamentPage /> },
       // /wimbledon/2015/final  (Singles implicit)

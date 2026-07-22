@@ -1,6 +1,9 @@
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { ROUND_LABELS } from '../../lib/constants'
 import { isGettyEmbed, isGettyLandscape, gettyEmbedForIframe } from '../../lib/imageUtils'
 import { outfitAlt } from '../../lib/outfitText'
+import { pathForOutfit } from '../../lib/slugs'
 import LazyIframe from './LazyIframe'
 import ColorSwatch from '../ColorSwatch'
 
@@ -8,6 +11,7 @@ export default function OutfitCard({ outfit, settings, onClick }) {
   const colors     = outfit.colors ?? []
   const getty      = isGettyEmbed(outfit.imageUrl)
   const landscape  = getty && isGettyLandscape(outfit.imageUrl)
+  const [imgError, setImgError] = useState(false)
 
   const focalJustify = outfit.focal_point === 'left'  ? 'flex-start'
                      : outfit.focal_point === 'right' ? 'flex-end'
@@ -22,8 +26,21 @@ export default function OutfitCard({ outfit, settings, onClick }) {
   // hover caption keeps the compact `label` above.
   const alt = outfitAlt(outfit)
 
+  // The card is a real <Link> so crawlers and cmd/middle-click reach the outfit
+  // page. When the lightbox is enabled, a normal left-click opens it instead of
+  // navigating (preventDefault); the href stays intact for the other cases.
+  const handleClick =
+    settings.lightbox && onClick
+      ? (e) => { e.preventDefault(); onClick(e) }
+      : undefined
+
   return (
-    <div>
+    <Link
+      to={pathForOutfit(outfit)}
+      className="block hover:opacity-95 transition-opacity"
+      aria-label={alt}
+      onClick={handleClick}
+    >
       {settings.colorDot && colors.length > 0 && (
         <div className="flex gap-1 mb-1.5">
           {colors.map((color, i) => (
@@ -39,7 +56,6 @@ export default function OutfitCard({ outfit, settings, onClick }) {
         className={`relative aspect-[3/4] rounded overflow-hidden bg-dark3 group ${
           settings.lightbox ? 'cursor-pointer' : ''
         }`}
-        onClick={settings.lightbox ? onClick : undefined}
       >
         {getty ? (
           <LazyIframe
@@ -50,6 +66,11 @@ export default function OutfitCard({ outfit, settings, onClick }) {
             iframeClassName="w-full h-full border-0 pointer-events-none"
             sandbox="allow-scripts allow-same-origin"
           />
+        ) : imgError || !outfit.imageUrl ? (
+          // Broken/missing image → labeled placeholder instead of a blank white box.
+          <div className="w-full h-full flex items-center justify-center bg-dark3 p-2 text-center">
+            <span className="text-[10px] text-muted leading-tight line-clamp-4">{label}</span>
+          </div>
         ) : (
           <img
             src={outfit.imageUrl}
@@ -57,12 +78,13 @@ export default function OutfitCard({ outfit, settings, onClick }) {
             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.04]"
             style={{ objectPosition: outfit.focal_point === 'left' ? 'left center' : outfit.focal_point === 'right' ? 'right center' : 'center center' }}
             loading="lazy"
+            onError={() => setImgError(true)}
           />
         )}
         <div className="absolute inset-0 bg-dark/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-2">
           <p className="text-xs text-ink leading-tight line-clamp-3">{label}</p>
         </div>
       </div>
-    </div>
+    </Link>
   )
 }

@@ -64,3 +64,19 @@ export function tournamentDescription(t, year, count) {
   const n = count === 1 ? 'outfit' : 'outfits'
   return `Every Serena Williams outfit from the ${year} ${t}${count ? ` — ${count} ${n}` : ''}, catalogued by round and discipline in the Serena Williams Fit-dex archive.`
 }
+
+// ── Tournament hub page (all years of one tournament) ──
+export function tournamentHubTitle(t) {
+  return `Serena Williams ${t} Outfits | Serena Williams Fit-dex`
+}
+
+export function tournamentHubHeading(t) {
+  return `Serena Williams ${t} Outfits`
+}
+
+export function tournamentHubDescription(t, count, years) {
+  const n = count === 1 ? 'outfit' : 'outfits'
+  const span =
+    years && years.length > 1 ? ` from ${years[0]} to ${years[years.length - 1]}` : ''
+  return `Every Serena Williams outfit worn at ${t}${span} — ${count} ${n} catalogued by year, round, and discipline in the Serena Williams Fit-dex archive.`
+}
