@@ -1,18 +1,17 @@
 import { useState } from 'react'
 import { isGettyEmbed } from '../../lib/imageUtils'
-import { filterByQuery } from '../../lib/adminUtils'
+import { useOutfitSearch } from '../../hooks/useOutfitSearch'
 import TabSearch from './TabSearch'
 import OutfitThumbnail from './OutfitThumbnail'
 
 export default function CloudinaryMigrationPanel({ outfits, onUpdate }) {
-  const [search, setSearch] = useState('')
   const [embeds, setEmbeds] = useState({})
   const [saving, setSaving] = useState({})
   const [saved,  setSaved]  = useState({})
   const [errors, setErrors] = useState({})
 
   const cloudinary = outfits.filter(o => o.imageUrl?.includes('cloudinary.com'))
-  const visible    = filterByQuery(cloudinary, search)
+  const { search, setSearch, visible } = useOutfitSearch(cloudinary)
 
   const handleEmbed = (id, val) => {
     setEmbeds(prev => ({ ...prev, [id]: val }))

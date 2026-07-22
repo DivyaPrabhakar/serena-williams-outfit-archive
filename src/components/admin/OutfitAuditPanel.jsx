@@ -1,15 +1,13 @@
-import { useState } from 'react'
-import { filterByQuery } from '../../lib/adminUtils'
 import { useRowSelection } from '../../hooks/useRowSelection'
+import { useOutfitSearch } from '../../hooks/useOutfitSearch'
 import TabSearch from './TabSearch'
 import OutfitRow from './OutfitRow'
 import SelectionBar from './SelectionBar'
 import ListHeader from './ListHeader'
 
 export default function OutfitAuditPanel({ outfits, onEdit, onDelete, onDeleteMany, filter, countSuffix, emptyMessage, renderExtra }) {
-  const [search, setSearch] = useState('')
-  const list    = outfits.filter(filter)
-  const visible = filterByQuery(list, search)
+  const list = outfits.filter(filter)
+  const { search, setSearch, visible } = useOutfitSearch(list)
   const { selected, toggle, clear, allSelected, toggleAll, removeSelected } =
     useRowSelection(visible.map(o => o.id), onDeleteMany)
 

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { isGettyEmbed } from '../../lib/imageUtils'
-import { filterByQuery } from '../../lib/adminUtils'
 import { useRowSelection } from '../../hooks/useRowSelection'
+import { useOutfitSearch } from '../../hooks/useOutfitSearch'
 import TabSearch from './TabSearch'
 import OutfitRow from './OutfitRow'
 import SelectionBar from './SelectionBar'
@@ -23,7 +23,6 @@ export default function BrokenLinksPanel({ outfits, onEdit, onDelete, onDeleteMa
   const [status,  setStatus]  = useState({})
   const [checked, setChecked] = useState(0)
   const [running, setRunning] = useState(false)
-  const [search,  setSearch]  = useState('')
 
   useEffect(() => {
     if (running && checked >= outfits.length) setRunning(false)
@@ -31,7 +30,7 @@ export default function BrokenLinksPanel({ outfits, onEdit, onDelete, onDeleteMa
 
   const done    = !running && checked > 0
   const broken  = outfits.filter(o => status[o.id] === 'broken')
-  const visible = filterByQuery(broken, search)
+  const { search, setSearch, visible } = useOutfitSearch(broken)
   const { selected, toggle, clear, allSelected, toggleAll, removeSelected } =
     useRowSelection(visible.map(o => o.id), onDeleteMany)
 
