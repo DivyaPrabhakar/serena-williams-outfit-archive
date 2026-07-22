@@ -12,7 +12,20 @@
   status = 301
   force = true
 
+# /admin is intentionally client-rendered (excluded from prerendering), so it has
+# no static file. Rewrite it to the SPA shell so the client router can mount it.
+# Must stay ABOVE the catch-all below (first match wins).
 [[redirects]]
-  from = "/*"
+  from = "/admin"
   to = "/index.html"
   status = 200
+
+# Genuine unmatched paths. Every real route is prerendered to its own static file,
+# and Netlify serves existing files before applying non-forced redirects — so valid
+# routes are unaffected and only URLs with no page reach this rule. Return a real
+# 404 with the prerendered 404 page instead of the old soft-200 that masqueraded the
+# homepage at every bogus URL (a soft-404 that wastes crawl budget).
+[[redirects]]
+  from = "/*"
+  to = "/404.html"
+  status = 404
