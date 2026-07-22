@@ -1,7 +1,6 @@
 import { filterByQuery } from '../../lib/adminUtils'
-import { isGettyEmbed, gettyEmbedForIframe } from '../../lib/imageUtils'
 import { useRowSelection } from '../../hooks/useRowSelection'
-import LazyIframe from '../gallery/LazyIframe'
+import OutfitRow from './OutfitRow'
 import SelectionBar from './SelectionBar'
 
 const ROUND_ORDER = ['R1', 'R2', 'R3', 'R4', 'QF', 'SF', 'F']
@@ -20,11 +19,6 @@ export default function EntriesList({ outfits, onEdit, onDelete, onDeleteMany, s
     })
 
   const allSelected = filtered.length > 0 && filtered.every(o => selected.has(o.id))
-
-  const handleDelete = (id) => {
-    if (!window.confirm('Delete this outfit?')) return
-    onDelete(id)
-  }
 
   const handleBulkDelete = async () => {
     await onDeleteMany([...selected])
@@ -70,76 +64,28 @@ export default function EntriesList({ outfits, onEdit, onDelete, onDeleteMany, s
       ) : (
         <div className="flex flex-col gap-px">
           {filtered.map(o => (
-            <div
+            <OutfitRow
               key={o.id}
-              className="flex items-center gap-3 bg-[#1A1A1A] px-3 py-2.5"
+              o={o}
+              onEdit={onEdit}
+              onDelete={onDelete}
+              selectable
+              selected={selected.has(o.id)}
+              onToggleSelect={toggle}
             >
-              {/* Select */}
-              <input
-                type="checkbox"
-                checked={selected.has(o.id)}
-                onChange={() => toggle(o.id)}
-                className="flex-shrink-0 w-4 h-4 accent-[#C9A84C] cursor-pointer"
-              />
-
-              {/* Thumbnail */}
-              {isGettyEmbed(o.imageUrl) ? (
-                <LazyIframe
-                  srcDoc={`<!DOCTYPE html><html><head><style>html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#111}body{display:flex;align-items:center;justify-content:center}</style></head><body>${gettyEmbedForIframe(o.imageUrl)}</body></html>`}
-                  wrapperClassName="w-10 h-14 flex-shrink-0 bg-[#111]"
-                  iframeClassName="w-full h-full border-0 pointer-events-none"
-                  sandbox="allow-scripts allow-same-origin"
-                />
-              ) : (
-                <img
-                  src={o.imageUrl}
-                  alt=""
-                  className="w-10 h-14 object-cover flex-shrink-0 bg-[#111]"
-                  onError={e => { e.target.style.background = '#222' }}
-                />
-              )}
-
-              {/* Info */}
-              <div className="flex-1 min-w-0">
-                <div className="text-sm text-[#F0EDE6] truncate">
-                  {[o.tournament, o.year].filter(Boolean).join(' ')}
-                  {o.discipline && (
-                    <span className="text-[#8A877F]"> · {o.discipline}</span>
-                  )}
-                  {o.round && (
-                    <span className="text-[#8A877F]"> · {o.round}</span>
-                  )}
+              {o.colors?.length > 0 && (
+                <div className="flex gap-1 mt-1 flex-wrap">
+                  {o.colors.map(c => (
+                    <span
+                      key={c}
+                      className="text-[10px] text-[#555] border border-[#252525] px-1.5 py-0.5"
+                    >
+                      {c}
+                    </span>
+                  ))}
                 </div>
-                {o.colors?.length > 0 && (
-                  <div className="flex gap-1 mt-1 flex-wrap">
-                    {o.colors.map(c => (
-                      <span
-                        key={c}
-                        className="text-[10px] text-[#555] border border-[#252525] px-1.5 py-0.5"
-                      >
-                        {c}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Actions */}
-              <div className="flex gap-1.5 flex-shrink-0">
-                <button
-                  onClick={() => onEdit(o)}
-                  className="text-xs border border-[#333] text-[#8A877F] px-2.5 py-1 hover:border-[#C9A84C] hover:text-[#C9A84C] transition-colors cursor-pointer"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => handleDelete(o.id)}
-                  className="text-xs border border-[#333] text-[#8A877F] px-2.5 py-1 hover:border-red-500 hover:text-red-400 transition-colors cursor-pointer"
-                >
-                  Del
-                </button>
-              </div>
-            </div>
+              )}
+            </OutfitRow>
           ))}
         </div>
       )}
