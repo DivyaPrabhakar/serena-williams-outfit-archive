@@ -39,13 +39,14 @@ export function outfitToRow(o) {
 // ── Fetch helpers ───────────────────────────────────────────────────────────
 // Single place that talks to the outfits function: attaches the admin token
 // (required for every write) and JSON-encodes the body when present.
-async function adminFetch(query = '', { method = 'GET', body, adminToken } = {}) {
+async function adminFetch(query = '', { method = 'GET', body, adminToken, keepalive } = {}) {
   const headers = { 'Content-Type': 'application/json' }
   if (adminToken) headers['x-admin-token'] = adminToken
   return fetch(`${API}${query}`, {
     method,
     headers,
     ...(body !== undefined && { body: JSON.stringify(body) }),
+    ...(keepalive && { keepalive: true }),
   })
 }
 
@@ -81,6 +82,21 @@ export async function triggerRebuildNow(adminToken) {
   const res = await adminFetch('', { method: 'POST', adminToken, body: { _triggerRebuild: true } })
   await assertOk(res, 'Failed to trigger rebuild')
   return res.json()
+}
+
+// Fire a rebuild as the page unloads so pending changes go live on tab close.
+// `ifPending` lets the server decide atomically (builds only when something's
+// pending — never misses a just-made edit, never builds a clean tab), and
+// `keepalive` lets the request complete even after the page is gone.
+export function triggerRebuildOnUnload(adminToken) {
+  try {
+    adminFetch('', {
+      method: 'POST',
+      adminToken,
+      body: { _triggerRebuild: true, ifPending: true },
+      keepalive: true,
+    })
+  } catch { /* best-effort during unload */ }
 }
 
 // ── CRUD ──────────────────────────────────────────────────────────────────

@@ -46,21 +46,44 @@ async function getBuildStatus() {
   };
 }
 
-// Force an immediate rebuild (admin "Rebuild now" button): reset the pending
-// counter and ping the build hook. Awaiting the POST only waits for Netlify to
-// ACCEPT the trigger (~ms), not for the build to finish.
-async function fireBuildNow() {
+// Fire a build immediately, resetting the pending counter, then ping the hook.
+// Two modes:
+//   - default (admin "Rebuild now" button): always fires, even with nothing
+//     pending — for "I need to see it live right now".
+//   - onlyIfPending (tab-close auto-flush): atomically claims pending changes and
+//     skips entirely when the site is clean, so closing the admin tab after a
+//     quiet session doesn't spawn a needless build. The server decides
+//     atomically, so a just-made edit is never missed by a stale client.
+// Awaiting the hook POST only waits for Netlify to ACCEPT the trigger (~ms),
+// not for the build to finish.
+async function fireBuildNow({ onlyIfPending = false } = {}) {
   const hook = process.env.NETLIFY_BUILD_HOOK_URL;
-  await sbFetch('build_state?id=eq.1', {
-    method: 'PATCH',
-    adminWrite: true,
-    body: JSON.stringify({ last_triggered_at: new Date().toISOString(), pending_count: 0 }),
-  });
+
+  if (onlyIfPending) {
+    const claim = await sbFetch('build_state?id=eq.1&pending_count=gt.0', {
+      method: 'PATCH',
+      adminWrite: true,
+      prefer: 'return=representation',
+      body: JSON.stringify({ last_triggered_at: new Date().toISOString(), pending_count: 0 }),
+    });
+    let rows = [];
+    try { rows = JSON.parse(claim.body || '[]'); } catch (_) {}
+    if (!Array.isArray(rows) || rows.length === 0) {
+      return { ok: true, triggered: false, reason: 'no pending changes' };
+    }
+  } else {
+    await sbFetch('build_state?id=eq.1', {
+      method: 'PATCH',
+      adminWrite: true,
+      body: JSON.stringify({ last_triggered_at: new Date().toISOString(), pending_count: 0 }),
+    });
+  }
+
   if (hook) {
     try {
       await fetch(hook, { method: 'POST' });
     } catch (err) {
-      console.error('Manual build-hook trigger failed:', err.message);
+      console.error('Build-hook trigger failed:', err.message);
     }
   }
   return { ok: true, triggered: !!hook };
@@ -118,9 +141,9 @@ export const handler = async (event) => {
         const status = await getBuildStatus();
         return { statusCode: 200, headers: { ...CORS, 'Content-Type': 'application/json' }, body: JSON.stringify(status) };
       }
-      // Admin "Rebuild now" button: fire a build immediately.
+      // Admin "Rebuild now" button (always) or tab-close auto-flush (ifPending).
       if (body._triggerRebuild) {
-        const out = await fireBuildNow();
+        const out = await fireBuildNow({ onlyIfPending: !!body.ifPending });
         return { statusCode: 200, headers: { ...CORS, 'Content-Type': 'application/json' }, body: JSON.stringify(out) };
       }
     }

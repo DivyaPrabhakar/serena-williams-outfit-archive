@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { getBuildStatus, triggerRebuildNow } from '../../lib/api'
+import { getBuildStatus, triggerRebuildNow, triggerRebuildOnUnload } from '../../lib/api'
 
 // The scheduled function rebuilds at the top of every hour (UTC). Compute ms
 // until the next UTC :00 — done in UTC so it stays correct in timezones with a
@@ -55,6 +55,16 @@ export default function RebuildStatusPanel({ adminToken }) {
     return () => clearInterval(id)
   }, [refresh])
 
+  // Auto-publish on tab close: fire a rebuild as the page unloads. Uses pagehide
+  // (fires on close/navigate, NOT on tab-switch) with a keepalive request; the
+  // server only builds if changes are actually pending, so nothing is lost and a
+  // clean tab close is a no-op.
+  useEffect(() => {
+    const flush = () => triggerRebuildOnUnload(adminToken)
+    window.addEventListener('pagehide', flush)
+    return () => window.removeEventListener('pagehide', flush)
+  }, [adminToken])
+
   async function handleRebuildNow() {
     setBusy(true)
     setError(null)
@@ -99,6 +109,7 @@ export default function RebuildStatusPanel({ adminToken }) {
           {status && (
             <p className="text-[11px] text-[#555] mt-0.5">
               Last built {formatAgo(status.lastTriggeredAt)}
+              {hasPending && ' · closing this tab publishes them automatically'}
             </p>
           )}
         </div>
