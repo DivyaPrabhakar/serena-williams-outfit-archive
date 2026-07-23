@@ -48,7 +48,7 @@ export default function FilterBar({
       </button>
       <button
         onClick={toggleLayout}
-        className="px-4 py-2 rounded text-sm font-normal whitespace-nowrap transition-colors bg-dark3 hover:text-white"
+        className="hidden md:inline-block px-4 py-2 rounded text-sm font-normal whitespace-nowrap transition-colors bg-dark3 hover:text-white"
       >
         <span className="text-muted">Layout: </span>
         <span className="text-gold">{isStacked ? 'Stacked' : 'Side by side'}</span>

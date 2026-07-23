@@ -32,13 +32,22 @@ body {
 }
 
 /* Card width is driven by the --card-w CSS variable set inline per card
-   (from the gridDensity setting). Shrink cards a bit on mobile. */
+   (from the gridDensity setting). Cards shrink on mobile so more fit per row
+   and the gallery reads as a dense, mobile-optimized grid. */
 .gallery-card {
   width: var(--card-w);
 }
 
-@media (max-width: 640px) {
+/* Tablets / large phones (below the md layout switch). */
+@media (max-width: 767px) {
   .gallery-card {
-    width: calc(var(--card-w) * 0.82);
+    width: calc(var(--card-w) * 0.68);
+  }
+}
+
+/* Phones — smaller still. */
+@media (max-width: 480px) {
+  .gallery-card {
+    width: calc(var(--card-w) * 0.55);
   }
 }

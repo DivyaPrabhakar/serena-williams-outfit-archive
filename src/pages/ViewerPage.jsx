@@ -7,6 +7,7 @@ import { TOURNAMENT_ORDER } from "../lib/filterUtils";
 import { readStorage, writeStorage } from "../lib/storage";
 import { useSettings } from "../hooks/useSettings";
 import { useMissingOutfits } from "../hooks/useMissingOutfits";
+import { useIsMobile } from "../hooks/useIsMobile";
 import { HeaderSlotContext } from "../components/layout/HeaderSlot";
 import Seo from "../lib/seo";
 import { personRef } from "../lib/schema";
@@ -52,6 +53,11 @@ export default function ViewerPage() {
 
   const { settings } = useSettings();
 
+  // On mobile the Layout toggle is hidden and the gallery always renders
+  // stacked, so the user's stored layout only applies on desktop.
+  const isMobile = useIsMobile();
+  const effectiveLayout = isMobile ? 'vertical' : layout;
+
   const visibleOutfits = settings.hideGetty
     ? outfits.filter((o) => !isGettyEmbed(o.imageUrl))
     : outfits;
@@ -60,8 +66,8 @@ export default function ViewerPage() {
   // round slots and "did not play / not held" placeholders, and hide the section
   // subtitles/stats so it reads as a clean, dense grid.
   const gallerySettings = settings.hideGetty
-    ? { ...settings, showEmptySlots: false, showDimSlots: false, layout }
-    : { ...settings, layout };
+    ? { ...settings, showEmptySlots: false, showDimSlots: false, layout: effectiveLayout }
+    : { ...settings, layout: effectiveLayout };
 
   function togglePanel() {
     setPanelOpen((prev) => {
@@ -78,8 +84,12 @@ export default function ViewerPage() {
   }
 
   function setGroupBy(value) {
+    if (value === groupBy) return;
     setGroupByState(value);
     writeStorage('serena_gallery_groupby', value);
+    // Reordering the gallery in place isn't obvious when scrolled down, so jump
+    // back to the top to make the new grouping clearly land from the start.
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function setSortBy(value) {
