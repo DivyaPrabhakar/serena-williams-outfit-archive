@@ -18,6 +18,7 @@ export default function Nav() {
       />
 
       <div className="flex items-center gap-6">
+        <Link to="/stats" className="text-base text-muted hover:text-ink transition-colors">Stats</Link>
         <Link to="/about" className="text-base text-muted hover:text-ink transition-colors">About</Link>
       </div>
     </nav>

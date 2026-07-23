@@ -2,6 +2,7 @@ import Layout from './components/layout/Layout'
 import ViewerPage from './pages/ViewerPage'
 import AboutPage from './pages/AboutPage'
 import MethodologyPage from './pages/MethodologyPage'
+import StatsPage from './pages/StatsPage'
 import AdminPage from './pages/AdminPage'
 import TournamentPage from './pages/TournamentPage'
 import TournamentHubPage from './pages/TournamentHubPage'
@@ -19,6 +20,7 @@ export const routes = [
       { index: true, element: <ViewerPage /> },
       { path: 'about', element: <AboutPage /> },
       { path: 'methodology', element: <MethodologyPage /> },
+      { path: 'stats', element: <StatsPage /> },
       { path: 'admin', element: <AdminPage /> },
       // Concrete /404 is prerendered (in ssgPaths) → dist/404.html, which Netlify
       // serves with a real 404 status for unmatched URLs. Static, so it outranks

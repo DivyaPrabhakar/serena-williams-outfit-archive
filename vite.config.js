@@ -24,6 +24,7 @@ function contentPaths() {
     '/',
     '/about',
     '/methodology',
+    '/stats',
     ...allTournamentHubPaths(),
     ...allTournamentYearPaths(),
     ...allOutfitPaths(),
@@ -84,10 +85,9 @@ function writeSeoFiles() {
     `## Full index\n` +
     `- [Sitemap](${SITE_URL}/sitemap.xml): every individual tournament-year ` +
     `index page and outfit page in the archive.\n\n` +
-    `## Optional\n` +
-    `<!-- Archive stats page — add once the stats page ships:\n` +
+    `## Archive stats\n` +
     `- [Archive stats](${SITE_URL}/stats): live found/unfound counts and ` +
-    `coverage. -->\n`
+    `coverage.\n`
   writeFileSync(resolve(__dirname, 'dist/llms.txt'), llms)
 
   // Netlify serves dist/404.html (with a 404 status) via the catch-all in
