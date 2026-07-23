@@ -6,17 +6,23 @@ import {
   getCombinedSlotStatus,
   slotsForYear,
 } from '../lib/rounds'
+import {
+  slotKey,
+  tournamentKey,
+  slotDomId,
+  distinctSlotCount,
+} from '../lib/slots'
 
 export function useMissingOutfits(outfits, mode) {
   const highlightTimerRef = useRef(null)
 
   const condensedMissing = useMemo(() => {
-    const outfitKeys = new Set(outfits.map(o => `${o.year}_${o.tournament}`))
+    const outfitKeys = new Set(outfits.map(o => tournamentKey(o.year, o.tournament)))
     const items = []
     for (const year of ACTIVE_YEARS) {
       for (const tournament of slotsForYear(year)) {
         if (
-          !outfitKeys.has(`${year}_${tournament}`) &&
+          !outfitKeys.has(tournamentKey(year, tournament)) &&
           getCombinedSlotStatus(tournament, year) === 'played'
         ) {
           items.push({ year, tournament })
@@ -28,14 +34,14 @@ export function useMissingOutfits(outfits, mode) {
 
   const expandedMissing = useMemo(() => {
     const outfitKeys = new Set(
-      outfits.map(o => `${o.year}_${o.tournament}_${o.discipline}_${o.roundNumber}`),
+      outfits.map(o => slotKey(o.year, o.tournament, o.discipline, o.roundNumber)),
     )
     const items = []
     for (const year of ACTIVE_YEARS) {
       for (const tournament of slotsForYear(year)) {
         for (const discipline of DISCIPLINES) {
           for (const r of getRoundNumbers(tournament, year, discipline)) {
-            if (!outfitKeys.has(`${year}_${tournament}_${discipline}_${r}`)) {
+            if (!outfitKeys.has(slotKey(year, tournament, discipline, r))) {
               items.push({ year, tournament, discipline, roundNumber: r, round: getRoundLabel(r) })
             }
           }
@@ -72,13 +78,7 @@ export function useMissingOutfits(outfits, mode) {
 
   // Numerator for the progress indicator: unique outfit entries in the fitdex,
   // deduped by slot key (same key format used for expandedMissing above).
-  const foundCount = useMemo(
-    () =>
-      new Set(
-        outfits.map(o => `${o.year}_${o.tournament}_${o.discipline}_${o.roundNumber}`),
-      ).size,
-    [outfits],
-  )
+  const foundCount = useMemo(() => distinctSlotCount(outfits), [outfits])
 
   function handleHighlight(item) {
     if (highlightTimerRef.current) clearTimeout(highlightTimerRef.current)
@@ -88,7 +88,7 @@ export function useMissingOutfits(outfits, mode) {
       .forEach(el => el.classList.remove('slot-highlight'))
 
     const id = item.roundNumber
-      ? `slot-${item.year}-${item.tournament}-${item.discipline}-${item.roundNumber}`
+      ? slotDomId(item.year, item.tournament, item.discipline, item.roundNumber)
       : `slot-${item.year}-${item.tournament}`
 
     const el     = document.getElementById(id)

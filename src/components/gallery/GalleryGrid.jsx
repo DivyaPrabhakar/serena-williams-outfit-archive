@@ -4,6 +4,7 @@ import { slotsForYear, getRoundLabel, getRoundNumbers } from '../../lib/rounds'
 import { sortTournaments } from '../../lib/filterUtils'
 import { tournamentHubPath } from '../../lib/slugs'
 import { CARD_WIDTHS, isKnownForYear, groupNavId } from '../../lib/galleryUtils'
+import { slotKey, slotDomId, outfitSlotMap } from '../../lib/slots'
 import ExpandedYearSection from './ExpandedYearSection'
 import GroupSection from './GroupSection'
 import DisciplineBlock from './DisciplineBlock'
@@ -23,9 +24,7 @@ export default function GalleryGrid({ outfits, groupBy = 'year', sortBy = 'chron
     )
   }
 
-  const outfitMap = new Map(
-    outfits.map(o => [`${o.year}_${o.tournament}_${o.discipline}_${o.roundNumber}`, o])
-  )
+  const outfitMap = outfitSlotMap(outfits)
   const years = [...new Set(outfits.map(o => o.year))].sort((a, b) => a - b)
 
   function tournamentsForYear(year) {
@@ -158,9 +157,7 @@ function GroupedGallery({ outfits, groupBy, sortBy, settings, onOpenLightbox }) 
 }
 
 function TournamentGroupedGallery({ outfits, sortBy, settings, onOpenLightbox }) {
-  const outfitMap = new Map(
-    outfits.map(o => [`${o.year}_${o.tournament}_${o.discipline}_${o.roundNumber}`, o])
-  )
+  const outfitMap = outfitSlotMap(outfits)
   const cardWidth = CARD_WIDTHS[settings.gridDensity] ?? 128
   const stacked = settings.hideGetty || settings.layout === 'vertical'
 
@@ -194,7 +191,7 @@ function TournamentGroupedGallery({ outfits, sortBy, settings, onOpenLightbox })
           for (const year of years) {
             if (!isKnownForYear(tournament, year)) continue
             for (const roundNumber of getRoundNumbers(tournament, year, discipline)) {
-              const outfit = outfitMap.get(`${year}_${tournament}_${discipline}_${roundNumber}`) ?? null
+              const outfit = outfitMap.get(slotKey(year, tournament, discipline, roundNumber)) ?? null
               if (outfit) captured.add(outfit.id)
               slots.push({ year, roundNumber, outfit })
             }
@@ -238,7 +235,7 @@ function TournamentGroupedGallery({ outfits, sortBy, settings, onOpenLightbox })
                     key: outfit ? outfit.id : `${year}-${roundNumber}`,
                     outfit,
                     emptyLabel: `${year} ${getRoundLabel(roundNumber)}`,
-                    slotId: `slot-${year}-${tournament}-${discipline}-${roundNumber}`,
+                    slotId: slotDomId(year, tournament, discipline, roundNumber),
                   }))
                 return (
                   <DisciplineBlock

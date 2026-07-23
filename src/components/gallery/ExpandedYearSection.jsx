@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { DISCIPLINES } from '../../lib/constants'
 import { getRoundsForSlot, getSlotStatus, getRoundLabel, getCombinedSlotStatus, getRoundNumbers } from '../../lib/rounds'
 import { CARD_WIDTHS, isKnownForYear, getYearSubtitle } from '../../lib/galleryUtils'
+import { slotKey, slotDomId } from '../../lib/slots'
 import { getSortedColors } from '../../lib/colorUtils'
 import { tournamentPath } from '../../lib/slugs'
 import DisciplineBlock from './DisciplineBlock'
@@ -18,7 +19,7 @@ function ExpandedTournamentBlock({ tournament, year, outfitMap, settings, sortBy
 
     if (roundCount > 0) {
       const slots = getRoundNumbers(tournament, year, discipline).map(roundNumber => {
-        const outfit = outfitMap.get(`${year}_${tournament}_${discipline}_${roundNumber}`) ?? null
+        const outfit = outfitMap.get(slotKey(year, tournament, discipline, roundNumber)) ?? null
         return { roundNumber, outfit }
       })
       return [{ discipline, slots, status: 'played' }]
@@ -97,7 +98,7 @@ function ExpandedTournamentBlock({ tournament, year, outfitMap, settings, sortBy
               key: roundNumber,
               outfit,
               emptyLabel: `${discipline} ${getRoundLabel(roundNumber)}`,
-              slotId: `slot-${year}-${tournament}-${discipline}-${roundNumber}`,
+              slotId: slotDomId(year, tournament, discipline, roundNumber),
             }))
           return (
             <DisciplineBlock

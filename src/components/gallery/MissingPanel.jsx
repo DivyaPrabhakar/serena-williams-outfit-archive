@@ -1,4 +1,5 @@
 import { sortTournaments } from '../../lib/filterUtils'
+import { outfitSlotKey } from '../../lib/slots'
 
 function TournamentGroup({ name, count, children }) {
   return (
@@ -63,7 +64,7 @@ function ExpandedContent({ items, onHighlight }) {
                   </p>
                   {dItems.map((item) => (
                     <MissingButton
-                      key={`${item.year}_${item.tournament}_${item.discipline}_${item.roundNumber}`}
+                      key={outfitSlotKey(item)}
                       label={`${item.year} · ${item.round}`}
                       onClick={() => onHighlight(item)}
                     />

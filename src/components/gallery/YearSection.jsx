@@ -1,6 +1,7 @@
 import { DISCIPLINES } from '../../lib/constants'
 import { getRoundsForSlot, getSlotStatus, getRoundLabel, getCombinedSlotStatus } from '../../lib/rounds'
 import { CARD_WIDTHS, getYearSubtitle } from '../../lib/galleryUtils'
+import { slotKey } from '../../lib/slots'
 import FeatureBreak from './FeatureBreak'
 import DimSlot from './DimSlot'
 
@@ -36,7 +37,7 @@ export default function YearSection({ year, outfitMap, tournaments, yearOutfits,
       if (roundCount > 0) {
         const slots = Array.from({ length: roundCount }, (_, i) => {
           const roundNumber = i + 1
-          const mapKey = `${year}_${tournament}_${discipline}_${roundNumber}`
+          const mapKey = slotKey(year, tournament, discipline, roundNumber)
           const outfit = outfitMap.get(mapKey)
           return outfit
             ? { type: 'outfit', outfit }
