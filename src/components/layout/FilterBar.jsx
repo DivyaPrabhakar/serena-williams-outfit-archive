@@ -26,7 +26,7 @@ export default function FilterBar({
   }
 
   return (
-    <div className="flex flex-wrap md:flex-nowrap items-center justify-center gap-2">
+    <div className="flex flex-wrap sm:flex-nowrap items-center justify-center gap-2">
       {!loading && (
         <button
           onClick={togglePanel}
@@ -48,7 +48,7 @@ export default function FilterBar({
       </button>
       <button
         onClick={toggleLayout}
-        className="hidden md:inline-block px-4 py-2 rounded text-sm font-normal whitespace-nowrap transition-colors bg-dark3 hover:text-white"
+        className="hidden sm:inline-block px-4 py-2 rounded text-sm font-normal whitespace-nowrap transition-colors bg-dark3 hover:text-white"
       >
         <span className="text-muted">Layout: </span>
         <span className="text-gold">{isStacked ? 'Stacked' : 'Side by side'}</span>
