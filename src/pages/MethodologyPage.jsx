@@ -14,7 +14,7 @@ export default function MethodologyPage() {
         </h1>
 
         <div className="space-y-5 text-ink text-xl leading-relaxed">
-          <p className="text-gold text-base uppercase tracking-widest font-medium mb-4">
+          <p className="text-brand text-base uppercase tracking-widest font-medium mb-4">
             Found &amp; Unfound
           </p>
           <p>
@@ -27,8 +27,8 @@ export default function MethodologyPage() {
           </p>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-dark3 space-y-5 text-ink text-xl leading-relaxed">
-          <p className="text-gold text-base uppercase tracking-widest font-medium mb-4">
+        <div className="mt-12 pt-8 border-t-2 border-white space-y-5 text-ink text-xl leading-relaxed">
+          <p className="text-brand text-base uppercase tracking-widest font-medium mb-4">
             Getty-Embed Compliance
           </p>
           <p>

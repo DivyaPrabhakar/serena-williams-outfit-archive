@@ -49,7 +49,7 @@ export default function AddOutfitForm({ onAdd }) {
       <button
         type="submit"
         disabled={submitting}
-        className="bg-[#C9A84C] text-[#0D0D0D] font-medium text-sm py-3 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
+        className="bg-brand text-dark font-medium text-sm py-3 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
       >
         {submitting ? 'Adding…' : 'Add to Gallery'}
       </button>

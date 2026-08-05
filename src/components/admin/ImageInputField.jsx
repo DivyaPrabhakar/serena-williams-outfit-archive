@@ -14,10 +14,10 @@ export default function ImageInputField({ gettyEmbed, imageUrl, focalPoint, erro
           onChange={e => onGettyEmbed(e.target.value)}
           placeholder="Paste the embed code from Getty Images…"
           rows={4}
-          className="w-full bg-[#0D0D0D] border border-[#333] text-[#F0EDE6] px-3 py-2 text-sm outline-none focus:border-[#C9A84C] placeholder-[#3a3a3a] resize-y font-mono"
+          className="w-full bg-dark border-2 border-white text-ink px-3 py-2 text-sm outline-none focus:border-brand placeholder-line-strong resize-y font-mono"
         />
         {gettyEmbed.trim() && isGettyEmbed(gettyEmbed) && (
-          <p className="text-xs text-[#8A877F]">
+          <p className="text-xs text-muted">
             Getty embed detected
             {(() => { const m = gettyEmbed.match(/items:'(\d+)'/) ; return m ? ` — asset #${m[1]}` : '' })()}
           </p>
@@ -26,9 +26,9 @@ export default function ImageInputField({ gettyEmbed, imageUrl, focalPoint, erro
 
       {/* Divider */}
       <div className="flex items-center gap-3">
-        <div className="flex-1 border-t border-[#2a2a2a]" />
-        <span className="text-[10px] text-[#3a3a3a] uppercase tracking-wider">or</span>
-        <div className="flex-1 border-t border-[#2a2a2a]" />
+        <div className="flex-1 border-t-2 border-white" />
+        <span className="text-[10px] text-line-strong uppercase tracking-wider">or</span>
+        <div className="flex-1 border-t-2 border-white" />
       </div>
 
       {/* Direct image URL */}
@@ -39,15 +39,15 @@ export default function ImageInputField({ gettyEmbed, imageUrl, focalPoint, erro
           value={imageUrl}
           onChange={e => onImageUrl(e.target.value)}
           placeholder="https://… (from a news or sports site)"
-          className="w-full bg-[#0D0D0D] border border-[#333] text-[#F0EDE6] px-3 py-2 text-sm outline-none focus:border-[#C9A84C] placeholder-[#3a3a3a]"
+          className="w-full bg-dark border-2 border-white text-ink px-3 py-2 text-sm outline-none focus:border-brand placeholder-line-strong"
         />
-        <p className="text-[10px] text-[#3a3a3a]">Facebook and Instagram links are not supported</p>
+        <p className="text-[10px] text-line-strong">Facebook and Instagram links are not supported</p>
         <InlineError msg={errors?.imageUrl} />
         {imageUrl.trim() && !isBlockedUrl(imageUrl.trim()) && (
           <img
             src={imageUrl.trim()}
             alt="Preview"
-            className="max-h-48 max-w-full object-contain border border-[#2a2a2a] bg-[#111]"
+            className="max-h-48 max-w-full object-contain border-2 border-white bg-well"
             onError={e => { e.target.style.display = 'none' }}
           />
         )}
@@ -64,12 +64,12 @@ export default function ImageInputField({ gettyEmbed, imageUrl, focalPoint, erro
               key={fp}
               type="button"
               onClick={() => onFocalPoint(fp)}
-              className={`px-4 py-1.5 text-xs border transition-colors capitalize ${
+              className={`px-4 py-1.5 text-xs border-2 transition-colors capitalize ${
                 i === 0 ? '' : '-ml-px'
               } ${
                 focalPoint === fp
-                  ? 'border-[#C9A84C] bg-[#C9A84C]/10 text-[#C9A84C] z-10 relative'
-                  : 'border-[#2a2a2a] text-[#8A877F] hover:border-[#C9A84C] hover:text-[#C9A84C] cursor-pointer'
+                  ? 'border-brand bg-brand/10 text-brand z-10 relative'
+                  : 'border-white text-muted hover:border-brand hover:text-brand cursor-pointer'
               }`}
             >
               {fp}

@@ -14,7 +14,7 @@ export default function AboutPage() {
         </h1>
 
         <div className="space-y-5 text-ink text-xl leading-relaxed">
-          <p className="text-gold text-base uppercase tracking-widest font-medium mb-4">
+          <p className="text-brand text-base uppercase tracking-widest font-medium mb-4">
             The Project
           </p>
           <p>
@@ -27,8 +27,8 @@ export default function AboutPage() {
           </p>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-dark3 space-y-5 text-ink text-xl leading-relaxed">
-          <p className="text-gold text-base uppercase tracking-widest font-medium mb-4">
+        <div className="mt-12 pt-8 border-t-2 border-white space-y-5 text-ink text-xl leading-relaxed">
+          <p className="text-brand text-base uppercase tracking-widest font-medium mb-4">
             The Creator
           </p>
           <p>
@@ -44,7 +44,7 @@ export default function AboutPage() {
               href="https://www.linkedin.com/in/divyaprabhakar/"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gold underline hover:text-gold-light transition-colors"
+              className="text-brand underline hover:text-brand-light transition-colors"
             >
               Prabhakar currently leads
             </a>{" "}
@@ -53,7 +53,7 @@ export default function AboutPage() {
               href="https://formenergy.com/"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gold underline hover:text-gold-light transition-colors"
+              className="text-brand underline hover:text-brand-light transition-colors"
             >
               Form Energy
             </a>
@@ -64,19 +64,19 @@ export default function AboutPage() {
               href="https://divyaprabhakar.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gold underline hover:text-gold-light transition-colors"
+              className="text-brand underline hover:text-brand-light transition-colors"
             >
               divyaprabhakar.com
             </a>
           </p>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-dark3 space-y-3">
+        <div className="mt-12 pt-8 border-t-2 border-white space-y-3">
           <p className="text-base text-muted">
             Contact:{" "}
             <a
               href="mailto:divyaworks1234@gmail.com"
-              className="text-gold underline hover:text-gold-light transition-colors"
+              className="text-brand underline hover:text-brand-light transition-colors"
             >
               divyaworks1234@gmail.com
             </a>

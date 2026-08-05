@@ -5,7 +5,7 @@ export default function TabSearch({ value, onChange }) {
       value={value}
       onChange={e => onChange(e.target.value)}
       placeholder="Search by tournament, year, discipline, round…"
-      className="w-full bg-[#0D0D0D] border border-[#333] text-[#F0EDE6] px-3 py-2 text-sm outline-none focus:border-[#C9A84C] placeholder-[#3a3a3a]"
+      className="w-full bg-dark border-2 border-white text-ink px-3 py-2 text-sm outline-none focus:border-brand placeholder-line-strong"
     />
   )
 }

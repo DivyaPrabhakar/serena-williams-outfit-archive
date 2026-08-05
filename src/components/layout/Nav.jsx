@@ -7,9 +7,9 @@ export default function Nav() {
   const [menuOpen, setMenuOpen] = useState(false)
 
   return (
-    <nav className="sticky top-0 z-40 bg-dark border-b border-dark3 px-6 h-28 flex items-center justify-between relative">
+    <nav className="sticky top-0 z-40 bg-dark border-b-2 border-white px-6 h-28 flex items-center justify-between relative">
       <Link to="/" className="flex flex-col items-start flex-shrink-0 hover:opacity-80 transition-opacity">
-        <span className="font-[family-name:var(--font-bebas)] text-2xl sm:text-4xl text-gold tracking-wide leading-none">Serena Williams Fit-dex</span>
+        <span className="font-[family-name:var(--font-bebas)] text-2xl sm:text-4xl text-brand tracking-wide leading-none">Serena Williams Fit-dex</span>
         <span className="font-[family-name:var(--font-cormorant)] text-lg italic text-muted hidden sm:inline leading-none mt-0.5">Gotta Find 'Em All</span>
       </Link>
 
@@ -28,7 +28,7 @@ export default function Nav() {
       {/* Mobile: hamburger toggles a slide-in drawer */}
       <button
         onClick={() => setMenuOpen(true)}
-        className="md:hidden flex items-center justify-center p-2 -mr-2 text-ink hover:text-gold transition-colors"
+        className="md:hidden flex items-center justify-center p-2 -mr-2 text-ink hover:text-brand transition-colors"
         aria-label="Open menu"
         aria-expanded={menuOpen}
       >
@@ -51,12 +51,12 @@ function MobileNavDrawer({ onClose }) {
   return (
     <>
       <div className="md:hidden fixed inset-0 z-40 bg-black/50" onClick={onClose} />
-      <div className="md:hidden fixed right-0 top-28 bottom-0 z-[45] w-full sm:w-72 bg-dark2 border-l border-dark3 shadow-2xl flex flex-col">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-dark3 flex-shrink-0">
-          <h3 className="font-playfair text-gold text-base">Menu</h3>
+      <div className="md:hidden fixed right-0 top-28 bottom-0 z-[45] w-full sm:w-72 bg-dark2 border-l-2 border-white shadow-2xl flex flex-col">
+        <div className="flex items-center justify-between px-5 py-4 border-b-2 border-white flex-shrink-0">
+          <h3 className="font-playfair text-brand text-base">Menu</h3>
           <button
             onClick={onClose}
-            className="flex items-center gap-1.5 text-sm font-medium text-ink bg-dark3 hover:bg-gold hover:text-dark rounded px-3 py-1.5 transition-colors"
+            className="flex items-center gap-1.5 text-sm font-medium text-ink bg-dark3 hover:bg-brand hover:text-dark rounded px-3 py-1.5 transition-colors"
             aria-label="Close"
           >
             <span className="text-lg leading-none">×</span>

@@ -54,12 +54,12 @@ export default function BrokenLinksPanel({ outfits, onEdit, onDelete, onDeleteMa
         <button
           onClick={run}
           disabled={running}
-          className="text-xs border border-[#333] text-[#8A877F] px-4 py-2 hover:border-[#C9A84C] hover:text-[#C9A84C] transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+          className="text-xs border-2 border-white text-muted px-4 py-2 hover:border-brand hover:text-brand transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {running ? `Checking ${checked} / ${outfits.length}…` : done ? 'Re-check' : 'Check All URLs'}
         </button>
         {done && (
-          <p className="text-xs text-[#8A877F] uppercase tracking-wide">
+          <p className="text-xs text-muted uppercase tracking-wide">
             {broken.length === 0 ? 'All links valid' : `${broken.length} broken`}
           </p>
         )}
@@ -89,7 +89,7 @@ export default function BrokenLinksPanel({ outfits, onEdit, onDelete, onDeleteMa
       )}
 
       {done && broken.length === 0 && (
-        <p className="text-[#555] text-sm">No broken image links found.</p>
+        <p className="text-dim text-sm">No broken image links found.</p>
       )}
     </div>
   )

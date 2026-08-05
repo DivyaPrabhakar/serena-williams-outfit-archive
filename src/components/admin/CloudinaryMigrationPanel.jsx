@@ -41,13 +41,13 @@ export default function CloudinaryMigrationPanel({ outfits, onUpdate }) {
   }
 
   if (cloudinary.length === 0) {
-    return <p className="text-[#555] text-sm">All Cloudinary images have been migrated.</p>
+    return <p className="text-dim text-sm">All Cloudinary images have been migrated.</p>
   }
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <p className="text-xs text-[#8A877F] uppercase tracking-wide">
+        <p className="text-xs text-muted uppercase tracking-wide">
           {cloudinary.length} Cloudinary {cloudinary.length === 1 ? 'image' : 'images'} remaining
         </p>
       </div>
@@ -55,39 +55,39 @@ export default function CloudinaryMigrationPanel({ outfits, onUpdate }) {
       <TabSearch value={search} onChange={setSearch} />
 
       {visible.length === 0 ? (
-        <p className="text-[#555] text-sm">No results.</p>
+        <p className="text-dim text-sm">No results.</p>
       ) : (
         <div className="flex flex-col gap-3">
           {visible.map(o => (
-            <div key={o.id} className="border border-[#2a2a2a] bg-[#111]">
+            <div key={o.id} className="border-2 border-white bg-well">
               <div className="flex items-center gap-3 px-3 py-2.5">
                 <OutfitThumbnail o={o} />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm text-[#F0EDE6] truncate">
+                  <p className="text-sm text-ink truncate">
                     {o.year} {o.tournament}
-                    {o.discipline && <span className="text-[#8A877F]"> · {o.discipline}</span>}
-                    {o.round      && <span className="text-[#8A877F]"> · {o.round}</span>}
+                    {o.discipline && <span className="text-muted"> · {o.discipline}</span>}
+                    {o.round      && <span className="text-muted"> · {o.round}</span>}
                   </p>
-                  <p className="text-[10px] text-[#3a3a3a] truncate mt-0.5">{o.imageUrl}</p>
+                  <p className="text-[10px] text-line-strong truncate mt-0.5">{o.imageUrl}</p>
                 </div>
                 {saved[o.id] && (
                   <span className="text-xs text-green-500 flex-shrink-0">✓ Updated</span>
                 )}
               </div>
 
-              <div className="border-t border-[#1e1e1e] px-3 pb-3 pt-2.5 flex flex-col gap-2">
+              <div className="border-t-2 border-white px-3 pb-3 pt-2.5 flex flex-col gap-2">
                 <textarea
                   value={embeds[o.id] ?? ''}
                   onChange={e => handleEmbed(o.id, e.target.value)}
                   placeholder="Paste Getty embed code here…"
                   rows={3}
-                  className="w-full bg-[#0D0D0D] border border-[#333] text-[#F0EDE6] px-3 py-2 text-xs outline-none focus:border-[#C9A84C] placeholder-[#3a3a3a] resize-y font-mono"
+                  className="w-full bg-dark border-2 border-white text-ink px-3 py-2 text-xs outline-none focus:border-brand placeholder-line-strong resize-y font-mono"
                 />
                 {errors[o.id] && (
                   <p className="text-xs text-red-400">{errors[o.id]}</p>
                 )}
                 {embeds[o.id]?.trim() && isGettyEmbed(embeds[o.id]) && (
-                  <p className="text-[10px] text-[#8A877F]">
+                  <p className="text-[10px] text-muted">
                     Getty embed detected
                     {(() => { const m = embeds[o.id].match(/items:'(\d+)'/) ; return m ? ` — asset #${m[1]}` : '' })()}
                   </p>
@@ -95,7 +95,7 @@ export default function CloudinaryMigrationPanel({ outfits, onUpdate }) {
                 <button
                   onClick={() => handleSave(o)}
                   disabled={saving[o.id]}
-                  className="self-end text-xs border border-[#C9A84C] text-[#C9A84C] px-4 py-1.5 hover:bg-[#C9A84C]/10 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="self-end text-xs border-2 border-brand text-brand px-4 py-1.5 hover:bg-brand/10 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   {saving[o.id] ? 'Saving…' : 'Save'}
                 </button>

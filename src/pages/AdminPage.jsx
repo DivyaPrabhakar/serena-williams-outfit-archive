@@ -57,7 +57,7 @@ export default function AdminPage() {
   if (!adminToken) return <>{ADMIN_SEO}<AdminLogin onSuccess={setAdminToken} /></>
 
   const renderTab = () => {
-    if (loading && outfits.length === 0) return <p className="text-[#555] text-sm">Loading…</p>
+    if (loading && outfits.length === 0) return <p className="text-dim text-sm">Loading…</p>
     switch (tab) {
       case 'upload':
         return <AddOutfitForm onAdd={insert} />
@@ -71,14 +71,14 @@ export default function AdminPage() {
       case 'no-image':
         return <OutfitAuditPanel outfits={outfits} onEdit={setEditingOutfit} onDelete={remove} onDeleteMany={removeMany}
           filter={o => !o.imageUrl} countSuffix="without any image" emptyMessage="All outfits have images."
-          renderExtra={o => <p className="text-xs text-[#555] truncate mt-0.5">{o.imageUrl || '(no image)'}</p>} />
+          renderExtra={o => <p className="text-xs text-dim truncate mt-0.5">{o.imageUrl || '(no image)'}</p>} />
       case 'no-round':
         return <OutfitAuditPanel outfits={outfits} onEdit={setEditingOutfit} onDelete={remove} onDeleteMany={removeMany}
           filter={o => !o.round} countSuffix="without round" emptyMessage="All outfits have a round assigned." />
       case 'no-brand':
         return <OutfitAuditPanel outfits={outfits} onEdit={setEditingOutfit} onDelete={remove} onDeleteMany={removeMany}
           filter={o => !o.brand} countSuffix="without brand" emptyMessage="All outfits have a brand assigned."
-          renderExtra={o => <p className="text-xs text-[#555] mt-0.5">{o.year}</p>} />
+          renderExtra={o => <p className="text-xs text-dim mt-0.5">{o.year}</p>} />
       case 'display':
         return <DisplaySettingsPanel />
       case 'search':
@@ -103,25 +103,25 @@ export default function AdminPage() {
       {/* Header */}
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h2 className="font-[family-name:var(--font-playfair)] text-2xl font-bold text-[#F0EDE6]">
+          <h2 className="font-[family-name:var(--font-playfair)] text-2xl font-bold text-ink">
             Gallery Admin
           </h2>
           {!loading && (
-            <p className="text-[#8A877F] text-sm mt-0.5">
+            <p className="text-muted text-sm mt-0.5">
               {outfits.length} outfit{outfits.length !== 1 ? 's' : ''} in the Fit-dex
             </p>
           )}
         </div>
         <button
           onClick={() => setAdminToken(null)}
-          className="text-xs text-[#555] hover:text-[#8A877F] transition-colors cursor-pointer"
+          className="text-xs text-dim hover:text-muted transition-colors cursor-pointer"
         >
           Sign out
         </button>
       </div>
 
       {error && (
-        <div className="bg-red-900/20 border border-red-800 text-red-400 text-sm px-4 py-3 mb-6">
+        <div className="bg-red-900/20 border-2 border-red-800 text-red-400 text-sm px-4 py-3 mb-6">
           {error}
         </div>
       )}
@@ -129,15 +129,15 @@ export default function AdminPage() {
       <RebuildStatusPanel adminToken={adminToken} />
 
       {/* Tab bar */}
-      <div className="flex border-b border-[#2a2a2a] mb-6 overflow-x-auto">
+      <div className="flex border-b-2 border-white mb-6 overflow-x-auto">
         {TABS.map(t => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
             className={`px-4 py-3 text-xs uppercase tracking-wider whitespace-nowrap border-b-2 -mb-px transition-colors cursor-pointer ${
               tab === t.id
-                ? 'border-[#C9A84C] text-[#C9A84C]'
-                : 'border-transparent text-[#555] hover:text-[#8A877F]'
+                ? 'border-brand text-brand'
+                : 'border-transparent text-dim hover:text-muted'
             }`}
           >
             {t.label}
@@ -146,7 +146,7 @@ export default function AdminPage() {
       </div>
 
       {/* Tab content */}
-      <div className="bg-[#1A1A1A] border border-[#2a2a2a] p-6">
+      <div className="bg-dark2 border-2 border-white p-6">
         {renderTab()}
       </div>
 

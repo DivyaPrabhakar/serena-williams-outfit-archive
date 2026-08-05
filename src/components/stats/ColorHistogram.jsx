@@ -10,7 +10,7 @@ export default function ColorHistogram({ data }) {
         <div key={color} className="flex-1 flex flex-col items-center justify-end h-full gap-2">
           <span className="text-muted text-xs tabular-nums">{count}</span>
           <div
-            className="w-full rounded-t border border-dark3"
+            className="w-full rounded-t border-2 border-white"
             style={{
               height: `${max > 0 ? (count / max) * 100 : 0}%`,
               background: COLOR_MAP[color] ?? color,

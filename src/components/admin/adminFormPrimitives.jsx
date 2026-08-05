@@ -4,12 +4,12 @@ export function PickerBtn({ active, disabled, onClick, children }) {
       type="button"
       disabled={disabled}
       onClick={onClick}
-      className={`px-3 py-1.5 text-xs border transition-colors ${
+      className={`px-3 py-1.5 text-xs border-2 transition-colors ${
         active
-          ? 'border-[#C9A84C] bg-[#C9A84C]/10 text-[#C9A84C]'
+          ? 'border-brand bg-brand/10 text-brand'
           : disabled
-          ? 'border-[#1a1a1a] text-[#2a2a2a] cursor-not-allowed'
-          : 'border-[#2a2a2a] text-[#8A877F] hover:border-[#C9A84C] hover:text-[#C9A84C] cursor-pointer'
+          ? 'border-white text-line-soft cursor-not-allowed'
+          : 'border-white text-muted hover:border-brand hover:text-brand cursor-pointer'
       }`}
     >
       {children}
@@ -18,7 +18,7 @@ export function PickerBtn({ active, disabled, onClick, children }) {
 }
 
 export function FieldLabel({ children }) {
-  return <label className="text-xs uppercase tracking-widest text-[#8A877F]">{children}</label>
+  return <label className="text-xs uppercase tracking-widest text-muted">{children}</label>
 }
 
 export function InlineError({ msg }) {

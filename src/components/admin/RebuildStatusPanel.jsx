@@ -84,30 +84,30 @@ export default function RebuildStatusPanel({ adminToken }) {
   const hasPending = pending > 0
 
   return (
-    <div className="mb-6 bg-[#1A1A1A] border border-[#2a2a2a] p-6">
+    <div className="mb-6 bg-dark2 border-2 border-white p-6">
       <div className="flex items-center justify-between gap-4">
         <div className="min-w-0">
-          <h3 className="font-[family-name:var(--font-playfair)] text-base font-bold text-[#F0EDE6]">
+          <h3 className="font-[family-name:var(--font-playfair)] text-base font-bold text-ink">
             Rebuilds
           </h3>
           {status ? (
-            <p className="text-sm text-[#8A877F] mt-0.5">
+            <p className="text-sm text-muted mt-0.5">
               {hasPending ? (
                 <>
-                  <span className="text-[#C9A84C] font-medium">{pending}</span> pending
+                  <span className="text-brand font-medium">{pending}</span> pending
                   change{pending !== 1 ? 's' : ''}
                   {' · next hourly rebuild in '}
-                  <span className="text-[#F0EDE6]">{formatDuration(msUntilNextHour(now))}</span>
+                  <span className="text-ink">{formatDuration(msUntilNextHour(now))}</span>
                 </>
               ) : (
                 <>No pending changes · site is up to date</>
               )}
             </p>
           ) : (
-            <p className="text-sm text-[#555] mt-0.5">Loading status…</p>
+            <p className="text-sm text-dim mt-0.5">Loading status…</p>
           )}
           {status && (
-            <p className="text-[11px] text-[#555] mt-0.5">
+            <p className="text-[11px] text-dim mt-0.5">
               Last built {formatAgo(status.lastTriggeredAt)}
               {hasPending && ' · closing this tab publishes them automatically'}
             </p>
@@ -119,15 +119,15 @@ export default function RebuildStatusPanel({ adminToken }) {
           disabled={busy}
           className={`flex-none px-4 py-2 rounded text-xs font-medium transition-colors ${
             busy
-              ? 'bg-[#1A1A1A] text-[#555] cursor-not-allowed border border-[#333]'
-              : 'bg-[#C9A84C] text-[#0D0D0D] hover:bg-[#F0D98A] cursor-pointer'
+              ? 'bg-dark2 text-dim cursor-not-allowed border-2 border-white'
+              : 'bg-brand text-dark hover:bg-brand-light cursor-pointer'
           }`}
         >
           {busy ? 'Triggering…' : 'Rebuild now'}
         </button>
       </div>
 
-      {flash && <p className="text-xs text-[#C9A84C] mt-3">{flash}</p>}
+      {flash && <p className="text-xs text-brand mt-3">{flash}</p>}
       {error && <p className="text-xs text-red-400 mt-3">{error}</p>}
     </div>
   )

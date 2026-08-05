@@ -9,7 +9,7 @@ export default function OutfitThumbnail({ o }) {
     return (
       <LazyIframe
         srcDoc={`<!DOCTYPE html><html><head><style>html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#111}body{display:flex;align-items:center;justify-content:center}</style></head><body>${gettyEmbedForIframe(o.imageUrl)}</body></html>`}
-        wrapperClassName="w-10 h-14 flex-shrink-0 bg-[#111]"
+        wrapperClassName="w-10 h-14 flex-shrink-0 bg-well"
         iframeClassName="w-full h-full border-0 pointer-events-none"
         sandbox="allow-scripts allow-same-origin"
       />
@@ -19,7 +19,7 @@ export default function OutfitThumbnail({ o }) {
     <img
       src={o.imageUrl}
       alt=""
-      className="w-10 h-14 object-cover flex-shrink-0 bg-[#222]"
+      className="w-10 h-14 object-cover flex-shrink-0 bg-well-light"
       onError={e => { e.target.style.opacity = '0.2' }}
     />
   )

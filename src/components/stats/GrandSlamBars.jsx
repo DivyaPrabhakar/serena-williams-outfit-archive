@@ -9,11 +9,11 @@ export default function GrandSlamBars({ data }) {
         return (
           <div key={tournament} className="flex-1 flex flex-col items-center h-full">
             <span className="text-muted text-sm tabular-nums mb-2">
-              <span className="text-gold">{logged}</span> / {needed}
+              <span className="text-brand">{logged}</span> / {needed}
             </span>
             <div className="relative w-full flex-1 rounded-t bg-dark3 overflow-hidden">
               <div
-                className="absolute inset-x-0 bottom-0 rounded-t bg-gold"
+                className="absolute inset-x-0 bottom-0 rounded-t bg-brand"
                 style={{ height: `${pct}%` }}
               />
             </div>

@@ -9,11 +9,11 @@ export default function BrandSplit({ brands, unspecified }) {
             <span className="w-14 text-ink text-lg shrink-0">{brand}</span>
             <div className="flex-1">
               <div
-                className="h-6 rounded bg-gold min-w-[2px]"
+                className="h-6 rounded bg-brand min-w-[2px]"
                 style={{ width: `${max > 0 ? (count / max) * 100 : 0}%` }}
               />
             </div>
-            <span className="text-gold text-lg tabular-nums w-12 text-right shrink-0">
+            <span className="text-brand text-lg tabular-nums w-12 text-right shrink-0">
               {count}
             </span>
           </div>

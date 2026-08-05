@@ -17,7 +17,7 @@ export default function NotFoundNotice({
         noindex
       />
       <p className="text-ink text-xl mb-4">{message}</p>
-      <Link to="/" className="text-gold underline">Back to the archive</Link>
+      <Link to="/" className="text-brand underline">Back to the archive</Link>
     </div>
   )
 }

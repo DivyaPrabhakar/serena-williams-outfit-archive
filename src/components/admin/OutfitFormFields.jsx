@@ -41,7 +41,7 @@ export default function OutfitFormFields({ form }) {
           placeholder="1999"
           min="1990"
           max="2030"
-          className="w-full bg-[#0D0D0D] border border-[#333] text-[#F0EDE6] px-3 py-2 text-sm outline-none focus:border-[#C9A84C] placeholder-[#3a3a3a] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+          className="w-full bg-dark border-2 border-white text-ink px-3 py-2 text-sm outline-none focus:border-brand placeholder-line-strong [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
         />
         <InlineError msg={errors.year} />
       </div>
@@ -71,7 +71,7 @@ export default function OutfitFormFields({ form }) {
             value={f.otherTournament}
             onChange={e => set('otherTournament', e.target.value)}
             placeholder="Tournament name…"
-            className="w-full bg-[#0D0D0D] border border-[#333] text-[#F0EDE6] px-3 py-2 text-sm outline-none focus:border-[#C9A84C] placeholder-[#3a3a3a]"
+            className="w-full bg-dark border-2 border-white text-ink px-3 py-2 text-sm outline-none focus:border-brand placeholder-line-strong"
           />
         )}
         <InlineError msg={errors.tournament} />
@@ -143,7 +143,7 @@ export default function OutfitFormFields({ form }) {
           onChange={e => set('notes', e.target.value)}
           placeholder="e.g. Nike catsuit, worn during pregnancy comeback…"
           rows={3}
-          className="w-full bg-[#0D0D0D] border border-[#333] text-[#F0EDE6] px-3 py-2 text-sm outline-none focus:border-[#C9A84C] placeholder-[#3a3a3a] resize-y"
+          className="w-full bg-dark border-2 border-white text-ink px-3 py-2 text-sm outline-none focus:border-brand placeholder-line-strong resize-y"
         />
       </div>
     </>

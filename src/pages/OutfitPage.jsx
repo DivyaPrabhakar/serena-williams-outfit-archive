@@ -46,7 +46,7 @@ function articleJsonLd(o, path) {
 function MetaRow({ label, children }) {
   if (children == null || children === '') return null
   return (
-    <div className="flex gap-3 py-2 border-b border-dark3">
+    <div className="flex gap-3 py-2 border-b-2 border-white">
       <dt className="w-32 shrink-0 text-muted uppercase tracking-widest text-xs pt-0.5">{label}</dt>
       <dd className="text-ink">{children}</dd>
     </div>
@@ -67,7 +67,7 @@ export default function OutfitPage() {
           noindex
         />
         <p className="text-ink text-xl mb-4">Outfit not found.</p>
-        <Link to="/" className="text-gold underline">Back to the archive</Link>
+        <Link to="/" className="text-brand underline">Back to the archive</Link>
       </div>
     )
   }
@@ -120,7 +120,7 @@ export default function OutfitPage() {
 
         <dl className="max-w-md">
           <MetaRow label="Tournament">
-            <Link to={tournamentPath(outfit.tournament, outfit.year)} className="text-gold underline">
+            <Link to={tournamentPath(outfit.tournament, outfit.year)} className="text-brand underline">
               {outfit.tournament} {outfit.year}
             </Link>
           </MetaRow>

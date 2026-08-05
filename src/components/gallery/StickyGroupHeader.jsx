@@ -55,22 +55,22 @@ export default function StickyGroupHeader({ id, label, swatches, title, titleHre
       <div
         ref={stickyRef}
         data-stuck={stuck}
-        className={`group/sticky sticky top-44 md:top-28 z-20 bg-dark -mx-3 px-3 py-3 transition-all duration-200 data-[stuck=true]:py-2 data-[stuck=true]:border-b data-[stuck=true]:border-dark3 ${className}`}
+        className={`group/sticky sticky top-44 md:top-28 z-20 bg-dark -mx-12 px-12 py-3 transition-all duration-200 data-[stuck=true]:py-5 data-[stuck=true]:border-b-2 data-[stuck=true]:border-white ${className}`}
       >
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-          {swatches}
-          <h2 className="font-playfair text-5xl text-ink leading-none transition-all duration-200 group-data-[stuck=true]/sticky:text-2xl">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-3">
+          <h2 className="w-full font-sans text-5xl text-ink leading-none transition-all duration-200 group-data-[stuck=true]/sticky:w-auto group-data-[stuck=true]/sticky:text-2xl">
             {titleHref ? (
-              <Link to={titleHref} className="hover:text-gold hover:underline underline-offset-4 transition-colors">{title}</Link>
+              <Link to={titleHref} className="hover:text-brand hover:underline underline-offset-4 transition-colors">{title}</Link>
             ) : (
               title
             )}
           </h2>
           {subtitle && (
-            <p className="w-full text-sm leading-none text-muted transition-all duration-200 group-data-[stuck=true]/sticky:w-auto group-data-[stuck=true]/sticky:text-xs">
+            <p className="text-base leading-none text-muted transition-all duration-200 group-data-[stuck=true]/sticky:text-xs">
               {subtitle}
             </p>
           )}
+          {swatches}
         </div>
       </div>
     </>

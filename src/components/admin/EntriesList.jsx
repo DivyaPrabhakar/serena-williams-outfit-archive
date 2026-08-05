@@ -41,7 +41,7 @@ export default function EntriesList({ outfits, onEdit, onDelete, onDeleteMany, s
 
       {/* List */}
       {filtered.length === 0 ? (
-        <p className="text-[#555] text-sm py-4">
+        <p className="text-dim text-sm py-4">
           {search.trim() ? 'No results.' : 'No outfits added yet.'}
         </p>
       ) : (
@@ -61,7 +61,7 @@ export default function EntriesList({ outfits, onEdit, onDelete, onDeleteMany, s
                   {o.colors.map(c => (
                     <span
                       key={c}
-                      className="text-[10px] text-[#555] border border-[#252525] px-1.5 py-0.5"
+                      className="text-[10px] text-dim border-2 border-white px-1.5 py-0.5"
                     >
                       {c}
                     </span>

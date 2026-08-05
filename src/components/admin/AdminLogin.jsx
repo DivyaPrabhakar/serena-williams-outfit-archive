@@ -27,12 +27,12 @@ export default function AdminLogin({ onSuccess }) {
   }
 
   return (
-    <div className="min-h-[calc(100vh-60px)] bg-[#0D0D0D] flex items-center justify-center px-4">
-      <div className="bg-[#1A1A1A] border border-[#2a2a2a] p-8 w-full max-w-sm">
-        <h2 className="font-[family-name:var(--font-playfair)] text-xl font-bold text-[#F0EDE6] mb-1">
+    <div className="min-h-[calc(100vh-60px)] bg-dark flex items-center justify-center px-4">
+      <div className="bg-dark2 border-2 border-white p-8 w-full max-w-sm">
+        <h2 className="font-[family-name:var(--font-playfair)] text-xl font-bold text-ink mb-1">
           Admin Access
         </h2>
-        <p className="text-[#8A877F] text-sm mb-6">
+        <p className="text-muted text-sm mb-6">
           Enter the admin password to manage the gallery
         </p>
 
@@ -43,7 +43,7 @@ export default function AdminLogin({ onSuccess }) {
             onChange={e => setPassword(e.target.value)}
             placeholder="••••••••"
             autoFocus
-            className="w-full bg-[#0D0D0D] border border-[#333] text-[#F0EDE6] px-3 py-2.5 text-sm outline-none focus:border-[#C9A84C] placeholder-[#3a3a3a]"
+            className="w-full bg-dark border-2 border-white text-ink px-3 py-2.5 text-sm outline-none focus:border-brand placeholder-line-strong"
           />
 
           {error && <p className="text-red-400 text-xs">{error}</p>}
@@ -51,7 +51,7 @@ export default function AdminLogin({ onSuccess }) {
           <button
             type="submit"
             disabled={checking || !password}
-            className="bg-[#C9A84C] text-[#0D0D0D] font-medium text-sm py-2.5 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
+            className="bg-brand text-dark font-medium text-sm py-2.5 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
           >
             {checking ? 'Checking…' : 'Enter'}
           </button>

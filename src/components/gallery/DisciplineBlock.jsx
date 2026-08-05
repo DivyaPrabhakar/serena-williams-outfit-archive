@@ -1,14 +1,11 @@
-import { DISCIPLINE_STYLE } from '../../lib/constants'
 import OutfitCard from './OutfitCard'
 import EmptySlot from './EmptySlot'
 
-// A discipline rendered as a faint tinted, color-coded block with a corner
-// label and a flex-wrap grid of card slots. Lets disciplines flow side by side
-// rather than each forced onto its own full-width row.
+// A discipline rendered as a faint tinted block with a corner label and a
+// flex-wrap grid of card slots. Lets disciplines flow side by side rather
+// than each forced onto its own full-width row.
 // items: [{ key, outfit, emptyLabel, slotId }]
 export default function DisciplineBlock({ discipline, items, cardWidth, maxColumns = 4, fillWidth = false, settings, onOpenLightbox }) {
-  const style = DISCIPLINE_STYLE[discipline] ?? DISCIPLINE_STYLE.Singles
-
   // Cap the block at maxColumns cards wide so disciplines with many slots wrap
   // their cards internally instead of hogging the full row width. Padding (p-2.5
   // → 20px) and the inner gap-2 (8px) are included since box-sizing is border-box.
@@ -17,13 +14,10 @@ export default function DisciplineBlock({ discipline, items, cardWidth, maxColum
 
   return (
     <div
-      className={`rounded-lg p-2.5 ring-1 ${fillWidth ? 'w-full' : ''}`}
-      style={{ background: style.tint, '--tw-ring-color': style.ring, maxWidth }}
+      className={`rounded-lg p-2.5 ring-1 bg-discipline-bg ring-discipline-border ${fillWidth ? 'w-full' : ''}`}
+      style={{ maxWidth }}
     >
-      <span
-        className="block text-[10px] uppercase tracking-widest mb-2"
-        style={{ color: style.label }}
-      >
+      <span className="block text-base mb-2 text-ink">
         {discipline}
       </span>
       <div className="flex flex-wrap gap-2">

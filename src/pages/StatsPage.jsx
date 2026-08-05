@@ -16,9 +16,9 @@ import ColorsByYear from "../components/stats/ColorsByYear";
 function Section({ title, children, divider = true }) {
   return (
     <section
-      className={divider ? "mt-12 pt-8 border-t border-dark3" : "mt-10"}
+      className={divider ? "mt-12 pt-8 border-t-2 border-white" : "mt-10"}
     >
-      <h2 className="text-gold text-base uppercase tracking-widest font-medium mb-6">
+      <h2 className="text-brand text-base uppercase tracking-widest font-medium mb-6">
         {title}
       </h2>
       {children}
@@ -65,9 +65,9 @@ export default function StatsPage() {
         </h1>
 
         <p className="text-ink text-2xl leading-relaxed">
-          <span className="text-gold">{head.found.toLocaleString()}</span> outfits
+          <span className="text-brand">{head.found.toLocaleString()}</span> outfits
           found out of{" "}
-          <span className="text-gold">{head.total.toLocaleString()}</span> she was
+          <span className="text-brand">{head.total.toLocaleString()}</span> she was
           known to wear
           {head.firstYear && head.lastYear
             ? ` — ${head.firstYear} to ${head.lastYear}`
@@ -75,7 +75,7 @@ export default function StatsPage() {
           .
         </p>
 
-        <hr className="border-t border-dark3 mt-16" />
+        <hr className="border-t-2 border-white mt-16" />
 
         <h2 className="text-4xl text-ink uppercase tracking-widest font-medium leading-none mt-16 mb-10">
           What we know so far from the {head.found.toLocaleString()} outfits
@@ -113,7 +113,7 @@ export default function StatsPage() {
         </Section>
 
         {updated && (
-          <p className="mt-12 pt-8 border-t border-dark3 text-muted text-sm">
+          <p className="mt-12 pt-8 border-t-2 border-white text-muted text-sm">
             Last updated: {updated}
           </p>
         )}

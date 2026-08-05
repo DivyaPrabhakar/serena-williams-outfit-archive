@@ -22,8 +22,8 @@ export default function FeatureBreak({ tournament, year, discipline, slots, sett
   return (
     <div className="mb-6">
       <div className="flex items-center gap-2 mb-2.5">
-        <span className="w-0.5 h-3.5 bg-gold flex-shrink-0 rounded-full" />
-        <span className="text-[10px] uppercase tracking-widest text-gold font-medium">
+        <span className="w-0.5 h-3.5 bg-brand flex-shrink-0 rounded-full" />
+        <span className="text-[10px] uppercase tracking-widest text-brand font-medium">
           {header}
         </span>
       </div>

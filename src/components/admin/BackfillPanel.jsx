@@ -83,12 +83,12 @@ function BackfillCard({ outfit, adminToken, onSaved, onSkip }) {
   const canSave = discipline && (noRoundsFound ? manualRound.trim().length > 0 : round !== null)
 
   return (
-    <div className="flex gap-4 p-4 bg-[#252525] rounded border border-[#333]">
+    <div className="flex gap-4 p-4 bg-dark3 rounded border-2 border-white">
       {/* Thumbnail */}
       <img
         src={outfit.imageUrl}
         alt=""
-        className="flex-none rounded object-cover bg-[#1A1A1A]"
+        className="flex-none rounded object-cover bg-dark2"
         style={{ width: 60, height: 80 }}
         loading="lazy"
       />
@@ -98,7 +98,7 @@ function BackfillCard({ outfit, adminToken, onSaved, onSkip }) {
         {/* Metadata row */}
         <div className="flex items-start justify-between gap-2">
           <div>
-            <p className="text-sm text-[#F0EDE6] font-medium">
+            <p className="text-sm text-ink font-medium">
               {outfit.tournament} {outfit.year}
             </p>
             {outfit.colors.length > 0 && (
@@ -109,18 +109,18 @@ function BackfillCard({ outfit, adminToken, onSaved, onSkip }) {
                       color={c}
                       className="w-2 h-2 rounded-full flex-shrink-0"
                     />
-                    <span className="text-[10px] text-[#8A877F]">{c}</span>
+                    <span className="text-[10px] text-muted">{c}</span>
                   </span>
                 ))}
               </div>
             )}
             {outfit.notes && (
-              <p className="text-[10px] text-[#8A877F] mt-0.5 line-clamp-2">{outfit.notes}</p>
+              <p className="text-[10px] text-muted mt-0.5 line-clamp-2">{outfit.notes}</p>
             )}
           </div>
           <button
             onClick={() => onSkip(outfit.id)}
-            className="text-[10px] text-[#555] hover:text-[#8A877F] flex-shrink-0 transition-colors"
+            className="text-[10px] text-dim hover:text-muted flex-shrink-0 transition-colors"
           >
             Skip for now
           </button>
@@ -128,7 +128,7 @@ function BackfillCard({ outfit, adminToken, onSaved, onSkip }) {
 
         {/* Discipline picker */}
         <div>
-          <p className="text-[10px] uppercase tracking-widest text-[#8A877F] mb-1.5">Discipline</p>
+          <p className="text-[10px] uppercase tracking-widest text-muted mb-1.5">Discipline</p>
           <div className="flex gap-1.5">
             {DISCIPLINES.map(d => {
               const disabled = d === 'Mixed' && outfit.tournament === 'Olympics'
@@ -139,10 +139,10 @@ function BackfillCard({ outfit, adminToken, onSaved, onSkip }) {
                   disabled={disabled}
                   className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
                     discipline === d
-                      ? 'bg-[#C9A84C] text-[#0D0D0D]'
+                      ? 'bg-brand text-dark'
                       : disabled
-                      ? 'bg-[#1A1A1A] text-[#8A877F]/30 cursor-not-allowed'
-                      : 'bg-[#1A1A1A] text-[#8A877F] hover:text-[#F0EDE6]'
+                      ? 'bg-dark2 text-muted/30 cursor-not-allowed'
+                      : 'bg-dark2 text-muted hover:text-ink'
                   }`}
                 >
                   {d}
@@ -154,9 +154,9 @@ function BackfillCard({ outfit, adminToken, onSaved, onSkip }) {
 
         {/* Round picker */}
         <div>
-          <p className="text-[10px] uppercase tracking-widest text-[#8A877F] mb-1.5">Round</p>
+          <p className="text-[10px] uppercase tracking-widest text-muted mb-1.5">Round</p>
           {!discipline ? (
-            <p className="text-[10px] text-[#8A877F]/50 italic">Select discipline first</p>
+            <p className="text-[10px] text-muted/50 italic">Select discipline first</p>
           ) : noRoundsFound ? (
             <div className="space-y-2">
               <p className="text-[10px] text-amber-400">
@@ -167,7 +167,7 @@ function BackfillCard({ outfit, adminToken, onSaved, onSkip }) {
                 value={manualRound}
                 onChange={e => onManualChange(e.target.value)}
                 placeholder="Type round label (R1, R2, QF, SF, F…)"
-                className="w-full bg-[#1A1A1A] border border-[#333] rounded px-2.5 py-1.5 text-xs text-[#F0EDE6] outline-none focus:border-[#C9A84C] placeholder-[#555]"
+                className="w-full bg-dark2 border-2 border-white rounded px-2.5 py-1.5 text-xs text-ink outline-none focus:border-brand placeholder-dim"
               />
             </div>
           ) : (
@@ -178,8 +178,8 @@ function BackfillCard({ outfit, adminToken, onSaved, onSkip }) {
                   onClick={() => pickRound(label)}
                   className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
                     round === label
-                      ? 'bg-[#C9A84C] text-[#0D0D0D]'
-                      : 'bg-[#1A1A1A] text-[#8A877F] hover:text-[#F0EDE6]'
+                      ? 'bg-brand text-dark'
+                      : 'bg-dark2 text-muted hover:text-ink'
                   }`}
                 >
                   {discipline} {label}
@@ -196,8 +196,8 @@ function BackfillCard({ outfit, adminToken, onSaved, onSkip }) {
             disabled={!canSave || saving}
             className={`px-4 py-1.5 rounded text-xs font-medium transition-colors ${
               canSave && !saving
-                ? 'bg-[#C9A84C] text-[#0D0D0D] hover:bg-[#F0D98A]'
-                : 'bg-[#1A1A1A] text-[#555] cursor-not-allowed'
+                ? 'bg-brand text-dark hover:bg-brand-light'
+                : 'bg-dark2 text-dim cursor-not-allowed'
             }`}
           >
             {saving ? 'Saving…' : 'Save'}
@@ -256,33 +256,33 @@ export default function BackfillPanel({ adminToken, totalOutfits }) {
   if (!loading && !error && remaining === 0) return null
 
   return (
-    <div className="mt-8 bg-[#1A1A1A] border border-[#2a2a2a] p-6">
+    <div className="mt-8 bg-dark2 border-2 border-white p-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-1">
-        <h3 className="font-[family-name:var(--font-playfair)] text-base font-bold text-[#F0EDE6]">
+        <h3 className="font-[family-name:var(--font-playfair)] text-base font-bold text-ink">
           Backfill
         </h3>
         {!loading && !error && (
-          <p className="text-sm text-[#8A877F]">
-            <span className="text-[#F0EDE6]">{remaining}</span> remaining
+          <p className="text-sm text-muted">
+            <span className="text-ink">{remaining}</span> remaining
             {' · '}
-            <span className="text-[#C9A84C]">{complete}</span> complete
+            <span className="text-brand">{complete}</span> complete
           </p>
         )}
       </div>
 
       {/* Subheading */}
       {!loading && !error && remaining > 0 && (
-        <p className="text-sm text-[#8A877F] mb-5">
+        <p className="text-sm text-muted mb-5">
           {remaining} outfit{remaining !== 1 ? 's' : ''} need backfilling.
           {skipped.size > 0 && (
-            <span className="text-[#555]"> ({skipped.size} skipped this session)</span>
+            <span className="text-dim"> ({skipped.size} skipped this session)</span>
           )}
         </p>
       )}
 
       {loading && (
-        <p className="text-[#555] text-sm mt-3">Checking for legacy entries…</p>
+        <p className="text-dim text-sm mt-3">Checking for legacy entries…</p>
       )}
 
       {error && (
@@ -301,7 +301,7 @@ export default function BackfillPanel({ adminToken, totalOutfits }) {
             />
           ))}
           {visible.length === 0 && skipped.size > 0 && (
-            <p className="text-[#555] text-sm">
+            <p className="text-dim text-sm">
               All remaining cards are skipped for this session. Reload to see them again.
             </p>
           )}

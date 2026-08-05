@@ -184,12 +184,3 @@ export const COLOR_MAP = {
   Orange: '#e67e22',
   Multi:  'linear-gradient(135deg,#e91e8c,#2980b9)',
 }
-
-// ── Discipline tint styles ────────────────────────────────────────────────
-// Faint background + ring + label color per discipline, used to color-code
-// grouped gallery blocks. Hues echo COLOR_MAP (Purple / Gold / Blue).
-export const DISCIPLINE_STYLE = {
-  Singles: { tint: 'rgba(142,68,173,0.10)', ring: 'rgba(142,68,173,0.30)', label: '#b388d4' },
-  Doubles: { tint: 'rgba(201,168,76,0.10)', ring: 'rgba(201,168,76,0.30)', label: '#d4be7a' },
-  Mixed:   { tint: 'rgba(41,128,185,0.10)', ring: 'rgba(41,128,185,0.30)', label: '#7fb2d4' },
-}

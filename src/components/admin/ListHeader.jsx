@@ -4,16 +4,16 @@
 export default function ListHeader({ shown, total, suffix = 'entries', selectable, allSelected, onToggleAll }) {
   return (
     <div className="flex items-center gap-3">
-      <p className="text-xs text-[#8A877F] uppercase tracking-wide">
+      <p className="text-xs text-muted uppercase tracking-wide">
         {shown} / {total} {suffix}
       </p>
       {selectable && (
-        <label className="flex items-center gap-1.5 text-xs text-[#8A877F] cursor-pointer">
+        <label className="flex items-center gap-1.5 text-xs text-muted cursor-pointer">
           <input
             type="checkbox"
             checked={allSelected}
             onChange={e => onToggleAll(e.target.checked)}
-            className="w-4 h-4 accent-[#C9A84C] cursor-pointer"
+            className="w-4 h-4 accent-brand cursor-pointer"
           />
           Select all
         </label>

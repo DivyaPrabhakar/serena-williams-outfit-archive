@@ -74,7 +74,7 @@ export default function GroupNav({ groupBy, collapsed, onToggle }) {
         onClick={onToggle}
         title={`Jump to a ${noun.toLowerCase().replace(/s$/, '')}`}
         aria-label={`Expand ${noun} navigation`}
-        className="hidden lg:flex fixed left-0 top-28 z-30 flex-col items-center gap-2 py-4 px-1.5 bg-dark2 border-r border-t border-dark3 rounded-tr rounded-br text-muted hover:text-gold transition-colors"
+        className="hidden lg:flex fixed left-0 top-28 z-30 flex-col items-center gap-2 py-4 px-1.5 bg-dark border-r-2 border-t-2 border-white rounded-tr rounded-br text-muted hover:text-brand transition-colors"
       >
         <span aria-hidden className="text-sm leading-none">›</span>
         <span
@@ -88,9 +88,9 @@ export default function GroupNav({ groupBy, collapsed, onToggle }) {
   }
 
   return (
-    <aside className="hidden lg:flex fixed left-0 top-28 bottom-0 z-30 w-52 flex-col bg-dark2 border-r border-dark3">
-      <div className="flex items-center justify-between px-4 py-4 border-b border-dark3 flex-shrink-0">
-        <h3 className="font-playfair text-gold text-sm">{noun}</h3>
+    <aside className="hidden lg:flex fixed left-0 top-28 bottom-0 z-30 w-52 flex-col bg-dark border-r-2 border-white">
+      <div className="flex items-center justify-between px-4 py-4 border-b-2 border-white flex-shrink-0">
+        <h3 className="font-playfair text-brand text-sm">{noun}</h3>
         <button
           onClick={onToggle}
           className="text-muted hover:text-ink text-lg leading-none"
@@ -107,10 +107,10 @@ export default function GroupNav({ groupBy, collapsed, onToggle }) {
             <button
               key={section.id}
               onClick={() => jumpTo(section)}
-              className={`w-full text-left px-4 py-2 text-sm truncate border-l-2 transition-colors ${
+              className={`w-full text-left px-4 py-2 text-sm truncate transition-colors ${
                 active
-                  ? 'border-gold text-gold'
-                  : 'border-transparent text-muted hover:text-ink'
+                  ? 'bg-brand/10 text-brand'
+                  : 'text-muted hover:text-ink'
               }`}
             >
               {section.label}

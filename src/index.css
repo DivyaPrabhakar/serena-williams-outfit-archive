@@ -1,17 +1,32 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: 'DM Sans', sans-serif;
-  --font-playfair: 'Playfair Display', serif;
-  --font-bebas: 'Bebas Neue', sans-serif;
-  --font-cormorant: 'Cormorant Garamond', serif;
-  --color-dark:       #0D0D0D;
-  --color-dark2:      #1A1A1A;
-  --color-dark3:      #252525;
-  --color-gold:       #C9A84C;
-  --color-gold-light: #F0D98A;
-  --color-ink:        #F0EDE6;
-  --color-muted:      #8A877F;
+  --font-sans: "DM Sans", sans-serif;
+  --font-playfair: "Playfair Display", serif;
+  --font-bebas: "Bebas Neue", sans-serif;
+  --font-cormorant: "Cormorant Garamond", serif;
+  --color-dark: #151817;
+  --color-dark2: #1a1a1a;
+  --color-dark3: #252525;
+  --color-brand: #ccff00;
+  --color-brand-light: #e2ff66;
+  --color-ink: #f0ede6;
+  --color-muted: #8a877f;
+
+  /* Admin UI grays — borders, wells, and dimmer text used only in the
+     admin panel. Kept as their own step so retinting chrome (dark/dark2/
+     dark3) doesn't have to also touch every form border. */
+  --color-line: #333333;
+  --color-line-soft: #2a2a2a;
+  --color-line-strong: #3a3a3a;
+  --color-dim: #555555;
+  --color-well: #111111;
+  --color-well-light: #222222;
+
+  /* Discipline blocks (Singles/Doubles/Mixed) in the grouped gallery view —
+     all disciplines share the same look now, not color-coded per discipline. */
+  --color-discipline-bg: rgba(61 106 75 / 10%);
+  --color-discipline-border: rgba(61 106 75 / 30%);
 }
 
 body {
@@ -21,9 +36,15 @@ body {
 }
 
 @keyframes slot-highlight {
-  0%   { box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.9); }
-  60%  { box-shadow: 0 0 0 5px rgba(201, 168, 76, 0.4); }
-  100% { box-shadow: 0 0 0 8px rgba(201, 168, 76, 0); }
+  0% {
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-brand) 90%, transparent);
+  }
+  60% {
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--color-brand) 40%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 8px color-mix(in srgb, var(--color-brand) 0%, transparent);
+  }
 }
 
 .slot-highlight {

@@ -9,7 +9,7 @@ export default function ColorsByYear({ data = [], allColors = [] }) {
     <div className="overflow-x-auto">
       <div className="inline-block min-w-full">
         {/* Legend header: one reference swatch per column */}
-        <div className="flex items-center gap-4 pb-2 mb-1 border-b border-dark3">
+        <div className="flex items-center gap-4 pb-2 mb-1 border-b-2 border-white">
           <span className="w-12 shrink-0" />
           <div className="flex gap-1.5">
             {allColors.map((color) => (
@@ -17,7 +17,7 @@ export default function ColorsByYear({ data = [], allColors = [] }) {
                 key={color}
                 color={color}
                 title={color}
-                className="w-5 h-5 rounded-sm border border-dark3 inline-block"
+                className="w-5 h-5 rounded-sm border-2 border-white inline-block"
               />
             ))}
           </div>
@@ -35,13 +35,13 @@ export default function ColorsByYear({ data = [], allColors = [] }) {
                       key={color}
                       color={color}
                       title={`${year} · ${color}`}
-                      className="w-5 h-5 rounded-sm border border-dark3 inline-block"
+                      className="w-5 h-5 rounded-sm border-2 border-white inline-block"
                     />
                   ) : (
                     <span
                       key={color}
                       title={`${year} · no ${color}`}
-                      className="w-5 h-5 rounded-sm border border-dark3 bg-dark2 opacity-40 inline-block"
+                      className="w-5 h-5 rounded-sm border-2 border-white bg-dark2 opacity-40 inline-block"
                     />
                   ),
                 )}

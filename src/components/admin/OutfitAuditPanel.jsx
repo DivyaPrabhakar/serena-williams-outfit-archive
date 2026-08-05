@@ -24,9 +24,9 @@ export default function OutfitAuditPanel({ outfits, onEdit, onDelete, onDeleteMa
       />
       <SelectionBar count={selected.size} onDelete={removeSelected} onClear={clear} />
       {list.length === 0 ? (
-        <p className="text-[#555] text-sm">{emptyMessage}</p>
+        <p className="text-dim text-sm">{emptyMessage}</p>
       ) : visible.length === 0 ? (
-        <p className="text-[#555] text-sm">No results.</p>
+        <p className="text-dim text-sm">No results.</p>
       ) : (
         <div className="flex flex-col gap-px">
           {visible.map(o => (

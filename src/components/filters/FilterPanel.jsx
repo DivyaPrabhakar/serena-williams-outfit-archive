@@ -23,12 +23,12 @@ export default function FilterPanel({
   const hasActive = activeTournament !== null || activeYear !== null || activeBrand !== null || activeColor !== null
 
   return (
-    <div className="fixed right-0 top-28 bottom-0 z-[45] w-full sm:w-72 bg-dark2 border-l border-dark3 shadow-2xl flex flex-col">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-dark3 flex-shrink-0">
-          <h3 className="font-playfair text-gold text-base">Filters</h3>
+    <div className="fixed right-0 top-28 bottom-0 z-[45] w-full sm:w-72 bg-dark2 border-l-2 border-white shadow-2xl flex flex-col">
+        <div className="flex items-center justify-between px-5 py-4 border-b-2 border-white flex-shrink-0">
+          <h3 className="font-playfair text-brand text-base">Filters</h3>
           <button
             onClick={onClose}
-            className="flex items-center gap-1.5 text-sm font-medium text-ink bg-dark3 hover:bg-gold hover:text-dark rounded px-3 py-1.5 transition-colors"
+            className="flex items-center gap-1.5 text-sm font-medium text-ink bg-dark3 hover:bg-brand hover:text-dark rounded px-3 py-1.5 transition-colors"
             aria-label="Close filters"
           >
             <span className="text-lg leading-none">×</span>
@@ -119,7 +119,7 @@ export default function FilterPanel({
         </div>
 
         {hasActive && (
-          <div className="px-5 py-4 border-t border-dark3 flex-shrink-0">
+          <div className="px-5 py-4 border-t-2 border-white flex-shrink-0">
             <button
               onClick={() => { onTournamentChange(null); onYearChange(null); onBrandChange(null); onColorChange(null) }}
               className="w-full py-2 rounded text-xs font-medium bg-dark3 text-muted hover:text-ink transition-colors"

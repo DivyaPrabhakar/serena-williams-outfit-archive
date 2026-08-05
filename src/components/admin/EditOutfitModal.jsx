@@ -51,15 +51,15 @@ export default function EditOutfitModal({ outfit, onSave, onClose }) {
       className="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4"
       onClick={e => e.target === e.currentTarget && onClose()}
     >
-      <div className="bg-[#1A1A1A] border border-[#2a2a2a] w-full max-w-lg max-h-[90vh] overflow-y-auto">
+      <div className="bg-dark2 border-2 border-white w-full max-w-lg max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#2a2a2a] sticky top-0 bg-[#1A1A1A]">
-          <h3 className="font-[family-name:var(--font-playfair)] text-base font-bold text-[#F0EDE6]">
+        <div className="flex items-center justify-between px-6 py-4 border-b-2 border-white sticky top-0 bg-dark2">
+          <h3 className="font-[family-name:var(--font-playfair)] text-base font-bold text-ink">
             Edit Outfit
           </h3>
           <button
             onClick={onClose}
-            className="text-[#8A877F] hover:text-[#F0EDE6] transition-colors text-lg leading-none cursor-pointer"
+            className="text-muted hover:text-ink transition-colors text-lg leading-none cursor-pointer"
           >
             ✕
           </button>
@@ -72,17 +72,17 @@ export default function EditOutfitModal({ outfit, onSave, onClose }) {
         </div>
 
         {/* Footer */}
-        <div className="flex gap-3 px-6 py-4 border-t border-[#2a2a2a] sticky bottom-0 bg-[#1A1A1A]">
+        <div className="flex gap-3 px-6 py-4 border-t-2 border-white sticky bottom-0 bg-dark2">
           <button
             onClick={onClose}
-            className="flex-1 border border-[#333] text-[#8A877F] text-sm py-2.5 hover:border-[#555] hover:text-[#F0EDE6] transition-colors cursor-pointer"
+            className="flex-1 border-2 border-white text-muted text-sm py-2.5 hover:border-dim hover:text-ink transition-colors cursor-pointer"
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
             disabled={saving}
-            className="flex-1 bg-[#C9A84C] text-[#0D0D0D] font-medium text-sm py-2.5 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
+            className="flex-1 bg-brand text-dark font-medium text-sm py-2.5 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
           >
             {saving ? 'Saving…' : 'Save Changes'}
           </button>

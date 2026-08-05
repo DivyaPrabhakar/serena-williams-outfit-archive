@@ -60,8 +60,8 @@ export default function Lightbox({ outfits, index, onNavigate, onClose }) {
 
         {/* Metadata panel */}
         <aside className="md:w-64 flex-shrink-0 flex flex-col bg-dark2 overflow-y-auto">
-          <header className="flex items-start justify-between px-5 pt-5 pb-4 border-b border-dark3">
-            <h2 className="font-playfair text-gold text-xl leading-tight">{outfit.tournament}</h2>
+          <header className="flex items-start justify-between px-5 pt-5 pb-4 border-b-2 border-white">
+            <h2 className="font-playfair text-brand text-xl leading-tight">{outfit.tournament}</h2>
             <button
               onClick={onClose}
               className="text-muted hover:text-ink text-2xl leading-none ml-3 mt-0.5 flex-shrink-0"
@@ -101,10 +101,10 @@ export default function Lightbox({ outfits, index, onNavigate, onClose }) {
             )}
           </dl>
 
-          <footer className="flex items-center justify-between px-5 py-4 border-t border-dark3">
+          <footer className="flex items-center justify-between px-5 py-4 border-t-2 border-white">
             <button
               onClick={() => onNavigate((index - 1 + outfits.length) % outfits.length)}
-              className="text-muted hover:text-gold text-sm transition-colors"
+              className="text-muted hover:text-brand text-sm transition-colors"
             >
               ← Prev
             </button>
@@ -113,7 +113,7 @@ export default function Lightbox({ outfits, index, onNavigate, onClose }) {
             </span>
             <button
               onClick={() => onNavigate((index + 1) % outfits.length)}
-              className="text-muted hover:text-gold text-sm transition-colors"
+              className="text-muted hover:text-brand text-sm transition-colors"
             >
               Next →
             </button>

@@ -222,7 +222,7 @@ function TournamentGroupedGallery({ outfits, sortBy, settings, onOpenLightbox })
             />
 
             <div
-              className={stacked ? 'flex flex-col gap-3 items-start pl-0 sm:pl-3' : 'grid gap-3 items-start pl-0 sm:pl-3'}
+              className={stacked ? 'flex flex-col gap-3 items-start pl-0' : 'grid gap-3 items-start pl-0'}
               style={stacked ? undefined : { gridTemplateColumns: `repeat(${disciplineBlocks.length}, minmax(0, 1fr))` }}
             >
               {disciplineBlocks.map(({ discipline, slots }) => {

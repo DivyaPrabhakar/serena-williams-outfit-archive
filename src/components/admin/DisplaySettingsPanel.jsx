@@ -23,12 +23,12 @@ export default function DisplaySettingsPanel() {
           </PickerBtn>
         </div>
       </div>
-      <p className="text-xs text-[#8A877F] leading-relaxed">
+      <p className="text-xs text-muted leading-relaxed">
         Hides all Getty-sourced images from the gallery — useful for taking screenshots for
         publications that can’t use Getty Images. The remaining images pack together with no
         gaps.
       </p>
-      <p className="text-xs text-[#555] leading-relaxed">
+      <p className="text-xs text-dim leading-relaxed">
         This setting is saved in this browser only, so it affects just this device.
       </p>
     </div>
