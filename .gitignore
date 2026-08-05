@@ -24,7 +24,8 @@ pnpm-debug.log*
 # IDE / tooling
 .vscode/
 .idea/
-.claude/
+.claude/*
+!.claude/skills/
 *.suo
 *.ntvs*
 *.njsproj
