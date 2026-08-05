@@ -35,6 +35,13 @@ body {
   color: var(--color-ink);
 }
 
+@layer base {
+  button:not(:disabled),
+  a {
+    cursor: pointer;
+  }
+}
+
 @keyframes slot-highlight {
   0% {
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-brand) 90%, transparent);

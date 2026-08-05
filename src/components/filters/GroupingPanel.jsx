@@ -16,7 +16,7 @@ function OptionButton({ active, onClick, children }) {
     <button
       onClick={onClick}
       className={`w-full text-left px-4 py-3 rounded text-sm font-medium transition-colors ${
-        active ? 'bg-brand text-dark' : 'bg-dark3 text-ink hover:text-white'
+        active ? 'bg-brand text-dark hover:bg-brand-light' : 'bg-dark3 text-ink hover:bg-brand/15 hover:text-brand'
       }`}
     >
       {children}

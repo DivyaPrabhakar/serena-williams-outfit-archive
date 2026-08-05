@@ -74,7 +74,7 @@ export default function GroupNav({ groupBy, collapsed, onToggle }) {
         onClick={onToggle}
         title={`Jump to a ${noun.toLowerCase().replace(/s$/, '')}`}
         aria-label={`Expand ${noun} navigation`}
-        className="hidden lg:flex fixed left-0 top-28 z-30 flex-col items-center gap-2 py-4 px-1.5 bg-dark border-r-2 border-t-2 border-white rounded-tr rounded-br text-muted hover:text-brand transition-colors"
+        className="hidden lg:flex fixed left-0 top-28 z-30 flex-col items-center gap-2 py-4 px-1.5 bg-dark border-r-2 border-t-2 border-white rounded-tr rounded-br text-muted hover:bg-brand/15 hover:text-brand transition-colors"
       >
         <span aria-hidden className="text-sm leading-none">›</span>
         <span
@@ -93,7 +93,7 @@ export default function GroupNav({ groupBy, collapsed, onToggle }) {
         <h3 className="font-playfair text-brand text-sm">{noun}</h3>
         <button
           onClick={onToggle}
-          className="text-muted hover:text-ink text-lg leading-none"
+          className="text-muted hover:bg-brand/15 hover:text-brand rounded text-lg leading-none px-1 transition-colors"
           aria-label={`Collapse ${noun} navigation`}
           title="Collapse"
         >
@@ -110,7 +110,7 @@ export default function GroupNav({ groupBy, collapsed, onToggle }) {
               className={`w-full text-left px-4 py-2 text-sm truncate transition-colors ${
                 active
                   ? 'bg-brand/10 text-brand'
-                  : 'text-muted hover:text-ink'
+                  : 'text-muted hover:bg-brand/15 hover:text-brand'
               }`}
             >
               {section.label}

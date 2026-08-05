@@ -31,7 +31,7 @@ export default function FilterBar({
         <button
           onClick={togglePanel}
           className={`px-4 py-2 rounded text-sm font-normal whitespace-nowrap transition-colors ${
-            panelOpen ? 'bg-brand text-dark' : 'bg-dark3 text-muted hover:text-white'
+            panelOpen ? 'bg-brand text-dark hover:bg-brand-light' : 'bg-dark3 text-muted hover:bg-brand/15 hover:text-brand'
           }`}
         >
           {foundCount}/{totalCount} outfits found
@@ -40,7 +40,7 @@ export default function FilterBar({
       <button
         onClick={openGrouping}
         className={`px-4 py-2 rounded text-sm font-normal whitespace-nowrap transition-colors ${
-          groupingPanelOpen ? 'bg-brand text-dark' : 'bg-dark3 hover:text-white'
+          groupingPanelOpen ? 'bg-brand text-dark hover:bg-brand-light' : 'bg-dark3 hover:bg-brand/15'
         }`}
       >
         <span className={groupingPanelOpen ? 'text-dark/60' : 'text-muted'}>View by: </span>
@@ -48,7 +48,7 @@ export default function FilterBar({
       </button>
       <button
         onClick={toggleLayout}
-        className="hidden sm:inline-block px-4 py-2 rounded text-sm font-normal whitespace-nowrap transition-colors bg-dark3 hover:text-white"
+        className="hidden sm:inline-block px-4 py-2 rounded text-sm font-normal whitespace-nowrap transition-colors bg-dark3 hover:bg-brand/15"
       >
         <span className="text-muted">Layout: </span>
         <span className="text-brand">{isStacked ? 'Stacked' : 'Side by side'}</span>

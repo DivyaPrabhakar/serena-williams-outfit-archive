@@ -3,7 +3,7 @@
 // line thin while spacing the dashes further apart without it.
 const DASHED_OUTLINE = {
   backgroundImage:
-    "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Crect x='0.5' y='0.5' width='99' height='99' rx='2' fill='none' stroke='white' stroke-opacity='0.5' stroke-width='1' stroke-dasharray='10 8'/%3E%3C/svg%3E\")",
+    "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Crect x='0.5' y='0.5' width='99' height='99' rx='2' fill='none' stroke='white' stroke-opacity='0.4' stroke-width='1' stroke-dasharray='4 3'/%3E%3C/svg%3E\")",
 }
 
 export default function EmptySlot({ label }) {

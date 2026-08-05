@@ -122,7 +122,7 @@ export default function FilterPanel({
           <div className="px-5 py-4 border-t-2 border-white flex-shrink-0">
             <button
               onClick={() => { onTournamentChange(null); onYearChange(null); onBrandChange(null); onColorChange(null) }}
-              className="w-full py-2 rounded text-xs font-medium bg-dark3 text-muted hover:text-ink transition-colors"
+              className="w-full py-2 rounded text-xs font-medium bg-dark3 text-muted hover:bg-brand/15 hover:text-brand transition-colors"
             >
               Clear all filters
             </button>
