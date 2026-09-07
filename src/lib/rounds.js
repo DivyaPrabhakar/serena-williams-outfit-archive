@@ -62,6 +62,25 @@ export function getValidRounds(tournament, year, discipline) {
   return getRoundNumbers(tournament, year, discipline).map(n => ROUND_SEQUENCE[n - 1])
 }
 
+// Whether we hold any recorded metadata (rounds played, or a did-not-play /
+// not-held marker) for this tournament + year in any discipline. Returns false
+// for years past the end of the dataset (2023+) even for Grand Slams / Olympics
+// — the admin form uses this to tell "she didn't play, so no rounds" apart from
+// "this year isn't logged yet, so show every round".
+export function hasSlotMetadata(tournament, year) {
+  const y = Number(year)
+  return ['Singles', 'Doubles', 'Mixed'].some((discipline) => {
+    const data = DISCIPLINE_DATA[discipline]
+    return (
+      data.rounds[tournament]?.[y] != null ||
+      data.didNotPlay[tournament]?.has(y) ||
+      data.notHeld[tournament]?.has(y) ||
+      data.nonSlamRounds?.[tournament]?.[y] != null ||
+      data.nonSlamExplicit?.[tournament]?.[y] != null
+    )
+  })
+}
+
 // ── Combined (all-discipline) slot status ─────────────────────────────────
 
 // Returns 'played' | 'did-not-play' | 'not-held'

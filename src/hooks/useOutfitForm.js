@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react'
 import { GRAND_SLAMS, OLYMPICS_YEARS, ROUND_SEQUENCE } from '../lib/constants'
-import { getValidRounds, getRoundsForSlot, getSlotStatus, getRoundNumber } from '../lib/rounds'
+import { getValidRounds, getRoundsForSlot, getSlotStatus, getRoundNumber, hasSlotMetadata } from '../lib/rounds'
 import { isBlockedUrl } from '../lib/imageUtils'
 
 // Mixed doubles is contested at all four Grand Slams.
@@ -16,11 +16,13 @@ export function useOutfitForm(initialValues) {
   const effectiveTournament = f.tournament === 'Other' ? f.otherTournament.trim() : f.tournament
 
   // A slot is "known" (we can validate participation against metadata) when the
-  // tournament is a Grand Slam / Olympics, or when any discipline has recorded
-  // rounds for this year. Free-form "Other" / sparse non-slam years stay permissive.
+  // tournament is a Grand Slam / Olympics year we actually have data for, or when
+  // any discipline has recorded rounds for this year. Free-form "Other", sparse
+  // non-slam years, and years past the end of the dataset (2023+) stay permissive.
   const slotIsKnown = useMemo(() => {
     if (!effectiveTournament || !yearNum) return false
-    if (GRAND_SLAMS.includes(effectiveTournament) || effectiveTournament === 'Olympics') return true
+    if (GRAND_SLAMS.includes(effectiveTournament) || effectiveTournament === 'Olympics')
+      return hasSlotMetadata(effectiveTournament, yearNum)
     return ['Singles', 'Doubles', 'Mixed'].some(
       d => getRoundsForSlot(effectiveTournament, yearNum, d) > 0,
     )
