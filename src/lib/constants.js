@@ -136,7 +136,7 @@ export const NON_SLAM_ROUNDS_SINGLES = {
 export const NON_SLAM_ROUNDS_DOUBLES = {
   'Indian Wells / Evert Cup':          { 1999: 4 },
   'Lipton Championships / Miami Open': { 1999: 3 },
-  'Fed Cup / Billie Jean King Cup':    { 1999: 3 },
+  'Fed Cup / Billie Jean King Cup':    { 1999: 3, 2018: 1 }, // 2018: doubles rubber only (World Group first round, USA v NED, lost w/ Venus)
   'Eastbourne Tournament':             { 2022: 3 },
   'Porsche Tennis Grand Prix':         { 2008: 2 },
 }
