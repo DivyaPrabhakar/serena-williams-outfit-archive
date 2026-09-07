@@ -182,5 +182,6 @@ export const COLOR_MAP = {
   Pink:   '#e91e8c',
   Green:  '#27ae60',
   Orange: '#e67e22',
+  Brown:  '#8d5a3c',
   Multi:  'linear-gradient(135deg,#e91e8c,#2980b9)',
 }
