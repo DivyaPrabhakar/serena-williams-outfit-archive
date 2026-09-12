@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { DISCIPLINES } from '../../lib/constants'
-import { getRoundsForSlot, getSlotStatus, getRoundLabel, getCombinedSlotStatus, getRoundNumbers } from '../../lib/rounds'
+import { getRoundsForSlot, getSlotStatus, getRoundLabel, getCombinedSlotStatus, getRoundNumbers, hasSlotMetadata } from '../../lib/rounds'
 import { CARD_WIDTHS, isKnownForYear, getYearSubtitle } from '../../lib/galleryUtils'
 import { slotKey, slotDomId } from '../../lib/slots'
 import { getSortedColors } from '../../lib/colorUtils'
@@ -197,7 +197,13 @@ export default function ExpandedYearSection({ year, outfitMap, tournaments, year
   const yearColors = getSortedColors(yearOutfits.flatMap(o => o.colors ?? []))
 
   const blocks = tournaments.flatMap(tournament => {
-    if (!isKnownForYear(tournament, year)) {
+    // Grand Slams / Olympics are always "known" tournaments, but a year past the
+    // end of the round-metadata dataset (e.g. a freshly-logged 2026 entry) has no
+    // participation data to validate against — getRoundsForSlot would read that
+    // as 0 rounds played and getSlotStatus as 'played', so ExpandedTournamentBlock
+    // finds nothing to show and silently drops logged outfits. Route those years
+    // through the same permissive, outfits-only rendering as unknown tournaments.
+    if (!isKnownForYear(tournament, year) || !hasSlotMetadata(tournament, year)) {
       const tOutfits = yearOutfits.filter(o => o.tournament === tournament)
       return [(
         <UnknownTournamentBlock
