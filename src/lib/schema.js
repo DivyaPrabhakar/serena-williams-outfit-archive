@@ -111,13 +111,23 @@ function isGettyMediaUrl(imageUrl) {
   return /(?:^|\/\/)media\.gettyimages\.com\//.test(String(imageUrl ?? ''))
 }
 
+// Getty's standard end-user license agreement — the `license` field wants a URL
+// to the terms, distinct from `acquireLicensePage` (where *this* image can be
+// licensed). Same URL for every Getty image; Getty doesn't publish a per-image one.
+const GETTY_LICENSE_URL = 'https://www.gettyimages.com/eula'
+
+function gettyCreatorLd() {
+  return { '@type': 'Organization', name: 'Getty Images' }
+}
+
 // ── ImageObject for an outfit, with correct Getty attribution ─────────────
 // This is the ONLY place `creditText` is used — it names the *photo* credit
 // (Getty Images), which is a different concept from the outfit's brand/designer.
 // Three cases:
-//   • Getty embed  → credit + acquireLicensePage, NO hotlinked contentUrl (per Getty terms)
-//   • Getty media URL → credit + acquireLicensePage AND contentUrl (already a hosted image)
-//   • other (Contentful, etc.) → plain contentUrl, no Getty credit
+//   • Getty embed  → credit + creator + license + acquireLicensePage, NO hotlinked contentUrl (per Getty terms)
+//   • Getty media URL → same, plus contentUrl (already a hosted image)
+//   • other (Contentful, etc.) → plain contentUrl, no Getty credit/creator/license —
+//     provenance genuinely isn't known for these, so we don't fabricate it.
 export function outfitImageLd(outfit, { name, caption } = {}) {
   const url = outfit.imageUrl
   const detail = gettyDetailUrl(url)
@@ -133,6 +143,8 @@ export function outfitImageLd(outfit, { name, caption } = {}) {
       ...base,
       creditText: 'Getty Images',
       copyrightNotice: 'Getty Images',
+      creator: gettyCreatorLd(),
+      license: GETTY_LICENSE_URL,
       ...(detail ? { acquireLicensePage: detail } : {}),
     }
   }
@@ -143,6 +155,8 @@ export function outfitImageLd(outfit, { name, caption } = {}) {
       contentUrl: url,
       creditText: 'Getty Images',
       copyrightNotice: 'Getty Images',
+      creator: gettyCreatorLd(),
+      license: GETTY_LICENSE_URL,
       ...(detail ? { acquireLicensePage: detail } : {}),
     }
   }
