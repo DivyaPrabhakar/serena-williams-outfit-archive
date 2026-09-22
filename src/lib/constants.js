@@ -132,6 +132,7 @@ export const NON_SLAM_ROUNDS_SINGLES = {
   'National Bank Open':                { 2022: 2 },
   'Yarra Valley Classic':              { 2021: 3 },
   'Collector Swedish Open':            { 2015: 2 }, // R1 (round of 32) def. Bonaventure 6-2,6-1; R2 (round of 16) walkover loss to Koukalova
+  'Fed Cup / Billie Jean King Cup':    { 2015: 2 }, // World Group Playoffs, Brindisi — R1 def. Errani 4-6,7-6(3),6-3; R2 def. Giorgi 7-6(5),6-2
 }
 
 export const NON_SLAM_ROUNDS_DOUBLES = {
