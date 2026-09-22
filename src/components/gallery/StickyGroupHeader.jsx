@@ -55,7 +55,7 @@ export default function StickyGroupHeader({ id, label, swatches, title, titleHre
       <div
         ref={stickyRef}
         data-stuck={stuck}
-        className={`group/sticky sticky top-44 md:top-28 z-20 bg-dark -mx-12 px-12 py-3 transition-all duration-200 data-[stuck=true]:py-5 data-[stuck=true]:border-b-2 data-[stuck=true]:border-white ${className}`}
+        className={`group/sticky sticky top-48 md:top-28 z-30 bg-sticky-bg -mx-12 px-12 py-3 border-b-2 border-transparent transition-all duration-200 data-[stuck=true]:py-5 data-[stuck=true]:border-white ${className}`}
       >
         <div className="flex flex-wrap items-center gap-x-3 gap-y-3">
           <h2 className="w-full font-sans text-5xl text-ink leading-none transition-all duration-200 group-data-[stuck=true]/sticky:w-auto group-data-[stuck=true]/sticky:text-2xl">

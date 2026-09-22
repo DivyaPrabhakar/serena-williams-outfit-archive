@@ -27,6 +27,11 @@
      all disciplines share the same look now, not color-coded per discipline. */
   --color-discipline-bg: rgba(61 106 75 / 10%);
   --color-discipline-border: rgba(61 106 75 / 30%);
+
+  /* Sticky group headers (year/tournament/color/brand) need an opaque backdrop
+     so scrolling cards don't show through while pinned, tinted just enough to
+     read as "on brand" rather than flat page background. */
+  --color-sticky-bg: color-mix(in srgb, var(--color-brand) 10%, var(--color-dark));
 }
 
 body {
