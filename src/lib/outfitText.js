@@ -8,6 +8,25 @@ export function roundLabel(round) {
   return round ? (ROUND_LABELS[round] ?? round) : ''
 }
 
+// Rotating closes for outfitDescription — a fixed, verbatim closing sentence
+// repeated across 600+ near-identical pages is exactly the kind of thin/
+// duplicate-content signal that gets a large templated site deprioritized for
+// indexing (Search Console: "Discovered/Crawled — currently not indexed").
+// Picked deterministically per outfit (not random) so the same outfit always
+// reads the same way across builds/renders.
+const ARCHIVE_BLURBS = [
+  'From the Serena Williams outfits archive documenting every on-court look.',
+  'Catalogued as part of the Serena Williams Fit-dex on-court style archive.',
+  'One entry in the ongoing archive of every Serena Williams match outfit.',
+  'Logged in the Serena Williams Fit-dex, a complete on-court outfit archive.',
+]
+
+function archiveBlurb(o) {
+  let hash = 0
+  for (const ch of String(o.id ?? '')) hash = (hash * 31 + ch.charCodeAt(0)) | 0
+  return ARCHIVE_BLURBS[Math.abs(hash) % ARCHIVE_BLURBS.length]
+}
+
 function colorPhrase(colors) {
   const c = (colors ?? []).filter(Boolean)
   if (c.length === 0) return ''
@@ -40,7 +59,7 @@ export function outfitDescription(o) {
   const rl = roundLabel(o.round)
   const where = rl ? `${rl} of the ${o.year} ${o.tournament}` : `${o.year} ${o.tournament}`
   const disc = o.discipline && o.discipline !== 'Singles' ? ` ${o.discipline.toLowerCase()}` : ''
-  return `The ${look} Serena Williams wore for her${disc} match at the ${where}. From the Serena Williams outfits archive documenting every on-court look.`
+  return `The ${look} Serena Williams wore for her${disc} match at the ${where}. ${archiveBlurb(o)}`
 }
 
 // Descriptive alt text including her name and context.

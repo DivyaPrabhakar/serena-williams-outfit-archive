@@ -104,9 +104,11 @@ export default function OutfitPage() {
           </Link>
         </nav>
 
-        <h1 className="text-3xl sm:text-4xl text-ink font-medium leading-tight mb-6">
+        <h1 className="text-3xl sm:text-4xl text-ink font-medium leading-tight mb-4">
           {outfitHeading(outfit)}
         </h1>
+
+        <p className="text-sm text-muted max-w-md mb-6">{outfitDescription(outfit)}</p>
 
         <div className="mb-8 rounded overflow-hidden bg-dark3 max-w-md">
           <div className="relative aspect-[3/4]">
@@ -160,12 +162,11 @@ export default function OutfitPage() {
         </dl>
 
         <p className="mt-8 text-sm text-muted max-w-md">
-          Part of the{' '}
+          See every outfit from the{' '}
           <Link to={`/${tournamentToSlug(outfit.tournament)}/${outfit.year}`} className="underline hover:text-ink">
             {outfit.year} {outfit.tournament}
-          </Link>{' '}
-          collection in the Serena Williams outfits archive.{' '}
-          <Link to="/" className="underline hover:text-ink">Browse every outfit</Link>.
+          </Link>, or{' '}
+          <Link to="/" className="underline hover:text-ink">browse the full archive</Link>.
         </p>
       </div>
     </div>
