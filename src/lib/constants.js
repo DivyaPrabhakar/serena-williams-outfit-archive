@@ -131,6 +131,7 @@ export const NON_SLAM_ROUNDS_SINGLES = {
   'Western & Southern Open':           { 2022: 1 },
   'National Bank Open':                { 2022: 2 },
   'Yarra Valley Classic':              { 2021: 3 },
+  'Collector Swedish Open':            { 2015: 2 }, // R1 (round of 32) def. Bonaventure 6-2,6-1; R2 (round of 16) walkover loss to Koukalova
 }
 
 export const NON_SLAM_ROUNDS_DOUBLES = {

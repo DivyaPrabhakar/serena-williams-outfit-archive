@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { outfitFromParams, tournamentPath, tournamentToSlug } from '../lib/slugs'
 import { isGettyEmbed, isGettyLandscape, gettyEmbedForIframe } from '../lib/imageUtils'
@@ -56,6 +57,7 @@ function MetaRow({ label, children }) {
 export default function OutfitPage() {
   const params = useParams()
   const outfit = outfitFromParams(params)
+  const [imgError, setImgError] = useState(false)
 
   if (!outfit) {
     return (
@@ -112,8 +114,19 @@ export default function OutfitPage() {
                 sandbox="allow-scripts allow-same-origin"
                 loading="lazy"
               />
+            ) : imgError || !outfit.imageUrl ? (
+              // Broken/missing image → labeled placeholder instead of a browser
+              // broken-image icon (mirrors OutfitCard's grid-view fallback).
+              <div className="w-full h-full flex items-center justify-center bg-dark3 p-4 text-center">
+                <span className="text-sm text-muted">{outfitHeading(outfit)}</span>
+              </div>
             ) : (
-              <img src={outfit.imageUrl} alt={alt} className="w-full h-full object-cover" />
+              <img
+                src={outfit.imageUrl}
+                alt={alt}
+                className="w-full h-full object-cover"
+                onError={() => setImgError(true)}
+              />
             )}
           </div>
         </div>
