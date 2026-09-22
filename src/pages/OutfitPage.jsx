@@ -27,6 +27,10 @@ import ColorSwatch from '../components/ColorSwatch'
 // outfit's brand) is distinct from the photo credit inside `image`. author /
 // publisher resolve to the site-wide @graph in Layout.
 function articleJsonLd(o, path) {
+  // outfitImageLd returns null for Getty-embed outfits (no image field at all,
+  // rather than an ImageObject Google would flag for a missing contentUrl we're
+  // not allowed to fabricate — see schema.js).
+  const image = outfitImageLd(o, { name: outfitHeading(o), caption: outfitAlt(o) })
   return {
     '@context': 'https://schema.org',
     '@type': 'Article',
@@ -34,7 +38,7 @@ function articleJsonLd(o, path) {
     name: outfitHeading(o),
     description: outfitSchemaDescription(o),
     url: absoluteUrl(path),
-    image: outfitImageLd(o, { name: outfitHeading(o), caption: outfitAlt(o) }),
+    ...(image ? { image } : {}),
     datePublished: o.createdAt || undefined,
     dateModified: o.updatedAt || o.createdAt || undefined,
     author: authorRef(),

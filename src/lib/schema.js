@@ -124,29 +124,27 @@ function gettyCreatorLd() {
 // This is the ONLY place `creditText` is used — it names the *photo* credit
 // (Getty Images), which is a different concept from the outfit's brand/designer.
 // Three cases:
-//   • Getty embed  → credit + creator + license + acquireLicensePage, NO hotlinked contentUrl (per Getty terms)
-//   • Getty media URL → same, plus contentUrl (already a hosted image)
+//   • Getty embed  → null. Getty's embed widget (an iframe it renders client-side
+//     from its own script) has no real, static image URL for us to hotlink —
+//     Google's ImageObject requires `contentUrl`, but Getty's free-embed terms
+//     require using their signed widget instead of a direct link. Rather than
+//     fabricate a contentUrl and violate that, we omit the ImageObject entirely
+//     for these. Only affects eligibility for Google's Image rich-result feature
+//     for this photo — the Article page itself still indexes normally.
+//   • Getty media URL → contentUrl (already a hosted image) + credit/creator/license
 //   • other (Contentful, etc.) → plain contentUrl, no Getty credit/creator/license —
 //     provenance genuinely isn't known for these, so we don't fabricate it.
 export function outfitImageLd(outfit, { name, caption } = {}) {
   const url = outfit.imageUrl
   const detail = gettyDetailUrl(url)
+
+  if (isGettyEmbed(url)) return null
+
   const base = {
     '@type': 'ImageObject',
     ...(name ? { name } : {}),
     ...(caption ? { caption } : {}),
     representativeOfPage: true,
-  }
-
-  if (isGettyEmbed(url)) {
-    return {
-      ...base,
-      creditText: 'Getty Images',
-      copyrightNotice: 'Getty Images',
-      creator: gettyCreatorLd(),
-      license: GETTY_LICENSE_URL,
-      ...(detail ? { acquireLicensePage: detail } : {}),
-    }
   }
 
   if (isGettyMediaUrl(url)) {
