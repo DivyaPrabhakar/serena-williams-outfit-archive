@@ -1,13 +1,18 @@
-// Derived, crawlable URLs for outfits and tournaments — no DB slug column needed.
+// Derived, crawlable URLs for outfits and tournaments.
 //
 // URL scheme (Singles implicit, matching /wimbledon/2015/final & /us-open/2012):
 //   Tournament-year:      /{tournament}/{year}               e.g. /us-open/2012
 //   Outfit (Singles):     /{tournament}/{year}/{round}       e.g. /wimbledon/2015/final
 //   Outfit (Dbl/Mixed):   /{tournament}/{year}/{discipline}/{round}
 //
-// Slugs are computed once from the build-time snapshot. Two rows that map to the
-// same path (47 in current data — e.g. duplicate entries, or null rounds) are
-// disambiguated with a -2 / -3 suffix ordered by createdAt, so URLs stay stable.
+// Most of the path is derived fresh from each outfit's own fields. The one part
+// that can't be — the disambiguating suffix for outfits sharing the same
+// tournament/year/discipline/round — comes from the persisted `slugSuffix`
+// column (outfit.slugSuffix; null = no suffix, N = renders as "-N"), assigned
+// once at creation by netlify/functions/outfits.js. It used to be recomputed
+// every build from sort position, which meant adding/editing/deleting any
+// outfit in a collision group silently changed every other outfit's URL —
+// that's what caused Search Console's 404 and duplicate-canonical reports.
 
 import { snapshotOutfits } from './snapshot'
 
@@ -66,28 +71,15 @@ function basePath(o) {
   return '/' + segs.join('/')
 }
 
-// ── Path <-> outfit indices, with deterministic collision suffixes ──
+// ── Path <-> outfit indices, suffix taken straight from each row ──
 const pathByOutfitId = new Map()
 const outfitByPath = new Map()
 {
-  const groups = new Map()
-  const ordered = [...snapshotOutfits].sort(
-    (a, b) =>
-      String(a.createdAt ?? '').localeCompare(String(b.createdAt ?? '')) ||
-      String(a.id).localeCompare(String(b.id)),
-  )
-  for (const o of ordered) {
+  for (const o of snapshotOutfits) {
     const bp = basePath(o)
-    const arr = groups.get(bp) ?? []
-    arr.push(o)
-    groups.set(bp, arr)
-  }
-  for (const [bp, arr] of groups) {
-    arr.forEach((o, idx) => {
-      const p = idx === 0 ? bp : `${bp}-${idx + 1}`
-      pathByOutfitId.set(o.id, p)
-      outfitByPath.set(p, o)
-    })
+    const p = o.slugSuffix == null ? bp : `${bp}-${o.slugSuffix}`
+    pathByOutfitId.set(o.id, p)
+    outfitByPath.set(p, o)
   }
 }
 

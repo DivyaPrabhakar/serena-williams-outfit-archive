@@ -17,6 +17,9 @@ export function rowToOutfit(r) {
     notes:       r.notes       ?? null,
     focal_point: r.focal_point ?? 'center',
     brand:       r.brand       ?? null,
+    // Persisted URL disambiguator — see slugs.js. Assigned server-side only
+    // (netlify/functions/outfits.js), never sent from the client.
+    slugSuffix:  r.slug_suffix ?? null,
   }
 }
 

@@ -97,6 +97,33 @@ function unauthorized() {
   };
 }
 
+// Outfits sharing the same tournament/year/discipline/round get a stable,
+// persisted `slug_suffix` (null = no suffix, i.e. the bare URL; N = renders as
+// "-N") assigned once at creation, instead of being recomputed by position on
+// every build. See src/lib/slugs.js for why: recomputing by position meant
+// adding/editing/deleting any outfit in a group reshuffled every other
+// outfit's URL, which is what caused the Search Console 404 / duplicate-
+// canonical reports this migration fixes.
+//
+// excludeId lets a PATCH that changes group membership recompute its own
+// suffix without counting its own (about-to-be-overwritten) row.
+async function assignSlugSuffix({ tournament, year, discipline, round }, excludeId) {
+  const qp = new URLSearchParams({
+    select: 'slug_suffix',
+    tournament: `eq.${tournament}`,
+    year: `eq.${year}`,
+    discipline: `eq.${discipline}`,
+  });
+  qp.set('round', round == null ? 'is.null' : `eq.${round}`);
+  if (excludeId) qp.set('id', `neq.${excludeId}`);
+  const res = await sbFetch(`outfits?${qp.toString()}`, { adminWrite: true });
+  let rows = [];
+  try { rows = JSON.parse(res.body || '[]'); } catch (_) {}
+  if (rows.length === 0) return null;
+  const maxOccupied = Math.max(...rows.map((r) => r.slug_suffix ?? 1));
+  return maxOccupied + 1;
+}
+
 async function sbFetch(path, opts = {}) {
   const key = opts.adminWrite ? SB_SERVICE_KEY : SB_KEY;
   const res = await fetch(`${SB_URL}/rest/v1/${path}`, {
@@ -156,7 +183,26 @@ export const handler = async (event) => {
     } else if (method === 'POST') {
       const body = JSON.parse(event.body || '[]');
       const isBulk = Array.isArray(body);
-      const payload = isBulk ? body : { focal_point: 'center', ...body };
+      let payload;
+      if (isBulk) {
+        // Assign suffixes within the batch too, so two new rows landing in the
+        // same group in one bulk call don't collide with each other.
+        const batchCounts = new Map();
+        payload = [];
+        for (const row of body) {
+          const group = { tournament: row.tournament, year: row.year, discipline: row.discipline ?? 'Singles', round: row.round ?? null };
+          const key = JSON.stringify(group);
+          const dbNext = await assignSlugSuffix(group);
+          const batchNext = batchCounts.get(key);
+          const slug_suffix = batchNext != null ? batchNext + 1 : dbNext;
+          batchCounts.set(key, slug_suffix ?? 1);
+          payload.push({ ...row, slug_suffix });
+        }
+      } else {
+        const group = { tournament: body.tournament, year: body.year, discipline: body.discipline ?? 'Singles', round: body.round ?? null };
+        const slug_suffix = await assignSlugSuffix(group);
+        payload = { focal_point: 'center', ...body, slug_suffix };
+      }
       result = await sbFetch('outfits', {
         method: 'POST',
         prefer: isBulk ? 'resolution=ignore-duplicates' : 'return=representation',
@@ -168,6 +214,21 @@ export const handler = async (event) => {
       const id = params.id;
       if (!id) return { statusCode: 400, headers: CORS, body: JSON.stringify({ error: 'Missing id' }) };
       const patchBody = JSON.parse(event.body || '{}');
+      // Only recompute slug_suffix when a field that affects group membership
+      // is actually changing — most edits (colors, notes, brand, ...) leave the
+      // outfit's URL untouched.
+      const groupFields = ['tournament', 'year', 'discipline', 'round'];
+      if (groupFields.some((f) => f in patchBody)) {
+        const currentRes = await sbFetch(`outfits?id=eq.${encodeURIComponent(id)}&select=tournament,year,discipline,round`, { adminWrite: true });
+        const [current] = JSON.parse(currentRes.body || '[]');
+        const group = {
+          tournament: patchBody.tournament ?? current?.tournament,
+          year: patchBody.year ?? current?.year,
+          discipline: patchBody.discipline ?? current?.discipline ?? 'Singles',
+          round: 'round' in patchBody ? patchBody.round ?? null : current?.round ?? null,
+        };
+        patchBody.slug_suffix = await assignSlugSuffix(group, id);
+      }
       result = await sbFetch(`outfits?id=eq.${encodeURIComponent(id)}`, {
         method: 'PATCH',
         prefer: 'return=representation',
