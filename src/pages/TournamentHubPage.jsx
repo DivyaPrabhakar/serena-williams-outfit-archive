@@ -35,7 +35,7 @@ export default function TournamentHubPage() {
         {/* Years rail — laid out like the homepage jump-to-section panel, but each
             entry links to that year's dedicated page. */}
         <aside className="hidden lg:block lg:w-48 flex-shrink-0">
-          <div className="sticky top-28">
+          <div className="sticky top-[var(--nav-h)]">
             <h2 className="font-playfair text-brand text-sm px-4 py-4 border-b-2 border-white">Years</h2>
             <nav className="py-2">
               {years.map((y) => (

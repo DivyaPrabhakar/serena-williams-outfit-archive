@@ -32,6 +32,12 @@
      so scrolling cards don't show through while pinned, tinted just enough to
      read as "on brand" rather than flat page background. */
   --color-sticky-bg: color-mix(in srgb, var(--color-brand) 10%, var(--color-dark));
+
+  /* Fixed header nav height. Nav.jsx's own height, every sticky panel's top
+     offset, the sticky group header pin line, and the left jump-nav's
+     scroll-spy offset all read this one variable so they stay aligned to the
+     nav without each hardcoding "112px" independently. */
+  --nav-h: 112px;
 }
 
 body {

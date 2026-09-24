@@ -215,7 +215,7 @@ export default function ViewerPage() {
       {slotEl && createPortal(controls, slotEl)}
 
       {/* Mobile: header slot is hidden, so render controls in normal flow */}
-      <div className="lg:hidden sticky top-28 z-30 bg-dark border-b-2 border-white px-3 py-3 flex justify-center">
+      <div className="lg:hidden sticky top-[var(--nav-h)] z-30 bg-dark border-b-2 border-white px-3 py-3 flex justify-center">
         {controls}
       </div>
 

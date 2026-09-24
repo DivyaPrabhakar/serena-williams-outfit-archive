@@ -8,7 +8,7 @@ export default function Nav() {
   const [menuOpen, setMenuOpen] = useState(false)
 
   return (
-    <nav className="sticky top-0 z-40 bg-dark border-b-2 border-white px-6 h-28 flex items-start justify-between relative pt-6">
+    <nav className="sticky top-0 z-40 bg-dark border-b-2 border-white px-6 h-[var(--nav-h)] flex items-start justify-between relative pt-6">
       <Link to="/" className="flex flex-col items-start flex-shrink-0 hover:opacity-80 transition-opacity">
         <span className="font-[family-name:var(--font-bebas)] text-2xl sm:text-4xl text-brand tracking-wide leading-none">Serena Williams Fit-dex</span>
         <span className="font-[family-name:var(--font-sans)] text-[22px] italic text-muted hidden sm:inline leading-none mt-0.5">Gotta Find 'Em All</span>
@@ -52,7 +52,7 @@ function MobileNavDrawer({ onClose }) {
   return (
     <>
       <div className="md:hidden fixed inset-0 z-40 bg-black/50" onClick={onClose} />
-      <div className="md:hidden fixed right-0 top-28 bottom-0 z-[45] w-full sm:w-72 bg-dark2 border-l-2 border-white shadow-2xl flex flex-col">
+      <div className="md:hidden fixed right-0 top-[var(--nav-h)] bottom-0 z-[45] w-full sm:w-72 bg-dark2 border-l-2 border-white shadow-2xl flex flex-col">
         <PanelHeader title="Menu" onClose={onClose} />
         <nav className="flex flex-col px-5 py-5 gap-2">
           <Link

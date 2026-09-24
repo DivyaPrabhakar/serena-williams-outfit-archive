@@ -3,9 +3,13 @@ import { useGroupNav } from './groupNavStore'
 import PanelHeader from '../filters/PanelHeader'
 import AnchorListItem from '../filters/AnchorListItem'
 
-// Pin line where sticky group headers come to rest, in px — matches the
-// `md:top-28` (h-28 nav) used by StickyGroupHeader.
-const PIN_OFFSET = 112
+// Pin line where sticky group headers come to rest, in px — reads the same
+// --nav-h custom property (index.css) that the nav bar's own height and every
+// sticky panel's top offset are pinned to, so this never drifts out of sync.
+function getPinOffset() {
+  const raw = getComputedStyle(document.documentElement).getPropertyValue('--nav-h')
+  return parseFloat(raw) || 112
+}
 
 // Plural noun describing what the current grouping lists, shown in the rail
 // header and on the collapsed handle so it's clear what's behind it.
@@ -29,12 +33,14 @@ export default function GroupNav({ groupBy, collapsed, onToggle }) {
   useEffect(() => {
     if (sections.length === 0) return
 
+    const pinOffset = getPinOffset()
+
     function compute() {
       tickRef.current = false
       let active = sections[0].id
       for (const s of sections) {
         if (!s.el) continue
-        if (s.el.getBoundingClientRect().top - PIN_OFFSET <= 1) active = s.id
+        if (s.el.getBoundingClientRect().top - pinOffset <= 1) active = s.id
         else break
       }
       setActiveId(active)
@@ -76,7 +82,7 @@ export default function GroupNav({ groupBy, collapsed, onToggle }) {
         onClick={onToggle}
         title={`Jump to a ${noun.toLowerCase().replace(/s$/, '')}`}
         aria-label={`Expand ${noun} navigation`}
-        className="hidden lg:flex fixed left-0 top-28 z-30 flex-col items-center gap-2 py-4 px-1.5 bg-dark border-r-2 border-t-2 border-white rounded-tr rounded-br text-muted hover:bg-brand/15 hover:text-brand transition-colors"
+        className="hidden lg:flex fixed left-0 top-[var(--nav-h)] z-30 flex-col items-center gap-2 py-4 px-1.5 bg-dark border-r-2 border-t-2 border-white rounded-tr rounded-br text-muted hover:bg-brand/15 hover:text-brand transition-colors"
       >
         <span aria-hidden className="text-sm leading-none">›</span>
         <span
@@ -90,7 +96,7 @@ export default function GroupNav({ groupBy, collapsed, onToggle }) {
   }
 
   return (
-    <aside className="hidden lg:flex fixed left-0 top-28 bottom-0 z-30 w-52 flex-col bg-dark border-r-2 border-white">
+    <aside className="hidden lg:flex fixed left-0 top-[var(--nav-h)] bottom-0 z-30 w-52 flex-col bg-dark border-r-2 border-white">
       <PanelHeader
         title={noun}
         onClose={onToggle}
