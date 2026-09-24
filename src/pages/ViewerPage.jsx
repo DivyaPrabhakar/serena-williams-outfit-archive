@@ -218,7 +218,7 @@ export default function ViewerPage() {
       {/* Desktop-only left jump-nav populated by the rendered group headers */}
       <GroupNav groupBy={groupBy} collapsed={navCollapsed} onToggle={toggleNavCollapsed} />
 
-      <main className="px-12 pt-10 pb-24 max-w-[1600px] mx-auto">
+      <main className="px-12 pb-24 max-w-[1600px] mx-auto">
         {loading && (
           <div className="flex items-center justify-center py-32 text-muted text-sm">
             Loading…
