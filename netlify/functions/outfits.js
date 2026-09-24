@@ -13,6 +13,14 @@ const CORS = {
   'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, OPTIONS',
 };
 
+const JSON_HEADERS = { ...CORS, 'Content-Type': 'application/json' };
+
+// Every JSON response the handler returns goes through here so none of them
+// can accidentally drop the CORS or Content-Type headers.
+function json(statusCode, body) {
+  return { statusCode, headers: JSON_HEADERS, body: JSON.stringify(body) };
+}
+
 // Rebuild strategy: writes don't trigger a build directly. Instead each
 // successful write marks the site "dirty" (bumps pending_count + last_change_at
 // on the single-row `build_state` table). A separate hourly scheduled function
@@ -90,11 +98,7 @@ async function fireBuildNow({ onlyIfPending = false } = {}) {
 }
 
 function unauthorized() {
-  return {
-    statusCode: 401,
-    headers: { ...CORS, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ error: 'Unauthorized' }),
-  };
+  return json(401, { error: 'Unauthorized' });
 }
 
 // Outfits sharing the same tournament/year/discipline/round get a stable,
@@ -161,17 +165,17 @@ export const handler = async (event) => {
       let body = {};
       try { body = JSON.parse(event.body || '{}'); } catch { /* malformed body, treat as {} */ }
       if (body._authCheck) {
-        return { statusCode: 200, headers: { ...CORS, 'Content-Type': 'application/json' }, body: JSON.stringify({ ok: true }) };
+        return json(200, { ok: true });
       }
       // Admin rebuild-status panel: current pending count + last build time.
       if (body._buildStatus) {
         const status = await getBuildStatus();
-        return { statusCode: 200, headers: { ...CORS, 'Content-Type': 'application/json' }, body: JSON.stringify(status) };
+        return json(200, status);
       }
       // Admin "Rebuild now" button (always) or tab-close auto-flush (ifPending).
       if (body._triggerRebuild) {
         const out = await fireBuildNow({ onlyIfPending: !!body.ifPending });
-        return { statusCode: 200, headers: { ...CORS, 'Content-Type': 'application/json' }, body: JSON.stringify(out) };
+        return json(200, out);
       }
     }
 
@@ -212,7 +216,7 @@ export const handler = async (event) => {
 
     } else if (method === 'PATCH') {
       const id = params.id;
-      if (!id) return { statusCode: 400, headers: CORS, body: JSON.stringify({ error: 'Missing id' }) };
+      if (!id) return json(400, { error: 'Missing id' });
       const patchBody = JSON.parse(event.body || '{}');
       // Only recompute slug_suffix when a field that affects group membership
       // is actually changing — most edits (colors, notes, brand, ...) leave the
@@ -238,14 +242,14 @@ export const handler = async (event) => {
 
     } else if (method === 'DELETE') {
       const id = params.id;
-      if (!id) return { statusCode: 400, headers: CORS, body: JSON.stringify({ error: 'Missing id' }) };
+      if (!id) return json(400, { error: 'Missing id' });
       result = await sbFetch(`outfits?id=eq.${encodeURIComponent(id)}`, {
         method: 'DELETE',
         adminWrite: true,
       });
 
     } else {
-      return { statusCode: 405, headers: CORS, body: JSON.stringify({ error: 'Method not allowed' }) };
+      return json(405, { error: 'Method not allowed' });
     }
 
     // Mark the site dirty when a write succeeded — the hourly scheduled function
@@ -254,18 +258,16 @@ export const handler = async (event) => {
       await recordChange();
     }
 
+    // result.body is already a serialized JSON string from Supabase — pass it
+    // through as-is rather than going through json(), which would re-encode it.
     return {
       statusCode: result.status,
-      headers: { ...CORS, 'Content-Type': 'application/json' },
+      headers: JSON_HEADERS,
       body: result.body || '{}',
     };
 
   } catch (err) {
     console.error('Function error:', err);
-    return {
-      statusCode: 500,
-      headers: { ...CORS, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: err.message }),
-    };
+    return json(500, { error: err.message });
   }
 };
