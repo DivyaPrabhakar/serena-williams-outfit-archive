@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
-import { GRAND_SLAMS, OLYMPICS_YEARS, ROUND_SEQUENCE } from '../lib/constants'
+import { GRAND_SLAMS, ROUND_SEQUENCE } from '../lib/constants'
 import { getValidRounds, getRoundsForSlot, getSlotStatus, getRoundNumber, hasSlotMetadata } from '../lib/rounds'
 import { isBlockedUrl } from '../lib/imageUtils'
 

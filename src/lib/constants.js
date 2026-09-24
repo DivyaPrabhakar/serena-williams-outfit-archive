@@ -1,6 +1,5 @@
 // ── Core tournament / year constants ─────────────────────────────────────
 export const GRAND_SLAMS = ['Australian Open', 'Roland Garros', 'Wimbledon', 'US Open']
-export const ALL_TOURNAMENTS = [...GRAND_SLAMS, 'Olympics']
 export const OLYMPICS_YEARS = new Set([1996, 2000, 2004, 2008, 2012, 2016, 2020, 2021])
 export const ACTIVE_YEARS = Array.from({ length: 2022 - 1995 + 1 }, (_, i) => 1995 + i)
 
