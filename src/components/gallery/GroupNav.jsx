@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useGroupNav } from './GroupNavContext'
+import { useGroupNav } from './groupNavStore'
 import PanelHeader from '../filters/PanelHeader'
 import AnchorListItem from '../filters/AnchorListItem'
 

@@ -8,7 +8,7 @@ import { readStorage, writeStorage } from "../lib/storage";
 import { useSettings } from "../hooks/useSettings";
 import { useMissingOutfits } from "../hooks/useMissingOutfits";
 import { useIsMobile } from "../hooks/useIsMobile";
-import { HeaderSlotContext } from "../components/layout/HeaderSlot";
+import { HeaderSlotContext } from "../components/layout/headerSlotContext";
 import Seo from "../lib/seo";
 import { personRef } from "../lib/schema";
 import { absoluteUrl } from "../lib/siteUrl";

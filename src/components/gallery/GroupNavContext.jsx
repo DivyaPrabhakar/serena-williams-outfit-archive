@@ -1,12 +1,5 @@
-import { createContext, useCallback, useContext, useMemo, useState } from 'react'
-
-// Registry that each rendered StickyGroupHeader registers itself into. The
-// GroupNav rail reads the ordered section list from here so the left jump-nav
-// always reflects exactly what was rendered, for every grouping mode.
-const GroupNavContext = createContext({
-  register: () => () => {},
-  sections: [],
-})
+import { useCallback, useMemo, useState } from 'react'
+import { GroupNavContext } from './groupNavStore'
 
 export function GroupNavProvider({ children }) {
   const [entries, setEntries] = useState([])
@@ -33,9 +26,3 @@ export function GroupNavProvider({ children }) {
 
   return <GroupNavContext.Provider value={value}>{children}</GroupNavContext.Provider>
 }
-
-export function useGroupNav() {
-  return useContext(GroupNavContext)
-}
-
-export default GroupNavContext

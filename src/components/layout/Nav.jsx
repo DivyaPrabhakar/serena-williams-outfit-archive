@@ -1,6 +1,6 @@
 import { useContext, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { HeaderSlotContext } from './HeaderSlot'
+import { HeaderSlotContext } from './headerSlotContext'
 import PanelHeader from '../filters/PanelHeader'
 
 export default function Nav() {
