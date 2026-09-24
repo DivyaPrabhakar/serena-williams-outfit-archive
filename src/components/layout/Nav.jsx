@@ -7,20 +7,20 @@ export default function Nav() {
   const [menuOpen, setMenuOpen] = useState(false)
 
   return (
-    <nav className="sticky top-0 z-40 bg-dark border-b-2 border-white px-6 h-28 flex items-center justify-between relative">
+    <nav className="sticky top-0 z-40 bg-dark border-b-2 border-white px-6 h-28 flex items-start justify-between relative pt-6">
       <Link to="/" className="flex flex-col items-start flex-shrink-0 hover:opacity-80 transition-opacity">
         <span className="font-[family-name:var(--font-bebas)] text-2xl sm:text-4xl text-brand tracking-wide leading-none">Serena Williams Fit-dex</span>
-        <span className="font-[family-name:var(--font-cormorant)] text-lg italic text-muted hidden sm:inline leading-none mt-0.5">Gotta Find 'Em All</span>
+        <span className="font-[family-name:var(--font-sans)] text-[22px] italic text-muted hidden sm:inline leading-none mt-0.5">Gotta Find 'Em All</span>
       </Link>
 
       {/* Centered control slot — filled by ViewerPage via portal */}
       <div
         ref={setSlotEl}
-        className="hidden lg:flex flex-1 items-center justify-center gap-2"
+        className="hidden lg:flex flex-1 items-start justify-center gap-2"
       />
 
       {/* Desktop: inline nav links */}
-      <div className="hidden md:flex items-center gap-6">
+      <div className="hidden md:flex items-start gap-6">
         <Link to="/stats" className="text-base text-muted hover:text-ink transition-colors">Stats</Link>
         <Link to="/about" className="text-base text-muted hover:text-ink transition-colors">About</Link>
       </div>
@@ -28,7 +28,7 @@ export default function Nav() {
       {/* Mobile: hamburger toggles a slide-in drawer */}
       <button
         onClick={() => setMenuOpen(true)}
-        className="md:hidden flex items-center justify-center p-2 -mr-2 text-ink hover:text-brand transition-colors"
+        className="md:hidden flex items-center justify-center p-2 -mr-2 -mt-2 text-ink hover:text-brand transition-colors"
         aria-label="Open menu"
         aria-expanded={menuOpen}
       >
