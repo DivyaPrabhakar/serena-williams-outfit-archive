@@ -1,16 +1,24 @@
 import { GROUPING_LABELS } from '../../lib/filterUtils'
 import { LAYOUT_LABELS, SIZE_LABELS } from '../../lib/galleryUtils'
 
+// With no `prefix`, renders `value` as a single plain label (e.g. the
+// "N/M outfits found" button); with a `prefix`, renders "prefix: value" with
+// the value picked out in brand color (e.g. "Size: Large").
 function PanelButton({ active, onClick, prefix, value, className = '' }) {
+  const plainTextClass = !prefix ? (active ? 'text-dark' : 'text-muted hover:text-brand') : ''
   return (
     <button
       onClick={onClick}
       className={`px-4 py-2 rounded text-sm font-normal whitespace-nowrap transition-colors ${
         active ? 'bg-brand text-dark hover:bg-brand-light' : 'bg-dark3 hover:bg-brand/15'
-      } ${className}`}
+      } ${plainTextClass} ${className}`}
     >
-      <span className={active ? 'text-dark/60' : 'text-muted'}>{prefix}: </span>
-      <span className={active ? 'text-dark font-medium' : 'text-brand'}>{value}</span>
+      {prefix ? (
+        <>
+          <span className={active ? 'text-dark/60' : 'text-muted'}>{prefix}: </span>
+          <span className={active ? 'text-dark font-medium' : 'text-brand'}>{value}</span>
+        </>
+      ) : value}
     </button>
   )
 }
@@ -26,14 +34,11 @@ export default function FilterBar({
   return (
     <div className="flex flex-wrap sm:flex-nowrap items-center justify-center gap-2">
       {!loading && (
-        <button
+        <PanelButton
+          active={activePanel === 'missing'}
           onClick={() => onTogglePanel('missing')}
-          className={`px-4 py-2 rounded text-sm font-normal whitespace-nowrap transition-colors ${
-            activePanel === 'missing' ? 'bg-brand text-dark hover:bg-brand-light' : 'bg-dark3 text-muted hover:bg-brand/15 hover:text-brand'
-          }`}
-        >
-          {foundCount}/{totalCount} outfits found
-        </button>
+          value={`${foundCount}/${totalCount} outfits found`}
+        />
       )}
       <PanelButton
         active={activePanel === 'grouping'}
