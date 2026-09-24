@@ -16,6 +16,8 @@ import { snapshotOutfits } from "../lib/snapshot";
 import { tournamentPath } from "../lib/slugs";
 import FilterBar from "../components/layout/FilterBar";
 import GroupingPanel from "../components/filters/GroupingPanel";
+import LayoutPanel from "../components/filters/LayoutPanel";
+import SizePanel from "../components/filters/SizePanel";
 import GalleryGrid from "../components/gallery/GalleryGrid";
 import GroupNav from "../components/gallery/GroupNav";
 import { GroupNavProvider } from "../components/gallery/GroupNavContext";
@@ -31,11 +33,13 @@ export default function ViewerPage() {
   const [error, setError] = useState(null);
   const [lightboxIndex, setLightboxIndex] = useState(null);
 
-  const [groupingPanelOpen, setGroupingPanelOpen] = useState(false);
   const { slotEl } = useContext(HeaderSlotContext);
 
-  const [panelOpen, setPanelOpen] = useState(
-    () => readStorage(`serena_hunt_panel_expanded`, "false") === "true",
+  // Every top-bar control (outfits found, grouping, layout, size) opens its own
+  // right-side panel the same way, so at most one is open at a time. Only the
+  // "missing" panel's open state is persisted, matching its prior behavior.
+  const [activePanel, setActivePanel] = useState(
+    () => (readStorage(`serena_hunt_panel_expanded`, "false") === "true" ? "missing" : null),
   );
 
   const [groupBy, setGroupByState] = useState(
@@ -51,7 +55,7 @@ export default function ViewerPage() {
     () => readStorage('serena_gallery_layout', 'vertical'),
   );
 
-  const { settings } = useSettings();
+  const { settings, updateSetting } = useSettings();
 
   // On mobile the Layout toggle is hidden and the gallery always renders
   // stacked, so the user's stored layout only applies on desktop.
@@ -69,18 +73,21 @@ export default function ViewerPage() {
     ? { ...settings, showEmptySlots: false, showDimSlots: false, layout: effectiveLayout }
     : { ...settings, layout: effectiveLayout };
 
-  function togglePanel() {
-    setPanelOpen((prev) => {
-      const next = !prev;
-      if (next) setGroupingPanelOpen(false);
-      writeStorage(`serena_hunt_panel_expanded`, next);
+  function togglePanel(name) {
+    setActivePanel((prev) => {
+      const next = prev === name ? null : name;
+      if (name === "missing" || prev === "missing") {
+        writeStorage(`serena_hunt_panel_expanded`, next === "missing");
+      }
       return next;
     });
   }
 
   function closePanel() {
-    setPanelOpen(false);
-    writeStorage(`serena_hunt_panel_expanded`, false);
+    setActivePanel((prev) => {
+      if (prev === "missing") writeStorage(`serena_hunt_panel_expanded`, false);
+      return null;
+    });
   }
 
   function setGroupBy(value) {
@@ -138,7 +145,7 @@ export default function ViewerPage() {
     if (idx !== -1) setLightboxIndex(idx);
   }
 
-  const anyPanelOpen = panelOpen || groupingPanelOpen;
+  const anyPanelOpen = activePanel !== null;
 
   const homeJsonLd = (() => {
     const seen = new Map();
@@ -180,14 +187,11 @@ export default function ViewerPage() {
       loading={loading}
       foundCount={foundCount}
       totalCount={totalMatches}
-      panelOpen={panelOpen}
-      togglePanel={togglePanel}
-      setPanelOpen={setPanelOpen}
-      groupingPanelOpen={groupingPanelOpen}
-      setGroupingPanelOpen={setGroupingPanelOpen}
+      activePanel={activePanel}
+      onTogglePanel={togglePanel}
       groupBy={groupBy}
       layout={layout}
-      onLayoutChange={setLayout}
+      gridDensity={settings.gridDensity}
     />
   );
 
@@ -249,17 +253,33 @@ export default function ViewerPage() {
         />
       )}
 
-      {groupingPanelOpen && (
+      {activePanel === 'grouping' && (
         <GroupingPanel
           activeGrouping={groupBy}
           onGroupingChange={setGroupBy}
           sortBy={sortBy}
           onSortChange={setSortBy}
-          onClose={() => setGroupingPanelOpen(false)}
+          onClose={closePanel}
         />
       )}
 
-      {panelOpen && (
+      {activePanel === 'layout' && (
+        <LayoutPanel
+          layout={layout}
+          onLayoutChange={setLayout}
+          onClose={closePanel}
+        />
+      )}
+
+      {activePanel === 'size' && (
+        <SizePanel
+          gridDensity={settings.gridDensity}
+          onDensityChange={(d) => updateSetting('gridDensity', d)}
+          onClose={closePanel}
+        />
+      )}
+
+      {activePanel === 'missing' && (
         <MissingPanel
           expandedItems={expandedMissing}
           onHighlight={handleHighlight}

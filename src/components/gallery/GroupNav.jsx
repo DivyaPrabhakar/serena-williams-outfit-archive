@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useGroupNav } from './GroupNavContext'
+import PanelHeader from '../filters/PanelHeader'
+import AnchorListItem from '../filters/AnchorListItem'
 
 // Pin line where sticky group headers come to rest, in px — matches the
 // `md:top-28` (h-28 nav) used by StickyGroupHeader.
@@ -89,34 +91,23 @@ export default function GroupNav({ groupBy, collapsed, onToggle }) {
 
   return (
     <aside className="hidden lg:flex fixed left-0 top-28 bottom-0 z-30 w-52 flex-col bg-dark border-r-2 border-white">
-      <div className="flex items-center justify-between px-4 py-4 border-b-2 border-white flex-shrink-0">
-        <h3 className="font-playfair text-brand text-sm">{noun}</h3>
-        <button
-          onClick={onToggle}
-          className="text-muted hover:bg-brand/15 hover:text-brand rounded text-lg leading-none px-1 transition-colors"
-          aria-label={`Collapse ${noun} navigation`}
-          title="Collapse"
-        >
-          ‹
-        </button>
-      </div>
+      <PanelHeader
+        title={noun}
+        onClose={onToggle}
+        closeLabel="Collapse"
+        closeIcon="‹"
+        closeAriaLabel={`Collapse ${noun} navigation`}
+      />
       <nav className="flex-1 overflow-y-auto py-2">
-        {sections.map(section => {
-          const active = section.id === activeId
-          return (
-            <button
-              key={section.id}
-              onClick={() => jumpTo(section)}
-              className={`w-full text-left px-4 py-2 text-sm truncate transition-colors ${
-                active
-                  ? 'bg-brand/10 text-brand'
-                  : 'text-muted hover:bg-brand/15 hover:text-brand'
-              }`}
-            >
-              {section.label}
-            </button>
-          )
-        })}
+        {sections.map(section => (
+          <AnchorListItem
+            key={section.id}
+            active={section.id === activeId}
+            onClick={() => jumpTo(section)}
+          >
+            {section.label}
+          </AnchorListItem>
+        ))}
       </nav>
     </aside>
   )

@@ -1,10 +1,12 @@
 import { sortTournaments } from '../../lib/filterUtils'
 import { outfitSlotKey } from '../../lib/slots'
+import SidePanel from '../filters/SidePanel'
+import AnchorListItem from '../filters/AnchorListItem'
 
 function TournamentGroup({ name, count, children }) {
   return (
     <div className="mb-4">
-      <p className="text-xs font-medium text-ink mb-1.5">
+      <p className="text-sm font-medium text-ink mb-1.5 px-4">
         {name}
         <span className="text-muted font-normal ml-1.5">({count})</span>
       </p>
@@ -12,18 +14,6 @@ function TournamentGroup({ name, count, children }) {
     </div>
   );
 }
-
-function MissingButton({ label, onClick }) {
-  return (
-    <button
-      onClick={onClick}
-      className="block w-full text-left px-2 py-1 text-xs text-muted hover:text-ink hover:bg-dark3 rounded transition-colors leading-snug"
-    >
-      {label}
-    </button>
-  );
-}
-
 
 function ExpandedContent({ items, onHighlight }) {
   const byTournament = {};
@@ -39,7 +29,7 @@ function ExpandedContent({ items, onHighlight }) {
 
   return (
     <>
-      <p className="text-[10px] text-muted mb-4 flex-shrink-0">
+      <p className="text-sm text-muted mb-4 px-4 flex-shrink-0">
         {total} missing round{total !== 1 ? "s" : ""} across{" "}
         {tournaments.length} tournament{tournaments.length !== 1 ? "s" : ""}
       </p>
@@ -59,15 +49,16 @@ function ExpandedContent({ items, onHighlight }) {
                 );
               return (
                 <div key={d} className="ml-3 mb-2">
-                  <p className="text-[10px] uppercase tracking-widest text-muted/50 mb-1">
+                  <p className="text-sm uppercase tracking-widest text-muted/50 mb-1 px-4">
                     {d}
                   </p>
                   {dItems.map((item) => (
-                    <MissingButton
+                    <AnchorListItem
                       key={outfitSlotKey(item)}
-                      label={`${item.year} · ${item.round}`}
                       onClick={() => onHighlight(item)}
-                    />
+                    >
+                      {item.year} · {item.round}
+                    </AnchorListItem>
                   ))}
                 </div>
               );
@@ -81,28 +72,12 @@ function ExpandedContent({ items, onHighlight }) {
 
 export default function MissingPanel({ expandedItems, onHighlight, onClose }) {
   return (
-    <div className="fixed right-0 top-28 bottom-0 z-[45] w-full sm:w-72 bg-dark2 border-l-2 border-white shadow-2xl flex flex-col">
-      <div className="flex items-center justify-between px-5 py-4 border-b-2 border-white flex-shrink-0">
-        <h3 className="font-playfair text-base text-brand">
-          Outfits yet to find
-        </h3>
-        <button
-          onClick={onClose}
-          className="flex items-center gap-1.5 text-sm font-medium text-ink bg-dark3 hover:bg-brand hover:text-dark rounded px-3 py-1.5 transition-colors"
-          aria-label="Close panel"
-        >
-          <span className="text-lg leading-none">×</span>
-          Close
-        </button>
-      </div>
-
-      <div className="flex-1 overflow-y-auto px-5 py-4">
-        {expandedItems.length === 0 ? (
-          <p className="text-sm text-brand">All rounds documented!</p>
-        ) : (
-          <ExpandedContent items={expandedItems} onHighlight={onHighlight} />
-        )}
-      </div>
-    </div>
+    <SidePanel title="Outfits yet to find" onClose={onClose} bodyClassName="py-4">
+      {expandedItems.length === 0 ? (
+        <p className="text-sm text-brand px-4">All rounds documented!</p>
+      ) : (
+        <ExpandedContent items={expandedItems} onHighlight={onHighlight} />
+      )}
+    </SidePanel>
   );
 }

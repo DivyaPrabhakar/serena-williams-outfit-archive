@@ -3,6 +3,27 @@ import { DISCIPLINES, GRAND_SLAMS, NON_SLAM_ROUNDS_SINGLES, NON_SLAM_ROUNDS_DOUB
 export const CARD_WIDTHS = { small: 88, standard: 128, large: 172 }
 export const SLAM_TOURNAMENTS = new Set([...GRAND_SLAMS, 'Olympics'])
 
+// Single source of truth for the image-size control — shared by SizePanel
+// (the option list) and FilterBar (the "Size: <label>" summary).
+export const SIZE_OPTIONS = [
+  { value: 'small', label: 'Small' },
+  { value: 'standard', label: 'Medium' },
+  { value: 'large', label: 'Large' },
+]
+export const SIZE_LABELS = Object.fromEntries(
+  SIZE_OPTIONS.map(({ value, label }) => [value, label])
+)
+
+// Single source of truth for the grid layout control — shared by LayoutPanel
+// (the option list) and FilterBar (the "Layout: <label>" summary).
+export const LAYOUT_OPTIONS = [
+  { value: 'vertical', label: 'Stacked' },
+  { value: 'horizontal', label: 'Side by side' },
+]
+export const LAYOUT_LABELS = Object.fromEntries(
+  LAYOUT_OPTIONS.map(({ value, label }) => [value, label])
+)
+
 // Canonical outfit order within a tournament/year: by discipline, then round.
 // Shared so every gallery page lists outfits the same way.
 export function sortByDisciplineRound(outfits) {

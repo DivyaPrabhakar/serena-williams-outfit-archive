@@ -1,6 +1,7 @@
 import { useContext, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { HeaderSlotContext } from './HeaderSlot'
+import PanelHeader from '../filters/PanelHeader'
 
 export default function Nav() {
   const { setSlotEl } = useContext(HeaderSlotContext)
@@ -52,29 +53,19 @@ function MobileNavDrawer({ onClose }) {
     <>
       <div className="md:hidden fixed inset-0 z-40 bg-black/50" onClick={onClose} />
       <div className="md:hidden fixed right-0 top-28 bottom-0 z-[45] w-full sm:w-72 bg-dark2 border-l-2 border-white shadow-2xl flex flex-col">
-        <div className="flex items-center justify-between px-5 py-4 border-b-2 border-white flex-shrink-0">
-          <h3 className="font-playfair text-brand text-base">Menu</h3>
-          <button
-            onClick={onClose}
-            className="flex items-center gap-1.5 text-sm font-medium text-ink bg-dark3 hover:bg-brand hover:text-dark rounded px-3 py-1.5 transition-colors"
-            aria-label="Close"
-          >
-            <span className="text-lg leading-none">×</span>
-            Close
-          </button>
-        </div>
+        <PanelHeader title="Menu" onClose={onClose} />
         <nav className="flex flex-col px-5 py-5 gap-2">
           <Link
             to="/stats"
             onClick={onClose}
-            className="w-full text-left px-4 py-3 rounded text-sm font-medium bg-dark3 text-ink hover:text-white transition-colors"
+            className="w-full text-left px-4 py-3 rounded text-sm font-medium bg-dark3 text-ink hover:bg-brand/15 hover:text-brand transition-colors"
           >
             Stats
           </Link>
           <Link
             to="/about"
             onClick={onClose}
-            className="w-full text-left px-4 py-3 rounded text-sm font-medium bg-dark3 text-ink hover:text-white transition-colors"
+            className="w-full text-left px-4 py-3 rounded text-sm font-medium bg-dark3 text-ink hover:bg-brand/15 hover:text-brand transition-colors"
           >
             About
           </Link>
