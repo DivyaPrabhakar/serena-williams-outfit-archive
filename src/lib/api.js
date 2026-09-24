@@ -56,7 +56,7 @@ async function adminFetch(query = '', { method = 'GET', body, adminToken, keepal
 async function assertOk(res, label) {
   if (!res.ok) {
     let detail = ''
-    try { detail = await res.text() } catch {}
+    try { detail = await res.text() } catch { /* body already consumed or unreadable — ignore */ }
     throw new Error(`${label} (${res.status})${detail ? ': ' + detail : ''}`)
   }
 }

@@ -37,7 +37,7 @@ async function getBuildStatus() {
     { adminWrite: true },
   );
   let row = {};
-  try { row = JSON.parse(res.body || '[]')[0] || {}; } catch (_) {}
+  try { row = JSON.parse(res.body || '[]')[0] || {}; } catch { /* malformed body, fall back to {} */ }
   return {
     pendingCount:    row.pending_count ?? 0,
     lastChangeAt:    row.last_change_at ?? null,
@@ -67,7 +67,7 @@ async function fireBuildNow({ onlyIfPending = false } = {}) {
       body: JSON.stringify({ last_triggered_at: new Date().toISOString(), pending_count: 0 }),
     });
     let rows = [];
-    try { rows = JSON.parse(claim.body || '[]'); } catch (_) {}
+    try { rows = JSON.parse(claim.body || '[]'); } catch { /* malformed body, treat as no claim */ }
     if (!Array.isArray(rows) || rows.length === 0) {
       return { ok: true, triggered: false, reason: 'no pending changes' };
     }
@@ -118,7 +118,7 @@ async function assignSlugSuffix({ tournament, year, discipline, round }, exclude
   if (excludeId) qp.set('id', `neq.${excludeId}`);
   const res = await sbFetch(`outfits?${qp.toString()}`, { adminWrite: true });
   let rows = [];
-  try { rows = JSON.parse(res.body || '[]'); } catch (_) {}
+  try { rows = JSON.parse(res.body || '[]'); } catch { /* malformed body, treat as no rows */ }
   if (rows.length === 0) return null;
   const maxOccupied = Math.max(...rows.map((r) => r.slug_suffix ?? 1));
   return maxOccupied + 1;
@@ -159,7 +159,7 @@ export const handler = async (event) => {
     // Auth-check ping — just validate the token, return 200
     if (method === 'POST') {
       let body = {};
-      try { body = JSON.parse(event.body || '{}'); } catch(e) {}
+      try { body = JSON.parse(event.body || '{}'); } catch { /* malformed body, treat as {} */ }
       if (body._authCheck) {
         return { statusCode: 200, headers: { ...CORS, 'Content-Type': 'application/json' }, body: JSON.stringify({ ok: true }) };
       }

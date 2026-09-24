@@ -46,7 +46,7 @@ export const handler = async () => {
     });
 
     let rows = [];
-    try { rows = JSON.parse(claim.body || '[]'); } catch (_) {}
+    try { rows = JSON.parse(claim.body || '[]'); } catch { /* malformed body, treat as no claim */ }
 
     if (!Array.isArray(rows) || rows.length === 0) {
       console.log('rebuild-scheduler: no pending changes — no build triggered.');

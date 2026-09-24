@@ -10,7 +10,7 @@ export function readStorage(key, fallback) {
 export function writeStorage(key, value) {
   try {
     localStorage.setItem(key, String(value))
-  } catch {}
+  } catch { /* private mode, quota exceeded, etc. — ignore */ }
 }
 
 export function readStorageJson(key, fallback) {
@@ -25,5 +25,5 @@ export function readStorageJson(key, fallback) {
 export function writeStorageJson(key, value) {
   try {
     localStorage.setItem(key, JSON.stringify(value))
-  } catch {}
+  } catch { /* private mode, quota exceeded, etc. — ignore */ }
 }
