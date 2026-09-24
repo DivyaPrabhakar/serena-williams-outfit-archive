@@ -1,10 +1,10 @@
-import { CARD_WIDTHS } from '../../lib/galleryUtils'
+import { getCardWidth } from '../../lib/galleryUtils'
 import OutfitCard from './OutfitCard'
 import StickyGroupHeader from './StickyGroupHeader'
 import HeaderSwatches from './HeaderSwatches'
 
 export default function GroupSection({ navId, label, colors, outfits, settings, onOpenLightbox }) {
-  const cardWidth = CARD_WIDTHS[settings.gridDensity] ?? 128
+  const cardWidth = getCardWidth(settings.gridDensity)
 
   return (
     <section className="mb-14">

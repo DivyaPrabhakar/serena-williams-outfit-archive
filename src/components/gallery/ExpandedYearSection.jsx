@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { DISCIPLINES } from '../../lib/constants'
 import { getRoundsForSlot, getSlotStatus, getRoundLabel, getCombinedSlotStatus, getRoundNumbers, hasSlotMetadata } from '../../lib/rounds'
-import { CARD_WIDTHS, isKnownForYear, getYearSubtitle } from '../../lib/galleryUtils'
+import { getCardWidth, isKnownForYear, getYearSubtitle, isStackedLayout } from '../../lib/galleryUtils'
 import { slotKey, slotDomId } from '../../lib/slots'
 import { getSortedColors } from '../../lib/colorUtils'
 import { tournamentPath } from '../../lib/slugs'
@@ -13,7 +13,7 @@ import LinkArrowIcon from '../LinkArrowIcon'
 
 // For tournaments in the participation constants (grand slams + Olympics)
 function ExpandedTournamentBlock({ tournament, year, outfitMap, settings, sortBy, onOpenLightbox }) {
-  const cardWidth = CARD_WIDTHS[settings.gridDensity] ?? 128
+  const cardWidth = getCardWidth(settings.gridDensity)
 
   const disciplineBlocks = DISCIPLINES.flatMap(discipline => {
     const roundCount = getRoundsForSlot(tournament, year, discipline)
@@ -53,7 +53,7 @@ function ExpandedTournamentBlock({ tournament, year, outfitMap, settings, sortBy
     playedBlocks.flatMap(d => d.slots.flatMap(s => s.outfit?.colors ?? []))
   )
 
-  const stacked = settings.hideGetty || settings.layout === 'vertical'
+  const stacked = isStackedLayout(settings)
 
   // Only disciplines with visible content get a column, so the equal-width grid
   // divides evenly across what actually renders (2 disciplines → halves, 3 → thirds).
@@ -132,7 +132,7 @@ function ExpandedTournamentBlock({ tournament, year, outfitMap, settings, sortBy
 
 // For tournaments not in the participation constants — show what's logged, no empty slots
 function UnknownTournamentBlock({ tournament, year, outfits, settings, onOpenLightbox }) {
-  const cardWidth = CARD_WIDTHS[settings.gridDensity] ?? 128
+  const cardWidth = getCardWidth(settings.gridDensity)
 
   if (outfits.length === 0) return null
 
@@ -148,7 +148,7 @@ function UnknownTournamentBlock({ tournament, year, outfits, settings, onOpenLig
 
   const tournamentColors = getSortedColors(outfits.flatMap(o => o.colors ?? []))
 
-  const stacked = settings.hideGetty || settings.layout === 'vertical'
+  const stacked = isStackedLayout(settings)
   const disciplineEntries = Object.entries(byDiscipline)
 
   return (

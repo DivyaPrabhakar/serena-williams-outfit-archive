@@ -3,7 +3,7 @@ import { getSortedColors } from '../../lib/colorUtils'
 import { slotsForYear, getRoundLabel, getRoundNumbers } from '../../lib/rounds'
 import { sortTournaments } from '../../lib/filterUtils'
 import { tournamentHubPath } from '../../lib/slugs'
-import { CARD_WIDTHS, isKnownForYear, groupNavId } from '../../lib/galleryUtils'
+import { getCardWidth, isKnownForYear, groupNavId, isStackedLayout } from '../../lib/galleryUtils'
 import { slotKey, slotDomId, outfitSlotMap } from '../../lib/slots'
 import ExpandedYearSection from './ExpandedYearSection'
 import GroupSection from './GroupSection'
@@ -158,8 +158,8 @@ function GroupedGallery({ outfits, groupBy, sortBy, settings, onOpenLightbox }) 
 
 function TournamentGroupedGallery({ outfits, sortBy, settings, onOpenLightbox }) {
   const outfitMap = outfitSlotMap(outfits)
-  const cardWidth = CARD_WIDTHS[settings.gridDensity] ?? 128
-  const stacked = settings.hideGetty || settings.layout === 'vertical'
+  const cardWidth = getCardWidth(settings.gridDensity)
+  const stacked = isStackedLayout(settings)
 
   const map = {}
   for (const o of outfits) {

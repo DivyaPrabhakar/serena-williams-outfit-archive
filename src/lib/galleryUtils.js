@@ -3,6 +3,19 @@ import { DISCIPLINES, GRAND_SLAMS, NON_SLAM_ROUNDS_SINGLES, NON_SLAM_ROUNDS_DOUB
 export const CARD_WIDTHS = { small: 88, standard: 128, large: 172 }
 export const SLAM_TOURNAMENTS = new Set([...GRAND_SLAMS, 'Olympics'])
 
+// Single place that resolves a gridDensity value to a card width in px, so
+// call sites don't each hardcode their own "standard" fallback.
+export function getCardWidth(density) {
+  return CARD_WIDTHS[density] ?? CARD_WIDTHS.standard
+}
+
+// Cards render stacked (one discipline column at a time) instead of side by
+// side both in the Getty-hidden screenshot view and when the user's chosen
+// layout is 'vertical'.
+export function isStackedLayout(settings) {
+  return settings.hideGetty || settings.layout === 'vertical'
+}
+
 // Single source of truth for the image-size control — shared by SizePanel
 // (the option list) and FilterBar (the "Size: <label>" summary).
 export const SIZE_OPTIONS = [
