@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useGroupNav } from './GroupNavContext'
+import { useGroupNav } from './groupNavStore'
+import LinkArrowIcon from '../LinkArrowIcon'
 
 // Top-level group header (Year / Color / Brand / Tournament) that pins below the
 // nav while its section is scrolled. When pinned ("stuck") it collapses into a slim
@@ -60,7 +61,13 @@ export default function StickyGroupHeader({ id, label, swatches, title, titleHre
         <div className="flex flex-wrap items-center gap-x-3 gap-y-3">
           <h2 className="w-full font-sans text-5xl text-ink leading-none transition-all duration-200 group-data-[stuck=true]/sticky:w-auto group-data-[stuck=true]/sticky:text-2xl">
             {titleHref ? (
-              <Link to={titleHref} className="hover:text-brand hover:underline underline-offset-4 transition-colors">{title}</Link>
+              <Link
+                to={titleHref}
+                className="inline-flex items-center gap-2 underline decoration-2 underline-offset-4 hover:text-brand transition-colors"
+              >
+                {title}
+                <LinkArrowIcon />
+              </Link>
             ) : (
               title
             )}

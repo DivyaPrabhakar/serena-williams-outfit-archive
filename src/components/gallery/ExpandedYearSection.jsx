@@ -9,6 +9,7 @@ import DisciplineBlock from './DisciplineBlock'
 import StickyGroupHeader from './StickyGroupHeader'
 import HeaderSwatches from './HeaderSwatches'
 import ColorSwatch from '../ColorSwatch'
+import LinkArrowIcon from '../LinkArrowIcon'
 
 // For tournaments in the participation constants (grand slams + Olympics)
 function ExpandedTournamentBlock({ tournament, year, outfitMap, settings, sortBy, onOpenLightbox }) {
@@ -65,7 +66,10 @@ function ExpandedTournamentBlock({ tournament, year, outfitMap, settings, sortBy
       <div className="flex items-center gap-2 mb-4 flex-wrap">
         <span className="w-0.5 h-4 bg-brand flex-shrink-0 rounded-full" />
         <Link to={tournamentPath(tournament, year)} className="flex items-center gap-2 flex-wrap hover:opacity-80 transition-opacity">
-          <span className="text-base uppercase tracking-widest text-brand font-medium">{tournament}</span>
+          <span className="inline-flex items-center gap-1 text-base uppercase tracking-widest text-brand font-medium underline decoration-2 underline-offset-4">
+            {tournament}
+            <LinkArrowIcon />
+          </span>
           {!settings.hideGetty && <span className="text-xs uppercase tracking-widest text-brand/60">{year} · {stats}</span>}
         </Link>
         {tournamentColors.length > 0 && (
@@ -152,7 +156,10 @@ function UnknownTournamentBlock({ tournament, year, outfits, settings, onOpenLig
       <div className="flex items-center gap-2 mb-4 flex-wrap">
         <span className="w-0.5 h-4 bg-brand flex-shrink-0 rounded-full" />
         <Link to={tournamentPath(tournament, year)} className="flex items-center gap-2 flex-wrap hover:opacity-80 transition-opacity">
-          <span className="text-base uppercase tracking-widest text-brand font-medium">{tournament}</span>
+          <span className="inline-flex items-center gap-1 text-base uppercase tracking-widest text-brand font-medium underline decoration-2 underline-offset-4">
+            {tournament}
+            <LinkArrowIcon />
+          </span>
           {!settings.hideGetty && <span className="text-xs uppercase tracking-widest text-brand/60">{year} · {stats}</span>}
         </Link>
         {tournamentColors.length > 0 && (
